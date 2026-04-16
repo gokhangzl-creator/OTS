@@ -575,6 +575,47 @@ tr:hover td { background:#f8fafc; }
   /* iOS safe area */
   .main-content, .topbar-main { padding-bottom: env(safe-area-inset-bottom, 20px) !important; }
 }
+
+  /* iOS PWA yükseklik fix */
+  html, body {
+    height: 100% !important;
+    min-height: -webkit-fill-available !important;
+  }
+  #login-screen {
+    min-height: 100vh !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  #all-panels {
+    min-height: 100vh !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+  }
+  .panel {
+    min-height: 100vh !important;
+    min-height: calc(var(--vh, 1vh) * 100) !important;
+    width: 100% !important;
+  }
+  .main-content {
+    min-height: calc(var(--vh, 1vh) * 100 - 60px) !important;
+  }
+  .topbar-main {
+    min-height: calc(var(--vh, 1vh) * 100 - 60px) !important;
+  }
+
+
+@media all and (display-mode: standalone) {
+  .topbar {
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    height: calc(60px + env(safe-area-inset-top, 0px)) !important;
+  }
+  .main-content {
+    padding-top: calc(64px + env(safe-area-inset-top, 0px)) !important;
+  }
+  .topbar-main {
+    margin-top: calc(60px + env(safe-area-inset-top, 0px)) !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1112,6 +1153,7 @@ async function doLogin() {
 
 function routeByRole(user) {
   document.querySelectorAll('.panel').forEach(p => p.style.display='none');
+  window.scrollTo(0, 0);
   const role = user.role;
 
   if (role === 'admin') {
@@ -1746,6 +1788,18 @@ document.addEventListener('click', function(e) {
     if (overlay) overlay.classList.remove('open');
     if (btn) btn.innerHTML = '☰';
   }
+});
+
+
+// ── iOS PWA FİX ──
+function setIOSHeight() {
+  var vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', vh + 'px');
+}
+setIOSHeight();
+window.addEventListener('resize', setIOSHeight);
+window.addEventListener('orientationchange', function() {
+  setTimeout(setIOSHeight, 300);
 });
 
 </script>
