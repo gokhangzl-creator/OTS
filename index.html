@@ -1692,7 +1692,7 @@ function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-async function doLogin() {
+window.doLogin = async function() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value.trim();
   const errEl = document.getElementById('login-error');
@@ -1729,7 +1729,7 @@ function showOTPScreen() {
   document.getElementById('otp-input').focus();
 }
 
-async function verifyOTP() {
+window.verifyOTP = async function() {
   const entered = document.getElementById('otp-input').value.trim();
   const errEl = document.getElementById('otp-error');
   errEl.style.display = 'none';
@@ -1744,13 +1744,13 @@ async function verifyOTP() {
   routeByRole(currentUser);
 }
 
-function backToLogin() {
+window.backToLogin = function() {
   document.getElementById('otp-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   otpCode = null; otpUser = null;
 }
 
-async function resendOTP() {
+window.resendOTP = async function() {
   if (!otpUser) return;
   otpCode = generateOTP();
   otpExpiry = Date.now() + 5 * 60 * 1000;
@@ -1787,17 +1787,17 @@ async function sendApprovalNotification(toEmail, toName, pendingCount, pendingAm
 }
 
 // ── ŞİFRE DEĞİŞTİRME ──
-function openChangePassword() {
+window.openChangePassword = function() {
   document.getElementById('change-pass-modal').classList.add('open');
   document.getElementById('cp-current').value = '';
   document.getElementById('cp-new').value = '';
   document.getElementById('cp-confirm').value = '';
   document.getElementById('cp-error').style.display = 'none';
 }
-function closeChangePassword() {
+window.closeChangePassword = function() {
   document.getElementById('change-pass-modal').classList.remove('open');
 }
-async function saveNewPassword() {
+window.saveNewPassword = async function() {
   const current = document.getElementById('cp-current').value.trim();
   const newPass = document.getElementById('cp-new').value.trim();
   const confirm = document.getElementById('cp-confirm').value.trim();
@@ -1876,7 +1876,7 @@ function showRejectionNotification(message) {
 }
 
 
-function exportCurrentTable(name) {
+window.exportCurrentTable = function(name) {
   // Aktif paneldeki tabloyu bul
   const activePanel = document.querySelector('.panel.active');
   if (!activePanel) { showToast('Panel bulunamadı', 'error'); return; }
@@ -1896,7 +1896,7 @@ let resetCode = null;
 let resetExpiry = null;
 let resetUserId = null;
 
-function showForgotScreen() {
+window.showForgotScreen = function() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('forgot-screen').style.display = 'flex';
   document.getElementById('forgot-step1').style.display = 'block';
@@ -1905,13 +1905,13 @@ function showForgotScreen() {
   document.getElementById('forgot-error1').style.display = 'none';
 }
 
-function backToLoginFromForgot() {
+window.backToLoginFromForgot = function() {
   document.getElementById('forgot-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   resetCode = null; resetUserId = null;
 }
 
-async function sendResetCode() {
+window.sendResetCode = async function() {
   const email = document.getElementById('forgot-email').value.trim();
   const errEl = document.getElementById('forgot-error1');
   errEl.style.display = 'none';
@@ -1974,68 +1974,14 @@ async function resetPassword() {
 
 
 // ── ŞİFREMİ UNUTTUM ──
-let resetCode = null;
-let resetExpiry = null;
-let resetUserId = null;
 
-function showForgotScreen() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('forgot-screen').style.display = 'flex';
-  document.getElementById('forgot-step1').style.display = 'block';
-  document.getElementById('forgot-step2').style.display = 'none';
-  document.getElementById('forgot-email').value = '';
-  document.getElementById('forgot-error1').style.display = 'none';
-}
 
-function backToLoginFromForgot() {
-  document.getElementById('forgot-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  resetCode = null; resetUserId = null;
-}
 
-async function sendResetCode() {
-  const email = document.getElementById('forgot-email').value.trim();
-  const errEl = document.getElementById('forgot-error1');
-  errEl.style.display = 'none';
-  if (!email) { errEl.textContent = 'E-posta adresinizi girin.'; errEl.style.display='block'; return; }
-  
-  const btn = document.getElementById('forgot-send-btn');
-  btn.innerHTML = '<span class="spinner"></span> Gönderiliyor...'; btn.disabled = true;
-  
-  // Kullanıcıyı bul
-  const { data, error } = await db.from('users').select('id,name,email').eq('email', email).single();
-  btn.innerHTML = 'Kod Gönder →'; btn.disabled = false;
-  
-  if (error || !data) {
-    errEl.textContent = 'Bu e-posta adresi sistemde kayıtlı değil.';
-    errEl.style.display = 'block';
-    return;
-  }
-  
-  // Kod oluştur ve gönder
-  resetCode = generateOTP();
-  resetExpiry = Date.now() + 5 * 60 * 1000;
-  resetUserId = data.id;
-  
-  try {
-    await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
-      to_email: data.email,
-      to_name: data.name,
-      otp_code: resetCode
-    });
-  } catch(e) { console.warn('Mail gönderilemedi:', e); }
-  
-  // Adım 2'ye geç
-  document.getElementById('forgot-step1').style.display = 'none';
-  document.getElementById('forgot-step2').style.display = 'block';
-  document.getElementById('forgot-email-hint').textContent = email;
-  document.getElementById('forgot-code').value = '';
-  document.getElementById('forgot-newpass').value = '';
-  document.getElementById('forgot-confirm').value = '';
-  document.getElementById('forgot-error2').style.display = 'none';
-}
 
-async function confirmResetPassword() {
+
+
+
+window.confirmResetPassword = async function() {
   const code = document.getElementById('forgot-code').value.trim();
   const newPass = document.getElementById('forgot-newpass').value.trim();
   const confirm = document.getElementById('forgot-confirm').value.trim();
