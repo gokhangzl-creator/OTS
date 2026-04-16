@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Geçiş Testi</title>
+<style>
+body { font-family: sans-serif; margin: 0; background: #f0f2f5; }
+
+/* Orijinal panel CSS */
+.panel { 
+  display: block !important; 
+  visibility: hidden; 
+  position: absolute; 
+  pointer-events: none;
+  width: 100%;
+  min-height: 100vh;
+}
+.panel.active { 
+  visibility: visible !important; 
+  position: relative !important; 
+  pointer-events: all !important;
+}
+
+#all-panels { display:block; min-height:100vh; visibility:hidden; }
+#login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1e3a8a,#1d4ed8); }
+.login-card { background:white; padding:40px; border-radius:16px; width:360px; }
+.login-card h1 { margin-bottom:20px; color:#111; }
+.login-card input { width:100%; padding:10px; margin-bottom:12px; border:1px solid #ddd; border-radius:8px; font-size:14px; box-sizing:border-box; }
+.login-card button { width:100%; padding:12px; background:#1d4ed8; color:white; border:none; border-radius:8px; font-size:14px; cursor:pointer; }
+
+.panel-content { padding:40px; }
+.panel-content h1 { font-size:24px; font-weight:700; }
+.panel-content p { color:#666; margin-top:8px; }
+.panel-label { display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700; margin-top:12px; }
+
+.topbar { position:fixed; top:0; left:0; right:0; height:60px; background:white; border-bottom:3px solid #1d4ed8; display:flex; align-items:center; padding:0 24px; justify-content:space-between; z-index:100; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.topbar h2 { font-size:15px; font-weight:700; }
+.topbar button { padding:6px 14px; border:1px solid #ddd; border-radius:7px; background:white; cursor:pointer; font-size:12px; }
+.topbar button:hover { border-color:#ef4444; color:#ef4444; }
+.content { margin-top:80px; padding:28px; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>🏦 Ödeme Takip</h1>
+    <select id="test-role" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+      <option value="admin">Admin</option>
+      <option value="finans">Finans</option>
+      <option value="departman">Departman</option>
+      <option value="muhasebe_muduru">Muhasebe Müdürü</option>
+      <option value="direktor">Direktör</option>
+      <option value="gm">Genel Müdür</option>
+    </select>
+    <button onclick="testLogin()">Giriş Yap (Test)</button>
+  </div>
+</div>
+
+<!-- TÜM PANELLER -->
+<div id="all-panels">
+
+  <div class="panel" id="panel-admin">
+    <div class="topbar"><h2>🏦 Ödeme Takip — ADMİN</h2><button onclick="testLogout()">Çıkış</button></div>
+    <div class="content">
+      <h1>Admin Paneli</h1>
+      <p>Panel başarıyla açıldı ✅</p>
+      <span class="panel-label" style="background:#eef2ff;color:#3730a3;">Sistem Yöneticisi</span>
+      <p style="margin-top:20px;color:#333;">Bu panel iOS Safari'de de görünüyorsa sorun çözülmüş demektir.</p>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-finans">
+    <div class="topbar" style="border-color:#065f46;"><h2>🏦 Ödeme Takip — FİNANS</h2><button onclick="testLogout()">Çıkış</button></div>
+    <div class="content">
+      <h1>Finans Paneli</h1>
+      <p>Panel başarıyla açıldı ✅</p>
+      <span class="panel-label" style="background:#ecfdf5;color:#065f46;">Finans Kullanıcısı</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-departman">
+    <div class="topbar" style="border-color:#6d28d9;"><h2>🏦 Ödeme Takip — DEPARTMAN</h2><button onclick="testLogout()">Çıkış</button></div>
+    <div class="content">
+      <h1>Departman Paneli</h1>
+      <p>Panel başarıyla açıldı ✅</p>
+      <span class="panel-label" style="background:#f5f3ff;color:#6d28d9;">Departman Kullanıcısı</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-mudur">
+    <div class="topbar" style="border-color:#b45309;"><h2>🏦 Ödeme Takip — MÜDÜR</h2><button onclick="testLogout()">Çıkış</button></div>
+    <div class="content">
+      <h1>Muhasebe Müdürü Paneli</h1>
+      <p>Panel başarıyla açıldı ✅</p>
+      <span class="panel-label" style="background:#fffbeb;color:#b45309;">Muhasebe Müdürü</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-direktor">
+    <div class="topbar" style="border-color:#1e3a8a;"><h2>🏦 Ödeme Takip — DİREKTÖR</h2><button onclick="testLogout()">Çıkış</button></div>
+    <div class="content">
+      <h1>Direktör Paneli</h1>
+      <p>Panel başarıyla açıldı ✅</p>
+      <span class="panel-label" style="background:#eff6ff;color:#1e3a8a;">Mali İşler Direktörü</span>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-gm">
+    <div class="topbar" style="border-color:#92400e;"><h2>🏦 Ödeme Takip — GM</h2><button onclick="testLogout()">Çıkış</button></div>
+    <div class="content">
+      <h1>Genel Müdür Paneli</h1>
+      <p>Panel başarıyla açıldı ✅</p>
+      <span class="panel-label" style="background:#fffbeb;color:#92400e;">Genel Müdür</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var roleToPanel = {
+  'admin': 'panel-admin',
+  'finans': 'panel-finans', 
+  'departman': 'panel-departman',
+  'muhasebe_muduru': 'panel-mudur',
+  'direktor': 'panel-direktor',
+  'gm': 'panel-gm'
+};
+
+function testLogin() {
+  var role = document.getElementById('test-role').value;
+  var panelId = roleToPanel[role];
+  
+  // Login ekranını gizle
+  document.getElementById('login-screen').style.display = 'none';
+  
+  // all-panels görünür yap
+  document.getElementById('all-panels').style.visibility = 'visible';
+  
+  // Tüm panelleri gizle
+  document.querySelectorAll('.panel').forEach(function(p) {
+    p.classList.remove('active');
+  });
+  
+  // İlgili paneli göster
+  document.getElementById(panelId).classList.add('active');
+  
+  window.scrollTo(0, 0);
+  
+  console.log('Panel açıldı:', panelId);
+  console.log('Panel boyutu:', document.getElementById(panelId).getBoundingClientRect());
+}
+
+function testLogout() {
+  document.querySelectorAll('.panel').forEach(function(p) {
+    p.classList.remove('active');
+  });
+  document.getElementById('all-panels').style.visibility = 'hidden';
+  document.getElementById('login-screen').style.display = 'flex';
+}
+</script>
+</body>
+</html>
