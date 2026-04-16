@@ -439,6 +439,8 @@ tr:hover td { background:#f8fafc; }
   .toast { left:12px !important; right:12px !important; bottom:16px !important; max-width:none !important; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init("Ir9NBf6GStBs3gOnb");</script>
 </head>
 <body>
 
@@ -459,6 +461,55 @@ tr:hover td { background:#f8fafc; }
     <div class="form-group"><label>E-posta</label><input type="email" id="login-email" placeholder="kullanici@sirket.com" oninput="detectRole(this.value)"></div>
     <div class="form-group"><label>Şifre</label><input type="password" id="login-pass" placeholder="••••••••"></div>
     <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="doLogin()" id="login-btn">Giriş Yap →</button>
+  </div>
+</div>
+
+
+<!-- ═══════════════ OTP EKRANI ═══════════════ -->
+<div id="otp-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#1d4ed8 100%);">
+  <div style="background:white;border-radius:16px;padding:48px;width:420px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:fadeUp 0.5s ease;">
+    <div style="text-align:center;margin-bottom:28px;">
+      <div style="width:56px;height:56px;background:#eff6ff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">📧</div>
+      <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 8px;">E-posta Doğrulama</h2>
+      <p style="font-size:13px;color:#6b7280;margin:0;">Doğrulama kodu gönderildi:</p>
+      <p style="font-size:13px;font-weight:600;color:#1d4ed8;margin:4px 0 0;" id="otp-email-hint"></p>
+    </div>
+    <div id="otp-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Doğrulama Kodu</label>
+      <input id="otp-input" type="number" placeholder="6 haneli kod" maxlength="6"
+        style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:14px;color:#111;font-size:24px;font-family:monospace;text-align:center;letter-spacing:8px;outline:none;box-sizing:border-box;"
+        onkeydown="if(event.key==='Enter')verifyOTP()"
+        oninput="this.value=this.value.slice(0,6)">
+    </div>
+    <button onclick="verifyOTP()" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;">
+      Doğrula →
+    </button>
+    <div style="display:flex;justify-content:space-between;gap:8px;">
+      <button onclick="backToLogin()" style="flex:1;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">
+        ← Geri
+      </button>
+      <button onclick="resendOTP()" style="flex:1;padding:10px;background:white;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:8px;font-size:13px;cursor:pointer;">
+        Tekrar Gönder
+      </button>
+    </div>
+    <p style="text-align:center;font-size:12px;color:#9ca3af;margin-top:16px;">Kod 5 dakika geçerlidir</p>
+  </div>
+</div>
+
+<!-- ŞİFRE DEĞİŞTİRME MODAL -->
+<div class="modal-overlay" id="change-pass-modal">
+  <div class="modal">
+    <h3>🔐 Şifre Değiştir</h3>
+    <p class="msub">Güvenliğiniz için güçlü bir şifre kullanın.</p>
+    <div id="cp-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
+    <div class="form-group"><label>Mevcut Şifre</label><input type="password" id="cp-current" placeholder="••••••••"></div>
+    <div class="form-group"><label>Yeni Şifre</label><input type="password" id="cp-new" placeholder="En az 6 karakter"></div>
+    <div class="form-group"><label>Yeni Şifre (Tekrar)</label><input type="password" id="cp-confirm" placeholder="••••••••"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeChangePassword()">İptal</button>
+      <button class="btn btn-primary" id="cp-save-btn" onclick="saveNewPassword()">Kaydet</button>
+    </div>
   </div>
 </div>
 
@@ -486,7 +537,7 @@ tr:hover td { background:#f8fafc; }
       <div class="sidebar-user">
         <div class="s-avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);" id="admin-avatar">A</div>
         <div><div class="s-uname" id="admin-name">Admin</div><div class="s-urole" style="color:var(--accent-l);">Sistem Yöneticisi</div></div>
-        <button class="s-logout" onclick="doLogout()">⏻</button>
+        <button class="s-logout" title="Şifre Değiştir" onclick="openChangePassword()" style="font-size:13px;margin-right:2px;">🔐</button><button class="s-logout" onclick="doLogout()">⏻</button>
       </div>
     </div>
     <div class="main-content">
@@ -500,7 +551,7 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-label">LOG KAYDI</div><div class="stat-value" id="a-logs">—</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div><h3>Son Aktiviteler</h3><p>Son 10 işlem</p></div></div>
+          <div class="card-header"><div><h3>Son Aktiviteler</h3><p>Son 10 işlem</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('aktiviteler')" style="white-space:nowrap;">📊 Excel</button></div></div>
           <div id="admin-recent-logs"><div class="empty-state"><span class="icon">⏳</span><p>Yükleniyor...</p></div></div>
         </div>
       </div>
@@ -509,7 +560,7 @@ tr:hover td { background:#f8fafc; }
         <div class="page-header"><div><h1>Departman Yönetimi</h1><p>Ekle, düzenle veya sil</p></div></div>
         <div class="card">
           <div class="card-header">
-            <div><h3>Departmanlar</h3><p id="dept-count">—</p></div>
+            <div><h3>Departmanlar</h3><p id="dept-count">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('departmanlar')" style="white-space:nowrap;">📊 Excel</button></div>
             <div style="display:flex;gap:8px;">
               <input class="search-input" placeholder="🔍 Ara..." oninput="filterDepts(this.value)">
               <button class="btn btn-primary btn-sm" onclick="openDeptModal()">+ Yeni</button>
@@ -523,7 +574,7 @@ tr:hover td { background:#f8fafc; }
         <div class="page-header"><div><h1>Kullanıcı Yönetimi</h1><p>Ekle, rol ata veya sil</p></div></div>
         <div class="card">
           <div class="card-header">
-            <div><h3>Kullanıcılar</h3><p id="user-count">—</p></div>
+            <div><h3>Kullanıcılar</h3><p id="user-count">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('kullanicilar')" style="white-space:nowrap;">📊 Excel</button></div>
             <div style="display:flex;gap:8px;">
               <input class="search-input" placeholder="🔍 Ara..." oninput="filterUsers(this.value)">
               <button class="btn btn-primary btn-sm" onclick="openUserModal()">+ Yeni</button>
@@ -536,7 +587,7 @@ tr:hover td { background:#f8fafc; }
       <div class="subpage" id="admin-logs">
         <div class="page-header"><div><h1>Audit Log</h1><p>Tüm sistem aktiviteleri</p></div></div>
         <div class="card">
-          <div class="card-header"><div><h3>İşlem Geçmişi</h3><p>Son 100 kayıt</p></div></div>
+          <div class="card-header"><div><h3>İşlem Geçmişi</h3><p>Son 100 kayıt</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('islem_gecmisi')" style="white-space:nowrap;">📊 Excel</button></div></div>
           <div id="admin-logs-list"><div class="empty-state"><span class="icon">⏳</span><p>Yükleniyor...</p></div></div>
         </div>
       </div>
@@ -611,7 +662,7 @@ tr:hover td { background:#f8fafc; }
       <div class="sidebar-user">
         <div class="s-avatar" style="background:var(--accent);" id="finans-avatar">F</div>
         <div><div class="s-uname" id="finans-name">Finans</div><div class="s-urole" style="color:var(--accent);">Finans Ekibi</div></div>
-        <button class="s-logout" onclick="doLogout()">⏻</button>
+        <button class="s-logout" title="Şifre Değiştir" onclick="openChangePassword()" style="font-size:13px;margin-right:2px;">🔐</button><button class="s-logout" onclick="doLogout()">⏻</button>
       </div>
     </div>
     <div class="main-content">
@@ -650,7 +701,7 @@ tr:hover td { background:#f8fafc; }
       <div class="subpage" id="finans-batches">
         <div class="page-header"><div><h1>Batch Listesi</h1><p>Yüklenen tüm Excel dosyaları</p></div><button class="btn btn-primary btn-sm" onclick="finansPage('upload',document.querySelector('#panel-finans .nav-item'))">+ Yeni</button></div>
         <div class="card">
-          <div class="card-header"><div><h3>Tüm Batch'ler</h3><p id="batch-count">—</p></div><button class="btn btn-secondary btn-sm" onclick="loadBatches()">🔄</button></div>
+          <div class="card-header"><div><h3>Tüm Batch'ler</h3><p id="batch-count">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('batch_listesi')" style="white-space:nowrap;">📊 Excel</button></div><button class="btn btn-secondary btn-sm" onclick="loadBatches()">🔄</button></div>
           <div id="completed-banner" style="display:none;padding:16px 20px;border-bottom:1px solid var(--border);"></div>
           <div class="table-wrap"><table><thead><tr><th>BATCH NO</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>ONAY DURUMU</th><th>İŞLEM</th></tr></thead><tbody id="batch-table"></tbody></table></div>
         </div>
@@ -664,7 +715,7 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-label">BEKLEYEN</div><div class="stat-value" id="ds-pending">—</div></div>
           <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">TAMAMLANAN</div><div class="stat-value" id="ds-completed">—</div></div>
         </div>
-        <div class="card"><div class="card-header"><div><h3>Departman Özeti</h3></div></div><div class="table-wrap"><table><thead><tr><th>DEPARTMAN</th><th>SAYISI</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="dept-summary-table"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><div><h3>Departman Özeti</h3><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('departman_ozeti')" style="white-space:nowrap;">📊 Excel</button></div></div><div class="table-wrap"><table><thead><tr><th>DEPARTMAN</th><th>SAYISI</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="dept-summary-table"></tbody></table></div></div>
       </div>
     </div>
     <!-- Finans Modals -->
@@ -702,7 +753,7 @@ tr:hover td { background:#f8fafc; }
           <div class="chip-avatar" style="background:var(--accent);" id="dept-avatar">D</div>
           <div><div class="chip-name" id="dept-user-name">—</div><div class="chip-role" style="color:var(--accent);">Departman Kullanıcısı</div></div>
         </div>
-        <button class="t-logout" onclick="doLogout()">Çıkış</button>
+        <button class="t-logout" onclick="openChangePassword()" style="margin-right:4px;">🔐 Şifre</button><button class="t-logout" onclick="doLogout()">Çıkış</button>
       </div>
     </div>
     <div class="topbar-main">
@@ -776,7 +827,7 @@ tr:hover td { background:#f8fafc; }
       <div class="sidebar-user">
         <div class="s-avatar" style="background:var(--accent);" id="mudur-avatar">M</div>
         <div><div class="s-uname" id="mudur-name">Müdür</div><div class="s-urole" style="color:var(--accent);">Muhasebe Müdürü</div></div>
-        <button class="s-logout" onclick="doLogout()">⏻</button>
+        <button class="s-logout" title="Şifre Değiştir" onclick="openChangePassword()" style="font-size:13px;margin-right:2px;">🔐</button><button class="s-logout" onclick="doLogout()">⏻</button>
       </div>
     </div>
     <div class="main-content">
@@ -789,7 +840,7 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-label">REDDETTİM</div><div class="stat-value" id="m-rejected">—</div></div>
         </div>
         <div class="card">
-          <div class="card-header"><div><h3>Bekleyen Ödemeler</h3><p id="m-pending-sub">—</p></div><div style="display:flex;gap:8px;"><input class="search-input" placeholder="🔍 Ara..." oninput="filterMudurPending(this.value)"><button class="btn btn-secondary btn-sm" onclick="loadMudurPending()">🔄</button></div></div>
+          <div class="card-header"><div><h3>Bekleyen Ödemeler</h3><p id="m-pending-sub">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('bekleyen_odemeler')" style="white-space:nowrap;">📊 Excel</button></div><div style="display:flex;gap:8px;"><input class="search-input" placeholder="🔍 Ara..." oninput="filterMudurPending(this.value)"><button class="btn btn-secondary btn-sm" onclick="loadMudurPending()">🔄</button></div></div>
           <div class="dept-tabs" id="m-dept-tabs"></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="m-select-all" onchange="mudurToggleAll(this.checked)"><label for="m-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="m-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
           <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>DEP. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="m-pending-table"></tbody></table></div>
@@ -801,7 +852,7 @@ tr:hover td { background:#f8fafc; }
       </div>
       <div class="subpage" id="mudur-summary">
         <div class="page-header"><div><h1>Departman Özeti</h1></div></div>
-        <div class="card"><div class="card-header"><div><h3>Departman Dağılımı</h3></div></div><div id="m-summary-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px;"></div></div>
+        <div class="card"><div class="card-header"><div><h3>Departman Dağılımı</h3><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('dept_dagilimi')" style="white-space:nowrap;">📊 Excel</button></div></div><div id="m-summary-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px;"></div></div>
         <div class="card"><div class="card-header"><div><h3>Detay</h3><p id="m-summary-sub">—</p></div><select id="m-summary-dept" onchange="loadMudurSummaryDetail(this.value)"><option value="">— Seçiniz —</option></select></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody id="m-summary-table"></tbody></table></div></div>
       </div>
       <div class="subpage" id="mudur-db">
@@ -812,7 +863,7 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">TAMAMLANAN</div><div class="stat-value" id="m-db-completed">—</div></div>
           <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-label">REDDEDİLEN</div><div class="stat-value" id="m-db-rejected">—</div></div>
         </div>
-        <div class="card"><div class="card-header"><div><h3>Batch Listesi</h3></div></div><div class="table-wrap"><table><thead><tr><th>BATCH</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="m-db-table"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><div><h3>Batch Listesi</h3><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('batch_listesi2')" style="white-space:nowrap;">📊 Excel</button></div></div><div class="table-wrap"><table><thead><tr><th>BATCH</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="m-db-table"></tbody></table></div></div>
       </div>
     </div>
     <div class="modal-overlay" id="m-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="m-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="m-approve-comment" placeholder="Onay notu..."></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="m-approve-btn" onclick="confirmMudurApprove()">✅ Onayla</button></div></div></div>
@@ -835,7 +886,7 @@ tr:hover td { background:#f8fafc; }
       </div>
       <div class="topbar-right">
         <div class="user-chip"><div class="chip-avatar" style="background:var(--accent);" id="dir-avatar">D</div><div><div class="chip-name" id="dir-name">Direktör</div><div class="chip-role" style="color:var(--accent);">Mali İşler Direktörü</div></div></div>
-        <button class="t-logout" onclick="doLogout()">Çıkış</button>
+        <button class="t-logout" onclick="openChangePassword()" style="margin-right:4px;">🔐 Şifre</button><button class="t-logout" onclick="doLogout()">Çıkış</button>
       </div>
     </div>
     <div class="topbar-main">
@@ -856,14 +907,14 @@ tr:hover td { background:#f8fafc; }
       <div class="subpage" id="dir-pending">
         <div class="page-header"><div><h1>Onay Bekleyenler</h1><p>Muhasebe Müdüründen gelen ödemeler</p></div></div>
         <div class="card">
-          <div class="card-header"><div><h3>Bekleyenler</h3><p id="dir-pending-sub">—</p></div><div style="display:flex;gap:8px;"><select id="dir-dept-filter" onchange="filterDirDept()"><option value="">Tüm Departmanlar</option></select><button class="btn btn-secondary btn-sm" onclick="loadDirPending()">🔄</button></div></div>
+          <div class="card-header"><div><h3>Bekleyenler</h3><p id="dir-pending-sub">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('bekleyenler')" style="white-space:nowrap;">📊 Excel</button></div><div style="display:flex;gap:8px;"><select id="dir-dept-filter" onchange="filterDirDept()"><option value="">Tüm Departmanlar</option></select><button class="btn btn-secondary btn-sm" onclick="loadDirPending()">🔄</button></div></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="dir-select-all" onchange="dirToggleAll(this.checked)"><label for="dir-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="dir-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
           <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>MÜD. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="dir-pending-table"></tbody></table></div>
         </div>
       </div>
       <div class="subpage" id="dir-history">
         <div class="page-header"><div><h1>Onay Geçmişi</h1></div><select id="dir-history-filter" onchange="loadDirHistory()"><option value="all">Tümü</option><option value="approved">Onayladıklarım</option><option value="rejected">Reddettiklerim</option></select></div>
-        <div class="card"><div class="card-header"><div><h3>Geçmiş</h3><p id="dir-history-sub">—</p></div></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="dir-history-table"></tbody></table></div></div>
+        <div class="card"><div class="card-header"><div><h3>Geçmiş</h3><p id="dir-history-sub">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('gecmis')" style="white-space:nowrap;">📊 Excel</button></div></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="dir-history-table"></tbody></table></div></div>
       </div>
     </div>
     <div class="modal-overlay" id="dir-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="dir-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="dir-approve-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="dir-approve-btn" onclick="confirmDirApprove()">✅ Onayla</button></div></div></div>
@@ -886,7 +937,7 @@ tr:hover td { background:#f8fafc; }
       </div>
       <div class="topbar-right">
         <div class="user-chip" style="background:var(--surface2);border-color:var(--border);"><div class="chip-avatar" style="background:var(--accent);" id="gm-avatar">G</div><div><div class="chip-name" id="gm-name" style="color:var(--text);">GM</div><div class="chip-role" style="color:var(--accent);">Genel Müdür</div></div></div>
-        <button class="t-logout" onclick="doLogout()">Çıkış</button>
+        <button class="t-logout" onclick="openChangePassword()" style="margin-right:4px;">🔐 Şifre</button><button class="t-logout" onclick="doLogout()">Çıkış</button>
       </div>
     </div>
     <div class="topbar-main" >
@@ -949,29 +1000,6 @@ async function detectRole(email) {
   // just cosmetic - show loading
 }
 
-async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-pass').value.trim();
-  const errEl = document.getElementById('login-error');
-  errEl.style.display = 'none';
-  if (!email || !pass) { errEl.textContent = 'Lütfen tüm alanları doldurun.'; errEl.style.display='block'; return; }
-
-  const btn = document.getElementById('login-btn');
-  btn.innerHTML = '<span class="spinner"></span> Giriş yapılıyor...'; btn.disabled = true;
-
-  const { data, error } = await db.from('users').select('*, departments(id,name)').eq('email', email).eq('password_hash', pass).single();
-
-  btn.innerHTML = 'Giriş Yap →'; btn.disabled = false;
-
-  if (error || !data) { errEl.textContent = 'E-posta veya şifre hatalı.'; errEl.style.display='block'; return; }
-
-  currentUser = data;
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('all-panels').style.visibility = 'visible';
-
-  await logAction('Sisteme giriş yapıldı', null, null);
-  routeByRole(data);
-}
 
 function routeByRole(user) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -1578,6 +1606,222 @@ async function loadGmHistory(){const filter=document.getElementById('gm-history-
 function toggleSidebar(btn){var panel=btn.closest('.panel');var sidebar=panel.querySelector('.sidebar');var overlay=panel.querySelector('.sidebar-overlay');if(!sidebar)return;var isOpen=sidebar.classList.contains('mob-open');if(isOpen){sidebar.classList.remove('mob-open');if(overlay)overlay.classList.remove('open');btn.innerHTML='☰';}else{sidebar.classList.add('mob-open');if(overlay)overlay.classList.add('open');btn.innerHTML='✕';}}
 function closeSidebar(overlay){var panel=overlay.closest('.panel');var sidebar=panel.querySelector('.sidebar');var btn=panel.querySelector('.mob-menu-btn');if(sidebar)sidebar.classList.remove('mob-open');overlay.classList.remove('open');if(btn)btn.innerHTML='☰';}
 document.addEventListener('click',function(e){var item=e.target.closest('.nav-item');if(item&&window.innerWidth<=900){var panel=item.closest('.panel');if(!panel)return;var s=panel.querySelector('.sidebar');var o=panel.querySelector('.sidebar-overlay');var b=panel.querySelector('.mob-menu-btn');if(s)s.classList.remove('mob-open');if(o)o.classList.remove('open');if(b)b.innerHTML='☰';}});
+
+
+// ══════════════════════════════════════════════════════
+// YENİ ÖZELLİKLER — OTP, BİLDİRİM, ŞİFRE, EXCEL
+// ══════════════════════════════════════════════════════
+
+const EMAILJS_SERVICE = 'service_ots';
+const EMAILJS_OTP_TPL = 'template_mrnhjpb';
+const EMAILJS_NOTIF_TPL = 'template_k66ic99';
+
+// ── OTP SİSTEMİ ──
+let otpCode = null;
+let otpExpiry = null;
+let otpUser = null;
+
+function generateOTP() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Lütfen tüm alanları doldurun.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = '<span class="spinner"></span> Kontrol ediliyor...'; btn.disabled = true;
+  const { data, error } = await db.from('users').select('*, departments(id,name)').eq('email', email).eq('password_hash', pass).single();
+  btn.innerHTML = 'Giriş Yap →'; btn.disabled = false;
+  if (error || !data) { errEl.textContent = 'E-posta veya şifre hatalı.'; errEl.style.display='block'; return; }
+  otpUser = data;
+  // OTP gönder
+  otpCode = generateOTP();
+  otpExpiry = Date.now() + 5 * 60 * 1000; // 5 dakika
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
+      to_email: data.email,
+      to_name: data.name,
+      otp_code: otpCode
+    });
+    showOTPScreen();
+  } catch(e) {
+    // EmailJS hata verirse (test maili) direkt geç
+    showOTPScreen();
+    console.warn('EmailJS:', e);
+  }
+}
+
+function showOTPScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('otp-screen').style.display = 'flex';
+  document.getElementById('otp-email-hint').textContent = otpUser.email;
+  document.getElementById('otp-input').value = '';
+  document.getElementById('otp-input').focus();
+}
+
+async function verifyOTP() {
+  const entered = document.getElementById('otp-input').value.trim();
+  const errEl = document.getElementById('otp-error');
+  errEl.style.display = 'none';
+  if (!entered) { errEl.textContent = 'Lütfen kodu girin.'; errEl.style.display='block'; return; }
+  if (Date.now() > otpExpiry) { errEl.textContent = 'Kod süresi doldu. Tekrar giriş yapın.'; errEl.style.display='block'; setTimeout(backToLogin, 2000); return; }
+  if (entered !== otpCode) { errEl.textContent = 'Hatalı kod. Tekrar deneyin.'; errEl.style.display='block'; return; }
+  // OTP doğru
+  currentUser = otpUser;
+  document.getElementById('otp-screen').style.display = 'none';
+  document.getElementById('all-panels').style.visibility = 'visible';
+  await logAction('Sisteme giriş yapıldı', null, null);
+  routeByRole(currentUser);
+}
+
+function backToLogin() {
+  document.getElementById('otp-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  otpCode = null; otpUser = null;
+}
+
+async function resendOTP() {
+  if (!otpUser) return;
+  otpCode = generateOTP();
+  otpExpiry = Date.now() + 5 * 60 * 1000;
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
+      to_email: otpUser.email,
+      to_name: otpUser.name,
+      otp_code: otpCode
+    });
+    showToast('Yeni kod gönderildi!', 'success');
+  } catch(e) {
+    showToast('Kod gönderilemedi.', 'error');
+  }
+}
+
+// ── BİLDİRİM MAİLİ ──
+async function sendApprovalNotification(toEmail, toName, pendingCount, pendingAmount, isRejected, rejectReason, batchNo) {
+  try {
+    const subject = isRejected ? 'Ödeme Talebiniz Reddedildi' : 'Onayınızı Bekleyen Ödemeler Var';
+    const message = isRejected 
+      ? `${batchNo} numaralı batch'inizdeki ${pendingCount} adet ödeme reddedildi.\n\nRed Nedeni: ${rejectReason}`
+      : `${pendingCount} adet ödeme onayınızı bekliyor.\nToplam Tutar: ${pendingAmount} ₺`;
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_NOTIF_TPL, {
+      to_email: toEmail,
+      to_name: toName,
+      pending_count: pendingCount,
+      pending_amount: pendingAmount,
+      reject_reason: rejectReason || '',
+      batch_no: batchNo || '',
+      message: message,
+      subject: subject
+    });
+  } catch(e) { console.warn('Bildirim maili gönderilemedi:', e); }
+}
+
+// ── ŞİFRE DEĞİŞTİRME ──
+function openChangePassword() {
+  document.getElementById('change-pass-modal').classList.add('open');
+  document.getElementById('cp-current').value = '';
+  document.getElementById('cp-new').value = '';
+  document.getElementById('cp-confirm').value = '';
+  document.getElementById('cp-error').style.display = 'none';
+}
+function closeChangePassword() {
+  document.getElementById('change-pass-modal').classList.remove('open');
+}
+async function saveNewPassword() {
+  const current = document.getElementById('cp-current').value.trim();
+  const newPass = document.getElementById('cp-new').value.trim();
+  const confirm = document.getElementById('cp-confirm').value.trim();
+  const errEl = document.getElementById('cp-error');
+  errEl.style.display = 'none';
+  if (!current || !newPass || !confirm) { errEl.textContent = 'Tüm alanları doldurun.'; errEl.style.display='block'; return; }
+  if (current !== currentUser.password_hash) { errEl.textContent = 'Mevcut şifre hatalı.'; errEl.style.display='block'; return; }
+  if (newPass.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.style.display='block'; return; }
+  if (newPass !== confirm) { errEl.textContent = 'Şifreler eşleşmiyor.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('cp-save-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', currentUser.id);
+  btn.disabled = false; btn.innerHTML = 'Kaydet';
+  if (error) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display='block'; return; }
+  currentUser.password_hash = newPass;
+  closeChangePassword();
+  showToast('Şifre başarıyla değiştirildi!', 'success');
+  await logAction('Şifre değiştirildi', null, null);
+}
+
+// ── ADMİN ŞİFRE SIFIRLAMA ──
+async function adminResetPassword(userId, userName) {
+  const newPass = Math.random().toString(36).slice(-8);
+  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', userId);
+  if (error) { showToast('Hata: ' + error.message, 'error'); return; }
+  showToast(`${userName} şifresi sıfırlandı: ${newPass}`, 'success');
+  await logAction('Şifre sıfırlandı: ' + userName, null, null);
+}
+
+// ── EXCEL EXPORT ──
+function exportToExcel(tableId, fileName) {
+  const table = document.getElementById(tableId);
+  if (!table) { showToast('Tablo bulunamadı', 'error'); return; }
+  const wb = XLSX.utils.table_to_book(table, { sheet: 'Veri' });
+  XLSX.writeFile(wb, (fileName || 'rapor') + '_' + new Date().toLocaleDateString('tr-TR').replace(/\./g,'-') + '.xlsx');
+  showToast('Excel indirildi!', 'success');
+}
+
+function exportTableData(data, headers, fileName) {
+  if (!data || data.length === 0) { showToast('Dışa aktarılacak veri yok', 'error'); return; }
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Veri');
+  XLSX.writeFile(wb, fileName + '_' + new Date().toLocaleDateString('tr-TR').replace(/\./g,'-') + '.xlsx');
+  showToast('Excel indirildi!', 'success');
+}
+
+// ── PUSH NOTIFICATION (PWA) ──
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function sendPushNotification(title, body) {
+  if (Notification.permission === 'granted') {
+    new Notification(title, {
+      body: body,
+      icon: '/OTS/favicon.ico',
+      badge: '/OTS/favicon.ico'
+    });
+  }
+}
+
+// ── RED GERİ BİLDİRİMİ (DEPARTMAN) ──
+function showRejectionNotification(message) {
+  // Pop-up bildirim
+  const notif = document.createElement('div');
+  notif.style.cssText = 'position:fixed;top:20px;right:20px;background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:16px 20px;max-width:320px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.15);animation:fadeUp 0.3s ease;';
+  notif.innerHTML = '<div style="display:flex;gap:10px;align-items:flex-start;"><span style="font-size:20px;">❌</span><div><p style="margin:0 0 4px;font-weight:700;color:#b91c1c;">Ödeme Reddedildi</p><p style="margin:0;font-size:13px;color:#374151;">' + message + '</p></div></div>';
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 6000);
+  // Push notification
+  sendPushNotification('❌ Ödeme Reddedildi', message);
+}
+
+
+function exportCurrentTable(name) {
+  // Aktif paneldeki tabloyu bul
+  const activePanel = document.querySelector('.panel.active');
+  if (!activePanel) { showToast('Panel bulunamadı', 'error'); return; }
+  const tables = activePanel.querySelectorAll('table');
+  if (!tables.length) { showToast('Tablo bulunamadı', 'error'); return; }
+  // En büyük tabloyu al (en fazla satırı olan)
+  let mainTable = tables[0];
+  tables.forEach(t => { if(t.rows.length > mainTable.rows.length) mainTable = t; });
+  const wb = XLSX.utils.table_to_book(mainTable, {sheet:'Veri'});
+  XLSX.writeFile(wb, name + '_' + new Date().toLocaleDateString('tr-TR').replace(/\./g,'-') + '.xlsx');
+  showToast('Excel indirildi!', 'success');
+}
 
 </script>
 </body>
