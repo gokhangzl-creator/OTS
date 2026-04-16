@@ -369,6 +369,180 @@ tr:hover td { background:#f8fafc; }
 /* SEARCH */
 .search-input { background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:7px 12px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; width:200px; transition:border-color 0.2s; }
 .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg); }
+
+/* ═══════════════════════════════════════════
+   MOBİL RESPONSIVE — 768px ve altı
+═══════════════════════════════════════════ */
+
+/* Hamburger butonu — sadece mobilde görünür */
+.mob-menu-btn {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 300;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  color: white;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px #00000025;
+}
+
+/* Sidebar overlay — mobilde sidebar açıkken arka plan */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #00000050;
+  z-index: 99;
+}
+.sidebar-overlay.open { display: block; }
+
+@media (max-width: 768px) {
+
+  /* Hamburger göster */
+  .mob-menu-btn { display: flex; }
+
+  /* LOGIN */
+  .login-card {
+    width: calc(100vw - 32px);
+    padding: 28px 20px;
+    margin: 16px;
+  }
+
+  /* SIDEBAR — varsayılan gizli, açılınca görünür */
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 200;
+    width: 260px;
+  }
+  .sidebar.mob-open {
+    transform: translateX(0);
+  }
+
+  /* MAIN CONTENT — sidebar margin kaldır */
+  .main-content {
+    margin-left: 0 !important;
+    padding: 16px !important;
+    padding-top: 64px !important;
+  }
+
+  /* TOPBAR — mobil uyumu */
+  .topbar {
+    padding: 0 12px 0 60px;
+  }
+  .topbar-tabs { display: none; }
+  .chip-name { display: none; }
+  .chip-role { display: none; }
+  .user-chip { padding: 5px; border-radius: 50%; }
+  .topbar-sep { display: none; }
+  .topbar-main {
+    margin-top: 60px;
+    padding: 16px !important;
+  }
+
+  /* STATS GRID — 2 sütun */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px;
+  }
+  .stat-value { font-size: 22px !important; }
+
+  /* DEPT GRID — 1 sütun */
+  .dept-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* PAGE HEADER — dikey */
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .page-header h1 { font-size: 18px !important; }
+
+  /* CARD HEADER — dikey */
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+  .card-header > div:last-child {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* SEARCH INPUT — tam genişlik */
+  .search-input {
+    width: 100% !important;
+    flex: 1;
+  }
+
+  /* TABLO — yatay kaydırma */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { min-width: 500px; }
+  td, th { padding: 8px 10px !important; font-size: 12px !important; }
+
+  /* MODAL — tam genişlik */
+  .modal {
+    width: calc(100vw - 24px) !important;
+    padding: 20px 16px !important;
+    margin: 12px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-actions { flex-wrap: wrap; }
+  .modal-actions .btn { flex: 1; min-width: 100px; }
+
+  /* DRAWER — tam genişlik */
+  .drawer {
+    width: 100% !important;
+    top: 0;
+  }
+
+  /* BULK BAR — daha küçük */
+  .bulk-bar {
+    width: calc(100% - 24px);
+    flex-wrap: wrap;
+    justify-content: center;
+    bottom: 12px;
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+
+  /* BUTTON — mobilde tam genişlik bazı butonlar */
+  .btn-full-mob { width: 100% !important; }
+
+  /* FORM GROUP inputlar */
+  .form-group input,
+  select,
+  textarea {
+    font-size: 16px !important; /* iOS zoom engelle */
+  }
+
+  /* UPLOAD ZONE */
+  .upload-zone { padding: 24px 16px; }
+
+  /* DEPT TABS */
+  .dept-tabs { gap: 4px; padding: 10px 12px; overflow-x: auto; flex-wrap: nowrap; }
+  .dept-tab { white-space: nowrap; flex-shrink: 0; }
+
+  /* TOAST */
+  .toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: 100%;
+  }
+}
 </style>
 </head>
 <body>
@@ -398,6 +572,8 @@ tr:hover td { background:#f8fafc; }
 
   <!-- ───── ADMIN PANEL ───── -->
   <div class="panel" id="panel-admin">
+    <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
+    <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
       <div class="sidebar-logo">
         <div class="sicon">🏦</div>
@@ -523,6 +699,8 @@ tr:hover td { background:#f8fafc; }
 
   <!-- ───── FİNANS PANEL ───── -->
   <div class="panel" id="panel-finans">
+    <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
+    <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
       <div class="sidebar-logo">
         <div class="sicon">🏦</div>
@@ -685,6 +863,8 @@ tr:hover td { background:#f8fafc; }
 
   <!-- ───── MUHASEBE MÜDÜRÜ PANEL ───── -->
   <div class="panel" id="panel-mudur">
+    <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
+    <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
       <div class="sidebar-logo">
         <div class="sicon">🏦</div>
@@ -1496,6 +1676,44 @@ function openGmRejectModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelected
 async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'completed'}).eq('id',pid);await logAction(`GM Final Onay: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-approve-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme tamamlandı! 🎉`,'success');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='👑 Final Onay Ver';}}
 async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadGmHistory(){const filter=document.getElementById('gm-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','genel_mudur').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('gm-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('gm-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr style="border-color:var(--border);"><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${a.payments?.cari||'—'}</td><td><span class="badge badge-gold">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
+
+// MOBİL SİDEBAR
+function toggleSidebar(btn) {
+  const panel = btn.closest('.panel');
+  const sidebar = panel.querySelector('.sidebar');
+  const overlay = panel.querySelector('.sidebar-overlay');
+  const isOpen = sidebar.classList.contains('mob-open');
+  if (isOpen) {
+    sidebar.classList.remove('mob-open');
+    overlay.classList.remove('open');
+    btn.innerHTML = '☰';
+  } else {
+    sidebar.classList.add('mob-open');
+    overlay.classList.add('open');
+    btn.innerHTML = '✕';
+  }
+}
+function closeSidebar(overlay) {
+  const panel = overlay.closest('.panel');
+  const sidebar = panel.querySelector('.sidebar');
+  const btn = panel.querySelector('.mob-menu-btn');
+  sidebar.classList.remove('mob-open');
+  overlay.classList.remove('open');
+  if (btn) btn.innerHTML = '☰';
+}
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.nav-item') && window.innerWidth <= 768) {
+    const panel = e.target.closest('.panel');
+    if (panel) {
+      const sidebar = panel.querySelector('.sidebar');
+      const overlay = panel.querySelector('.sidebar-overlay');
+      const btn = panel.querySelector('.mob-menu-btn');
+      if (sidebar) { sidebar.classList.remove('mob-open'); }
+      if (overlay) { overlay.classList.remove('open'); }
+      if (btn) { btn.innerHTML = '☰'; }
+    }
+  }
+});
 </script>
 </body>
 </html>
