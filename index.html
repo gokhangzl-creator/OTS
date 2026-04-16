@@ -371,177 +371,267 @@ tr:hover td { background:#f8fafc; }
 .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg); }
 
 /* ═══════════════════════════════════════════
-   MOBİL RESPONSIVE — 768px ve altı
+   MOBİL RESPONSIVE — TAM DÜZELTME
 ═══════════════════════════════════════════ */
 
-/* Hamburger butonu — sadece mobilde görünür */
+/* Hamburger butonu */
 .mob-menu-btn {
   display: none;
   position: fixed;
-  top: 12px;
-  left: 12px;
-  z-index: 300;
+  top: 14px;
+  left: 14px;
+  z-index: 301;
   background: var(--accent);
   border: none;
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   font-size: 18px;
   color: white;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px #00000025;
+  box-shadow: 0 2px 8px #00000030;
 }
 
-/* Sidebar overlay — mobilde sidebar açıkken arka plan */
+/* Sidebar overlay */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: #00000050;
-  z-index: 99;
+  background: #00000055;
+  z-index: 199;
 }
 .sidebar-overlay.open { display: block; }
 
-@media (max-width: 768px) {
+@media (max-width: 900px) {
 
-  /* Hamburger göster */
-  .mob-menu-btn { display: flex; }
+  /* ── HAMBURGER ── */
+  .mob-menu-btn { display: flex !important; }
 
-  /* LOGIN */
+  /* ── LOGIN ── */
+  #login-screen { padding: 16px; align-items: flex-start; padding-top: 60px; }
   .login-card {
-    width: calc(100vw - 32px);
-    padding: 28px 20px;
-    margin: 16px;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 28px 20px !important;
+    margin: 0 !important;
   }
 
-  /* SIDEBAR — varsayılan gizli, açılınca görünür */
+  /* ── SIDEBAR — tüm paneller ── */
   .sidebar {
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    z-index: 200;
-    width: 260px;
+    transform: translateX(-100%) !important;
+    transition: transform 0.28s ease !important;
+    z-index: 200 !important;
+    width: 260px !important;
+    position: fixed !important;
   }
   .sidebar.mob-open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+    box-shadow: 4px 0 24px #00000030 !important;
   }
 
-  /* MAIN CONTENT — sidebar margin kaldır */
+  /* ── MAIN CONTENT (sidebar layout) ── */
   .main-content {
     margin-left: 0 !important;
     padding: 16px !important;
-    padding-top: 64px !important;
+    padding-top: 68px !important;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* TOPBAR — mobil uyumu */
+  /* ── TOPBAR ── */
   .topbar {
-    padding: 0 12px 0 60px;
+    padding: 0 12px 0 60px !important;
+    overflow: hidden;
   }
-  .topbar-tabs { display: none; }
-  .chip-name { display: none; }
-  .chip-role { display: none; }
-  .user-chip { padding: 5px; border-radius: 50%; }
-  .topbar-sep { display: none; }
+  .topbar-tabs {
+    display: none !important;
+  }
+  .topbar-sep { display: none !important; }
+  .chip-name, .chip-role { display: none !important; }
+  .user-chip {
+    padding: 4px !important;
+    border-radius: 50% !important;
+    min-width: unset !important;
+  }
+  .t-logout { font-size: 11px !important; padding: 5px 8px !important; }
+
+  /* ── TOPBAR-MAIN (topbar layout) ── */
   .topbar-main {
-    margin-top: 60px;
+    margin-top: 60px !important;
     padding: 16px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    overflow-x: hidden;
   }
 
-  /* STATS GRID — 2 sütun */
+  /* ── STATS GRID — 2 sütun ── */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
   }
-  .stat-value { font-size: 22px !important; }
+  .stat-value { font-size: 20px !important; }
+  .stat-label { font-size: 10px !important; }
+  .stat-card { padding: 14px !important; }
 
-  /* DEPT GRID — 1 sütun */
+  /* ── DEPT GRID — 1 sütun ── */
   .dept-grid {
     grid-template-columns: 1fr !important;
+    gap: 8px !important;
   }
 
-  /* PAGE HEADER — dikey */
+  /* ── PAGE HEADER ── */
   .page-header {
-    flex-direction: column;
-    gap: 12px;
-  }
-  .page-header h1 { font-size: 18px !important; }
-
-  /* CARD HEADER — dikey */
-  .card-header {
-    flex-direction: column;
+    flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 10px;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+  .page-header h1 { font-size: 17px !important; }
+  .page-header > div:last-child {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  /* ── CARD ── */
+  .card { margin-bottom: 14px !important; }
+  .card-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
   }
   .card-header > div:last-child {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
   }
+  .card-body { padding: 12px !important; }
 
-  /* SEARCH INPUT — tam genişlik */
+  /* ── TABLOLAR — YATAY KAYDIRMA ── */
+  .table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  /* table-wrap içi olmayan tablolar için wrapper */
+  .card > table,
+  .subpage > table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+  table {
+    min-width: 520px !important;
+  }
+  td { padding: 9px 10px !important; font-size: 12px !important; }
+  th { padding: 8px 10px !important; font-size: 10px !important; }
+
+  /* ── SEARCH ── */
   .search-input {
     width: 100% !important;
-    flex: 1;
+    max-width: 100% !important;
   }
 
-  /* TABLO — yatay kaydırma */
-  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { min-width: 500px; }
-  td, th { padding: 8px 10px !important; font-size: 12px !important; }
+  /* ── BUTONLAR ── */
+  .btn-sm { padding: 7px 11px !important; font-size: 12px !important; }
 
-  /* MODAL — tam genişlik */
+  /* ── MODALLER ── */
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
   .modal {
-    width: calc(100vw - 24px) !important;
-    padding: 20px 16px !important;
-    margin: 12px;
-    max-height: 90vh;
-    overflow-y: auto;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 24px 16px !important;
+    max-height: 88vh !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
   }
-  .modal-actions { flex-wrap: wrap; }
-  .modal-actions .btn { flex: 1; min-width: 100px; }
+  .modal-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .modal-actions .btn { flex: 1 !important; min-width: 100px !important; }
 
-  /* DRAWER — tam genişlik */
+  /* ── DRAWER ── */
   .drawer {
     width: 100% !important;
-    top: 0;
+    max-width: 100% !important;
   }
+  .drawer-head h3 { max-width: calc(100% - 48px) !important; }
 
-  /* BULK BAR — daha küçük */
+  /* ── BULK BAR ── */
   .bulk-bar {
-    width: calc(100% - 24px);
-    flex-wrap: wrap;
-    justify-content: center;
-    bottom: 12px;
-    font-size: 12px;
-    padding: 10px 14px;
+    width: calc(100% - 24px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    transform: none !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    bottom: 12px !important;
+    padding: 10px 14px !important;
+    font-size: 12px !important;
+  }
+  .bulk-bar.show { transform: none !important; }
+
+  /* ── UPLOAD ZONE ── */
+  .upload-zone { padding: 24px 16px !important; }
+
+  /* ── DEPT TABS (sekme çubuğu) ── */
+  .dept-tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 10px 12px !important;
+    gap: 6px !important;
+  }
+  .dept-tab {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    font-size: 11px !important;
   }
 
-  /* BUTTON — mobilde tam genişlik bazı butonlar */
-  .btn-full-mob { width: 100% !important; }
+  /* ── TAB NAVİGASYON (departman/müdür üst tabları) ── */
+  div[style*="fit-content"] {
+    width: 100% !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
 
-  /* FORM GROUP inputlar */
+  /* ── FORM ── */
   .form-group input,
+  .form-group select,
   select,
   textarea {
-    font-size: 16px !important; /* iOS zoom engelle */
+    font-size: 16px !important; /* iOS zoom engelleme */
   }
 
-  /* UPLOAD ZONE */
-  .upload-zone { padding: 24px 16px; }
-
-  /* DEPT TABS */
-  .dept-tabs { gap: 4px; padding: 10px 12px; overflow-x: auto; flex-wrap: nowrap; }
-  .dept-tab { white-space: nowrap; flex-shrink: 0; }
-
-  /* TOAST */
+  /* ── TOAST ── */
   .toast {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
-    max-width: 100%;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    max-width: 100% !important;
+    width: auto !important;
   }
+
+  /* ── BADGE WRAP ── */
+  .badge { font-size: 10px !important; padding: 2px 7px !important; }
+
+  /* ── SELECT ALL ROW ── */
+  .select-all-row { font-size: 11px !important; padding: 8px 10px !important; }
 }
 </style>
 </head>
@@ -620,7 +710,7 @@ tr:hover td { background:#f8fafc; }
               <button class="btn btn-primary btn-sm" onclick="openDeptModal()">+ Yeni</button>
             </div>
           </div>
-          <table><thead><tr><th>#</th><th>AD</th><th>KULLANICI</th><th>TARİH</th><th>İŞLEM</th></tr></thead><tbody id="dept-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th>#</th><th>AD</th><th>KULLANICI</th><th>TARİH</th><th>İŞLEM</th></tr></thead><tbody id="dept-table"></tbody></table></div>
         </div>
       </div>
       <!-- USERS -->
@@ -634,7 +724,7 @@ tr:hover td { background:#f8fafc; }
               <button class="btn btn-primary btn-sm" onclick="openUserModal()">+ Yeni</button>
             </div>
           </div>
-          <table><thead><tr><th>AD SOYAD</th><th>E-POSTA</th><th>ROL</th><th>DEPARTMAN</th><th>İŞLEM</th></tr></thead><tbody id="user-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th>AD SOYAD</th><th>E-POSTA</th><th>ROL</th><th>DEPARTMAN</th><th>İŞLEM</th></tr></thead><tbody id="user-table"></tbody></table></div>
         </div>
       </div>
       <!-- LOGS -->
@@ -748,7 +838,7 @@ tr:hover td { background:#f8fafc; }
             <div id="unknown-warning" style="display:none;margin-top:12px;"></div>
           </div>
           <div style="padding:12px 20px;font-size:12px;color:var(--text3);border-bottom:1px solid var(--border);">İlk 20 satır gösteriliyor</div>
-          <div style="overflow:auto;max-height:360px;"><table><thead><tr id="preview-head"></tr></thead><tbody id="preview-body"></tbody></table></div>
+          <div style="overflow:auto;max-height:360px;"><div class="table-wrap"><table><thead><tr id="preview-head"></tr></thead><tbody id="preview-body"></tbody></table></div>
         </div>
       </div>
       <!-- BATCHES -->
@@ -757,7 +847,7 @@ tr:hover td { background:#f8fafc; }
         <div class="card">
           <div class="card-header"><div><h3>Tüm Batch'ler</h3><p id="batch-count">—</p></div><button class="btn btn-secondary btn-sm" onclick="loadBatches()">🔄</button></div>
           <div id="completed-banner" style="display:none;padding:16px 20px;border-bottom:1px solid var(--border);"></div>
-          <table><thead><tr><th>BATCH NO</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>ONAY DURUMU</th><th>İŞLEM</th></tr></thead><tbody id="batch-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th>BATCH NO</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>ONAY DURUMU</th><th>İŞLEM</th></tr></thead><tbody id="batch-table"></tbody></table></div>
         </div>
       </div>
       <!-- DASHBOARD -->
@@ -769,7 +859,7 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-label">BEKLEYEN</div><div class="stat-value" id="ds-pending">—</div></div>
           <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">TAMAMLANAN</div><div class="stat-value" id="ds-completed">—</div></div>
         </div>
-        <div class="card"><div class="card-header"><div><h3>Departman Özeti</h3></div></div><table><thead><tr><th>DEPARTMAN</th><th>SAYISI</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="dept-summary-table"></tbody></table></div>
+        <div class="card"><div class="card-header"><div><h3>Departman Özeti</h3></div></div><div class="table-wrap"><table><thead><tr><th>DEPARTMAN</th><th>SAYISI</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="dept-summary-table"></tbody></table></div>
       </div>
     </div>
     <!-- Finans Modals -->
@@ -830,7 +920,7 @@ tr:hover td { background:#f8fafc; }
           <label for="dept-select-all" style="cursor:pointer;">Tümünü Seç</label>
           <span id="dept-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span>
         </div>
-        <table><thead><tr id="dept-thead"></tr></thead><tbody id="dept-payment-table"></tbody></table>
+        <div class="table-wrap"><table><thead><tr id="dept-thead"></tr></thead><tbody id="dept-payment-table"></tbody></table></div>
       </div>
     </div>
     <!-- Dept Modals -->
@@ -897,17 +987,17 @@ tr:hover td { background:#f8fafc; }
           <div class="card-header"><div><h3>Bekleyen Ödemeler</h3><p id="m-pending-sub">—</p></div><div style="display:flex;gap:8px;"><input class="search-input" placeholder="🔍 Ara..." oninput="filterMudurPending(this.value)"><button class="btn btn-secondary btn-sm" onclick="loadMudurPending()">🔄</button></div></div>
           <div class="dept-tabs" id="m-dept-tabs"></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="m-select-all" onchange="mudurToggleAll(this.checked)"><label for="m-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="m-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
-          <table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>DEP. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="m-pending-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>DEP. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="m-pending-table"></tbody></table></div>
         </div>
       </div>
       <div class="subpage" id="mudur-history">
         <div class="page-header"><div><h1>Onay Geçmişi</h1></div><select id="m-history-filter" onchange="loadMudurHistory()"><option value="all">Tümü</option><option value="approved">Onayladıklarım</option><option value="rejected">Reddettiklerim</option></select></div>
-        <div class="card"><div class="card-header"><div><h3>İşlem Geçmişi</h3><p id="m-history-sub">—</p></div></div><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="m-history-table"></tbody></table></div>
+        <div class="card"><div class="card-header"><div><h3>İşlem Geçmişi</h3><p id="m-history-sub">—</p></div></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="m-history-table"></tbody></table></div>
       </div>
       <div class="subpage" id="mudur-summary">
         <div class="page-header"><div><h1>Departman Özeti</h1></div></div>
         <div class="card"><div class="card-header"><div><h3>Departman Dağılımı</h3></div></div><div id="m-summary-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px;"></div></div>
-        <div class="card"><div class="card-header"><div><h3>Detay</h3><p id="m-summary-sub">—</p></div><select id="m-summary-dept" onchange="loadMudurSummaryDetail(this.value)"><option value="">— Seçiniz —</option></select></div><table><thead><tr><th>CARİ</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody id="m-summary-table"></tbody></table></div>
+        <div class="card"><div class="card-header"><div><h3>Detay</h3><p id="m-summary-sub">—</p></div><select id="m-summary-dept" onchange="loadMudurSummaryDetail(this.value)"><option value="">— Seçiniz —</option></select></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody id="m-summary-table"></tbody></table></div>
       </div>
       <div class="subpage" id="mudur-db">
         <div class="page-header"><div><h1>Dashboard</h1></div></div>
@@ -917,7 +1007,7 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">TAMAMLANAN</div><div class="stat-value" id="m-db-completed">—</div></div>
           <div class="stat-card"><div class="stat-icon">❌</div><div class="stat-label">REDDEDİLEN</div><div class="stat-value" id="m-db-rejected">—</div></div>
         </div>
-        <div class="card"><div class="card-header"><div><h3>Batch Listesi</h3></div></div><table><thead><tr><th>BATCH</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="m-db-table"></tbody></table></div>
+        <div class="card"><div class="card-header"><div><h3>Batch Listesi</h3></div></div><div class="table-wrap"><table><thead><tr><th>BATCH</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="m-db-table"></tbody></table></div>
       </div>
     </div>
     <div class="modal-overlay" id="m-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="m-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="m-approve-comment" placeholder="Onay notu..."></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="m-approve-btn" onclick="confirmMudurApprove()">✅ Onayla</button></div></div></div>
@@ -955,7 +1045,7 @@ tr:hover td { background:#f8fafc; }
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;" id="dir-dept-grid"></div>
         <div class="card" id="dir-drill-card" style="display:none;">
           <div class="card-header"><div><h3 id="dir-drill-title">—</h3><p id="dir-drill-sub">—</p></div><button class="btn btn-secondary btn-sm" onclick="closeDirDrill()">✕</button></div>
-          <table><thead><tr><th>CARİ</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody id="dir-drill-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th>CARİ</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody id="dir-drill-table"></tbody></table></div>
         </div>
       </div>
       <div class="subpage" id="dir-pending">
@@ -963,12 +1053,12 @@ tr:hover td { background:#f8fafc; }
         <div class="card">
           <div class="card-header"><div><h3>Bekleyenler</h3><p id="dir-pending-sub">—</p></div><div style="display:flex;gap:8px;"><select id="dir-dept-filter" onchange="filterDirDept()"><option value="">Tüm Departmanlar</option></select><button class="btn btn-secondary btn-sm" onclick="loadDirPending()">🔄</button></div></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="dir-select-all" onchange="dirToggleAll(this.checked)"><label for="dir-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="dir-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
-          <table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>MÜD. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="dir-pending-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>MÜD. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="dir-pending-table"></tbody></table></div>
         </div>
       </div>
       <div class="subpage" id="dir-history">
         <div class="page-header"><div><h1>Onay Geçmişi</h1></div><select id="dir-history-filter" onchange="loadDirHistory()"><option value="all">Tümü</option><option value="approved">Onayladıklarım</option><option value="rejected">Reddettiklerim</option></select></div>
-        <div class="card"><div class="card-header"><div><h3>Geçmiş</h3><p id="dir-history-sub">—</p></div></div><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="dir-history-table"></tbody></table></div>
+        <div class="card"><div class="card-header"><div><h3>Geçmiş</h3><p id="dir-history-sub">—</p></div></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="dir-history-table"></tbody></table></div>
       </div>
     </div>
     <div class="modal-overlay" id="dir-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="dir-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="dir-approve-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="dir-approve-btn" onclick="confirmDirApprove()">✅ Onayla</button></div></div></div>
@@ -1004,19 +1094,19 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card" ><div class="stat-icon" style="opacity:0.4;">📦</div><div class="stat-label" style="color:var(--text2);">BATCH</div><div class="stat-value" id="gm-batches">—</div></div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;" id="gm-dept-summary"></div>
-        <div class="card" ><div class="card-header" style="border-color:var(--border);"><div><h3 style="color:var(--accent);">Son Batch'ler</h3></div></div><table><thead><tr><th>BATCH</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="gm-batch-table"></tbody></table></div>
+        <div class="card" ><div class="card-header" style="border-color:var(--border);"><div><h3 style="color:var(--accent);">Son Batch'ler</h3></div></div><div class="table-wrap"><table><thead><tr><th>BATCH</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="gm-batch-table"></tbody></table></div>
       </div>
       <div class="subpage" id="gm-pending">
         <div style="margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;"><div><h1 style="font-size:28px;font-weight:700;color:var(--accent);">Final Onay</h1><p style="font-size:13px;color:var(--text2);margin-top:5px;">Tüm aşamalardan geçen ödemeler — son karar sizde</p></div><button class="btn btn-secondary btn-sm" onclick="loadGmPending()">🔄</button></div>
         <div class="card" >
           <div class="card-header" style="border-color:var(--border);"><div><h3 style="color:var(--accent);">Bekleyen Ödemeler</h3><p id="gm-pending-sub" style="color:var(--text2);">—</p></div><select id="gm-dept-filter" onchange="filterGmDept()" style="background:var(--surface2);border-color:var(--border);color:var(--text);"><option value="">Tüm Departmanlar</option></select></div>
           <div class="select-all-row" style="background:var(--surface2);border-color:var(--border);"><input type="checkbox" class="cb" id="gm-select-all" onchange="gmToggleAll(this.checked)"><label for="gm-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="gm-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
-          <table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>ONAY ZİNCİRİ</th><th>İŞLEM</th></tr></thead><tbody id="gm-pending-table"></tbody></table>
+          <div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>ONAY ZİNCİRİ</th><th>İŞLEM</th></tr></thead><tbody id="gm-pending-table"></tbody></table></div>
         </div>
       </div>
       <div class="subpage" id="gm-history">
         <div style="margin-bottom:24px;"><h1 style="font-size:28px;font-weight:700;color:var(--accent);">Onay Geçmişi</h1></div>
-        <div class="card" ><div class="card-header" style="border-color:var(--border);"><div><h3 style="color:var(--accent);">İşlem Geçmişi</h3><p id="gm-history-sub" style="color:var(--text2);">—</p></div><select id="gm-history-filter" onchange="loadGmHistory()" style="background:var(--surface2);border-color:var(--border);color:var(--text);"><option value="all">Tümü</option><option value="approved">Onayladıklarım</option><option value="rejected">Reddettiklerim</option></select></div><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="gm-history-table"></tbody></table></div>
+        <div class="card" ><div class="card-header" style="border-color:var(--border);"><div><h3 style="color:var(--accent);">İşlem Geçmişi</h3><p id="gm-history-sub" style="color:var(--text2);">—</p></div><select id="gm-history-filter" onchange="loadGmHistory()" style="background:var(--surface2);border-color:var(--border);color:var(--text);"><option value="all">Tümü</option><option value="approved">Onayladıklarım</option><option value="rejected">Reddettiklerim</option></select></div><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>KARARIM</th><th>AÇIKLAMA</th><th>TARİH</th></tr></thead><tbody id="gm-history-table"></tbody></table></div>
       </div>
     </div>
     <div class="modal-overlay" id="gm-approve-modal"><div class="modal"><h3 style="color:var(--accent);">👑 Final Onay</h3><p class="msub" id="gm-approve-sub">—</p><div class="form-group"><label>GM Notu (opsiyonel)</label><textarea id="gm-approve-comment" style="background:var(--surface2);border-color:var(--border);"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('gm-approve-modal')">İptal</button><button class="btn btn-gold btn-sm" id="gm-approve-btn" onclick="confirmGmApprove()">👑 Final Onay Ver</button></div></div></div>
@@ -1433,7 +1523,7 @@ async function showBatchDetail(batchId,batchNo){
   const{data}=await db.from('payments').select('*,departments(name)').eq('batch_id',batchId).order('cari');
   document.getElementById('detail-modal-sub').textContent=`${(data||[]).length} kayıt`;
   if(!data||data.length===0){document.getElementById('detail-modal-body').innerHTML='<div class="empty-state"><span class="icon">📭</span><p>Kayıt bulunamadı.</p></div>';return;}
-  document.getElementById('detail-modal-body').innerHTML=`<div style="max-height:400px;overflow:auto;"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody>${data.map(p=>`<tr><td style="font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.cari}</td><td>${p.departments?.name||'<span style="color:var(--danger)">Eşleşmedi</span>'}</td><td style="font-family:'DM Mono',monospace;color:var(--success);">${formatMoney(p.amount)}</td><td style="font-size:12px;color:var(--text3);">${p.due_date||'—'}</td><td>${statusBadge(p.status)}</td></tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('detail-modal-body').innerHTML=`<div style="max-height:400px;overflow:auto;"><div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>DURUM</th></tr></thead><tbody>${data.map(p=>`<tr><td style="font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.cari}</td><td>${p.departments?.name||'<span style="color:var(--danger)">Eşleşmedi</span>'}</td><td style="font-family:'DM Mono',monospace;color:var(--success);">${formatMoney(p.amount)}</td><td style="font-size:12px;color:var(--text3);">${p.due_date||'—'}</td><td>${statusBadge(p.status)}</td></tr>`).join('')}</tbody></table></div>`;
 }
 function closeDetailModal(){document.getElementById('detail-modal').classList.remove('open');}
 
@@ -1677,12 +1767,12 @@ async function confirmGmApprove(){const btn=document.getElementById('gm-approve-
 async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadGmHistory(){const filter=document.getElementById('gm-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','genel_mudur').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('gm-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('gm-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr style="border-color:var(--border);"><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${a.payments?.cari||'—'}</td><td><span class="badge badge-gold">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
-// MOBİL SİDEBAR
+// ── MOBİL SİDEBAR ──
 function toggleSidebar(btn) {
-  const panel = btn.closest('.panel');
-  const sidebar = panel.querySelector('.sidebar');
-  const overlay = panel.querySelector('.sidebar-overlay');
-  const isOpen = sidebar.classList.contains('mob-open');
+  var panel = btn.closest('.panel');
+  var sidebar = panel.querySelector('.sidebar');
+  var overlay = panel.querySelector('.sidebar-overlay');
+  var isOpen = sidebar.classList.contains('mob-open');
   if (isOpen) {
     sidebar.classList.remove('mob-open');
     overlay.classList.remove('open');
@@ -1694,26 +1784,28 @@ function toggleSidebar(btn) {
   }
 }
 function closeSidebar(overlay) {
-  const panel = overlay.closest('.panel');
-  const sidebar = panel.querySelector('.sidebar');
-  const btn = panel.querySelector('.mob-menu-btn');
+  var panel = overlay.closest('.panel');
+  var sidebar = panel.querySelector('.sidebar');
+  var btn = panel.querySelector('.mob-menu-btn');
   sidebar.classList.remove('mob-open');
   overlay.classList.remove('open');
   if (btn) btn.innerHTML = '☰';
 }
 document.addEventListener('click', function(e) {
-  if (e.target.closest('.nav-item') && window.innerWidth <= 768) {
-    const panel = e.target.closest('.panel');
+  var navItem = e.target.closest('.nav-item');
+  if (navItem && window.innerWidth <= 900) {
+    var panel = navItem.closest('.panel');
     if (panel) {
-      const sidebar = panel.querySelector('.sidebar');
-      const overlay = panel.querySelector('.sidebar-overlay');
-      const btn = panel.querySelector('.mob-menu-btn');
-      if (sidebar) { sidebar.classList.remove('mob-open'); }
-      if (overlay) { overlay.classList.remove('open'); }
-      if (btn) { btn.innerHTML = '☰'; }
+      var sidebar = panel.querySelector('.sidebar');
+      var overlay = panel.querySelector('.sidebar-overlay');
+      var btn = panel.querySelector('.mob-menu-btn');
+      if (sidebar) sidebar.classList.remove('mob-open');
+      if (overlay) overlay.classList.remove('open');
+      if (btn) btn.innerHTML = '☰';
     }
   }
 });
+
 </script>
 </body>
 </html>
