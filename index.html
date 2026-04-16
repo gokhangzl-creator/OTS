@@ -370,180 +370,205 @@ tr:hover td { background:#f8fafc; }
 .search-input { background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:7px 12px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:13px; outline:none; width:200px; transition:border-color 0.2s; }
 .search-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-bg); }
 
-/* ═══════════════════════════════════════════
-   MOBİL RESPONSIVE — TAM DÜZELTME
-═══════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   MOBİL RESPONSIVE — KAPSAMLI DÜZELTME
+   Tüm paneller, tüm tablolar, tüm layoutlar
+═══════════════════════════════════════════════════════ */
 
 /* Hamburger butonu */
 .mob-menu-btn {
   display: none;
   position: fixed;
-  top: 14px;
-  left: 14px;
-  z-index: 301;
+  top: 12px;
+  left: 12px;
+  z-index: 9999;
   background: var(--accent);
   border: none;
   border-radius: 8px;
-  width: 38px;
-  height: 38px;
-  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
   color: white;
   cursor: pointer;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px #00000030;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
 }
 
-/* Sidebar overlay */
 .sidebar-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: #00000055;
+  background: rgba(0,0,0,0.5);
   z-index: 199;
 }
 .sidebar-overlay.open { display: block; }
 
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
 
-  /* ── HAMBURGER ── */
+  /* ══ HAMBURGER ══ */
   .mob-menu-btn { display: flex !important; }
 
-  /* ── LOGIN ── */
-  #login-screen { padding: 16px; align-items: flex-start; padding-top: 60px; }
+  /* ══ BODY ══ */
+  body { overflow-x: hidden !important; }
+
+  /* ══ LOGIN ══ */
+  #login-screen {
+    padding: 20px !important;
+    align-items: center !important;
+  }
   .login-card {
     width: 100% !important;
-    max-width: 100% !important;
+    max-width: 420px !important;
     padding: 28px 20px !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
+    box-sizing: border-box !important;
   }
 
-  /* ── SIDEBAR — tüm paneller ── */
+  /* ══ SIDEBAR — gizle ══ */
   .sidebar {
-    transform: translateX(-100%) !important;
-    transition: transform 0.28s ease !important;
-    z-index: 200 !important;
-    width: 260px !important;
     position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    width: 260px !important;
+    transform: translateX(-260px) !important;
+    transition: transform 0.3s ease !important;
+    z-index: 500 !important;
+    overflow-y: auto !important;
   }
   .sidebar.mob-open {
     transform: translateX(0) !important;
-    box-shadow: 4px 0 24px #00000030 !important;
+    box-shadow: 8px 0 32px rgba(0,0,0,0.3) !important;
   }
 
-  /* ── MAIN CONTENT (sidebar layout) ── */
+  /* ══ MAIN CONTENT — sidebar layout ══ */
   .main-content {
     margin-left: 0 !important;
-    padding: 16px !important;
-    padding-top: 68px !important;
-    min-height: 100vh;
-    overflow-x: hidden;
+    width: 100% !important;
+    padding: 64px 12px 20px 12px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
-  /* ── TOPBAR ── */
+  /* ══ TOPBAR ══ */
   .topbar {
-    padding: 0 12px 0 60px !important;
-    overflow: hidden;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 0 10px 0 58px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
   }
-  .topbar-tabs {
-    display: none !important;
-  }
+  .topbar-tabs { display: none !important; }
   .topbar-sep { display: none !important; }
-  .chip-name, .chip-role { display: none !important; }
+  .chip-name { display: none !important; }
+  .chip-role { display: none !important; }
   .user-chip {
     padding: 4px !important;
     border-radius: 50% !important;
-    min-width: unset !important;
   }
   .t-logout { font-size: 11px !important; padding: 5px 8px !important; }
+  .topbar-logo h2 { font-size: 13px !important; }
 
-  /* ── TOPBAR-MAIN (topbar layout) ── */
+  /* ══ TOPBAR-MAIN layout ══ */
   .topbar-main {
     margin-top: 60px !important;
-    padding: 16px !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-    overflow-x: hidden;
+    padding: 12px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
-  /* ── STATS GRID — 2 sütun ── */
+  /* ══ STATS GRID — 2 sütun ══ */
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
-    margin-bottom: 16px !important;
-  }
-  .stat-value { font-size: 20px !important; }
-  .stat-label { font-size: 10px !important; }
-  .stat-card { padding: 14px !important; }
-
-  /* ── DEPT GRID — 1 sütun ── */
-  .dept-grid {
-    grid-template-columns: 1fr !important;
     gap: 8px !important;
+    margin-bottom: 12px !important;
   }
+  .stat-card { padding: 12px !important; }
+  .stat-value { font-size: 20px !important; }
+  .stat-label { font-size: 9px !important; }
+  .stat-icon { font-size: 16px !important; }
 
-  /* ── PAGE HEADER ── */
+  /* ══ DEPT GRID — 1 sütun ══ */
+  .dept-grid { grid-template-columns: 1fr !important; }
+
+  /* ══ PAGE HEADER ══ */
   .page-header {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 10px !important;
-    margin-bottom: 16px !important;
+    margin-bottom: 14px !important;
   }
   .page-header h1 { font-size: 17px !important; }
-  .page-header > div:last-child {
+  .page-header > *:last-child {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 8px !important;
+    gap: 6px !important;
     width: 100% !important;
   }
 
-  /* ── CARD ── */
-  .card { margin-bottom: 14px !important; }
+  /* ══ CARD ══ */
+  .card { margin-bottom: 12px !important; overflow: hidden !important; }
   .card-header {
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 10px !important;
-    padding: 12px 14px !important;
+    gap: 8px !important;
+    padding: 12px !important;
   }
-  .card-header > div:last-child {
+  .card-header > *:last-child {
     width: 100% !important;
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 8px !important;
+    gap: 6px !important;
   }
-  .card-body { padding: 12px !important; }
+  .card-body { padding: 0 !important; }
 
-  /* ── TABLOLAR — YATAY KAYDIRMA ── */
+  /* ══ TABLOLAR — KRİTİK DÜZELTME ══ */
+  /* Kart içindeki tüm tablo sarmalayıcılar */
+  .card { overflow: hidden !important; }
+  
   .table-wrap {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
     width: 100% !important;
-    display: block !important;
-  }
-  /* table-wrap içi olmayan tablolar için wrapper */
-  .card > table,
-  .subpage > table {
-    display: block !important;
-    overflow-x: auto !important;
+    overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
-    width: 100% !important;
+    display: block !important;
+    position: relative !important;
   }
-  table {
-    min-width: 520px !important;
-  }
-  td { padding: 9px 10px !important; font-size: 12px !important; }
-  th { padding: 8px 10px !important; font-size: 10px !important; }
 
-  /* ── SEARCH ── */
+  /* Sarmalanmamış tablolar için */
+  table {
+    width: max-content !important;
+    min-width: 100% !important;
+    display: table !important;
+  }
+
+  /* Tablo hücreleri */
+  td {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+  th {
+    padding: 7px 10px !important;
+    font-size: 10px !important;
+    white-space: nowrap !important;
+  }
+
+  /* ══ SEARCH INPUT ══ */
   .search-input {
     width: 100% !important;
-    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  /* ── BUTONLAR ── */
-  .btn-sm { padding: 7px 11px !important; font-size: 12px !important; }
+  /* ══ BUTONLAR ══ */
+  .btn { font-size: 12px !important; padding: 9px 14px !important; }
+  .btn-sm { font-size: 11px !important; padding: 6px 10px !important; }
 
-  /* ── MODALLER ── */
+  /* ══ MODAL — alttan açılan sheet ══ */
   .modal-overlay {
     align-items: flex-end !important;
     padding: 0 !important;
@@ -551,87 +576,119 @@ tr:hover td { background:#f8fafc; }
   .modal {
     width: 100% !important;
     max-width: 100% !important;
-    border-radius: 16px 16px 0 0 !important;
-    padding: 24px 16px !important;
-    max-height: 88vh !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 20px 16px 32px !important;
+    max-height: 85vh !important;
     overflow-y: auto !important;
     margin: 0 !important;
+    box-sizing: border-box !important;
   }
+  .modal h3 { font-size: 16px !important; }
   .modal-actions {
     flex-wrap: wrap !important;
     gap: 8px !important;
+    margin-top: 16px !important;
   }
-  .modal-actions .btn { flex: 1 !important; min-width: 100px !important; }
+  .modal-actions .btn {
+    flex: 1 !important;
+    min-width: 120px !important;
+  }
 
-  /* ── DRAWER ── */
+  /* ══ DRAWER ══ */
   .drawer {
     width: 100% !important;
     max-width: 100% !important;
+    top: 20% !important;
+    border-radius: 20px 20px 0 0 !important;
+    overflow: hidden !important;
   }
-  .drawer-head h3 { max-width: calc(100% - 48px) !important; }
 
-  /* ── BULK BAR ── */
+  /* ══ BULK BAR ══ */
   .bulk-bar {
-    width: calc(100% - 24px) !important;
-    left: 12px !important;
-    right: 12px !important;
-    transform: none !important;
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    transform: translateX(0) !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
-    gap: 8px !important;
-    bottom: 12px !important;
-    padding: 10px 14px !important;
-    font-size: 12px !important;
+    gap: 6px !important;
+    bottom: 8px !important;
+    padding: 10px 12px !important;
+    font-size: 11px !important;
+    border-radius: 10px !important;
   }
-  .bulk-bar.show { transform: none !important; }
+  .bulk-bar.show { transform: translateX(0) !important; opacity: 1 !important; }
 
-  /* ── UPLOAD ZONE ── */
-  .upload-zone { padding: 24px 16px !important; }
+  /* ══ UPLOAD ZONE ══ */
+  .upload-zone { padding: 20px 12px !important; }
 
-  /* ── DEPT TABS (sekme çubuğu) ── */
+  /* ══ DEPT TABS ══ */
   .dept-tabs {
     overflow-x: auto !important;
     flex-wrap: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
-    padding: 10px 12px !important;
-    gap: 6px !important;
+    padding: 8px 10px !important;
+    gap: 5px !important;
+    scrollbar-width: none !important;
   }
+  .dept-tabs::-webkit-scrollbar { display: none !important; }
   .dept-tab {
     white-space: nowrap !important;
     flex-shrink: 0 !important;
     font-size: 11px !important;
+    padding: 4px 10px !important;
   }
 
-  /* ── TAB NAVİGASYON (departman/müdür üst tabları) ── */
-  div[style*="fit-content"] {
+  /* ══ TAB NAVIGATION (satır içi flex tab'lar) ══ */
+  div[style*="fit-content"],
+  div[style*="fit-content;"] {
     width: 100% !important;
     overflow-x: auto !important;
     flex-wrap: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
   }
 
-  /* ── FORM ── */
+  /* ══ FORM ══ */
+  .form-group { margin-bottom: 12px !important; }
   .form-group input,
-  .form-group select,
-  select,
-  textarea {
-    font-size: 16px !important; /* iOS zoom engelleme */
+  textarea,
+  select {
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
   }
 
-  /* ── TOAST ── */
+  /* ══ TOAST ══ */
   .toast {
     left: 12px !important;
     right: 12px !important;
-    bottom: 12px !important;
-    max-width: 100% !important;
+    bottom: 16px !important;
+    max-width: none !important;
     width: auto !important;
+    font-size: 13px !important;
   }
 
-  /* ── BADGE WRAP ── */
-  .badge { font-size: 10px !important; padding: 2px 7px !important; }
+  /* ══ BADGE ══ */
+  .badge {
+    font-size: 10px !important;
+    padding: 2px 6px !important;
+  }
 
-  /* ── SELECT ALL ROW ── */
-  .select-all-row { font-size: 11px !important; padding: 8px 10px !important; }
+  /* ══ DROW (drawer row) ══ */
+  .drow {
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 8px 0 !important;
+  }
+  .dval {
+    text-align: left !important;
+    max-width: 100% !important;
+    font-size: 13px !important;
+  }
+
+  /* ══ SELECT ALL ROW ══ */
+  .select-all-row { padding: 8px 10px !important; font-size: 11px !important; }
 }
 </style>
 </head>
@@ -886,6 +943,7 @@ tr:hover td { background:#f8fafc; }
 
   <!-- ───── DEPARTMAN PANEL ───── -->
   <div class="panel" id="panel-departman">
+    <button class="mob-menu-btn" style="display:none;">☰</button>
     <div class="topbar">
       <div class="topbar-left">
         <div class="topbar-logo"><div class="ticon">🏦</div><h2>Ödeme Takip</h2></div>
@@ -1018,6 +1076,7 @@ tr:hover td { background:#f8fafc; }
 
   <!-- ───── DİREKTÖR PANEL ───── -->
   <div class="panel" id="panel-direktor">
+    <button class="mob-menu-btn" style="display:none;">☰</button>
     <div class="topbar">
       <div class="topbar-left">
         <div class="topbar-logo"><div class="ticon" style="background:var(--accent);">🏦</div><h2 style="color:#e2e8f0;">Ödeme Takip</h2></div>
@@ -1069,6 +1128,7 @@ tr:hover td { background:#f8fafc; }
 
   <!-- ───── GENEL MÜDÜR PANEL ───── -->
   <div class="panel" id="panel-gm">
+    <button class="mob-menu-btn" style="display:none;">☰</button>
     <div class="topbar">
       <div class="topbar-left">
         <div class="topbar-logo"><div class="ticon" style="background:var(--surface2);border:1px solid #d4a843;">🏦</div><h2 >Ödeme Takip</h2></div>
@@ -1767,19 +1827,20 @@ async function confirmGmApprove(){const btn=document.getElementById('gm-approve-
 async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadGmHistory(){const filter=document.getElementById('gm-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','genel_mudur').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('gm-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('gm-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr style="border-color:var(--border);"><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${a.payments?.cari||'—'}</td><td><span class="badge badge-gold">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
-// ── MOBİL SİDEBAR ──
+/* ── MOBİL SİDEBAR JS ── */
 function toggleSidebar(btn) {
   var panel = btn.closest('.panel');
   var sidebar = panel.querySelector('.sidebar');
   var overlay = panel.querySelector('.sidebar-overlay');
+  if (!sidebar) return;
   var isOpen = sidebar.classList.contains('mob-open');
   if (isOpen) {
     sidebar.classList.remove('mob-open');
-    overlay.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
     btn.innerHTML = '☰';
   } else {
     sidebar.classList.add('mob-open');
-    overlay.classList.add('open');
+    if (overlay) overlay.classList.add('open');
     btn.innerHTML = '✕';
   }
 }
@@ -1787,22 +1848,22 @@ function closeSidebar(overlay) {
   var panel = overlay.closest('.panel');
   var sidebar = panel.querySelector('.sidebar');
   var btn = panel.querySelector('.mob-menu-btn');
-  sidebar.classList.remove('mob-open');
+  if (sidebar) sidebar.classList.remove('mob-open');
   overlay.classList.remove('open');
   if (btn) btn.innerHTML = '☰';
 }
+// Nav item tıklanınca sidebar kapat
 document.addEventListener('click', function(e) {
-  var navItem = e.target.closest('.nav-item');
-  if (navItem && window.innerWidth <= 900) {
-    var panel = navItem.closest('.panel');
-    if (panel) {
-      var sidebar = panel.querySelector('.sidebar');
-      var overlay = panel.querySelector('.sidebar-overlay');
-      var btn = panel.querySelector('.mob-menu-btn');
-      if (sidebar) sidebar.classList.remove('mob-open');
-      if (overlay) overlay.classList.remove('open');
-      if (btn) btn.innerHTML = '☰';
-    }
+  var item = e.target.closest('.nav-item');
+  if (item && window.innerWidth <= 900) {
+    var panel = item.closest('.panel');
+    if (!panel) return;
+    var sidebar = panel.querySelector('.sidebar');
+    var overlay = panel.querySelector('.sidebar-overlay');
+    var btn = panel.querySelector('.mob-menu-btn');
+    if (sidebar) sidebar.classList.remove('mob-open');
+    if (overlay) overlay.classList.remove('open');
+    if (btn) btn.innerHTML = '☰';
   }
 });
 
