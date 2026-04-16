@@ -461,9 +461,76 @@ tr:hover td { background:#f8fafc; }
     <div class="form-group"><label>E-posta</label><input type="email" id="login-email" placeholder="kullanici@sirket.com" oninput="detectRole(this.value)"></div>
     <div class="form-group"><label>Şifre</label><input type="password" id="login-pass" placeholder="••••••••"></div>
     <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="doLogin()" id="login-btn">Giriş Yap →</button>
+    <div style="text-align:center;margin-top:14px;">
+      <a onclick="showForgotScreen()" style="font-size:13px;color:var(--accent);cursor:pointer;text-decoration:none;">Şifremi unuttum</a>
+    </div>
+    
   </div>
 </div>
 
+
+
+<!-- ═══════════════ ŞİFREMİ UNUTTUM ═══════════════ -->
+<div id="forgot-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#1d4ed8 100%);">
+  <div style="background:white;border-radius:16px;padding:48px;width:420px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:fadeUp 0.5s ease;">
+    
+    <!-- ADIM 1: Mail gir -->
+    <div id="forgot-step1">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="width:56px;height:56px;background:#eff6ff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">🔑</div>
+        <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 8px;">Şifremi Unuttum</h2>
+        <p style="font-size:13px;color:#6b7280;margin:0;">Kayıtlı e-posta adresinizi girin</p>
+      </div>
+      <div id="forgot-error1" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">E-posta Adresi</label>
+        <input id="forgot-email" type="email" placeholder="kullanici@sirket.com"
+          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;color:#111;font-size:14px;outline:none;box-sizing:border-box;"
+          onkeydown="if(event.key==='Enter')sendResetCode()">
+      </div>
+      <button onclick="sendResetCode()" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;" id="forgot-send-btn">
+        Kod Gönder →
+      </button>
+      <button onclick="backToLoginFromForgot()" style="width:100%;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">
+        ← Giriş Ekranına Dön
+      </button>
+    </div>
+
+    <!-- ADIM 2: Kod + Yeni şifre -->
+    <div id="forgot-step2" style="display:none;">
+      <div style="text-align:center;margin-bottom:28px;">
+        <div style="width:56px;height:56px;background:#eff6ff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">📧</div>
+        <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 8px;">Kodu Girin</h2>
+        <p style="font-size:13px;color:#6b7280;margin:0;">E-postanıza gönderilen kodu girin</p>
+        <p style="font-size:13px;font-weight:600;color:#1d4ed8;margin:4px 0 0;" id="forgot-email-hint"></p>
+      </div>
+      <div id="forgot-error2" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Doğrulama Kodu</label>
+        <input id="forgot-code" type="number" placeholder="6 haneli kod" maxlength="6"
+          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px;color:#111;font-size:24px;font-family:monospace;text-align:center;letter-spacing:8px;outline:none;box-sizing:border-box;"
+          oninput="this.value=this.value.slice(0,6)">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Yeni Şifre</label>
+        <input id="forgot-newpass" type="password" placeholder="En az 6 karakter"
+          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;color:#111;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Yeni Şifre (Tekrar)</label>
+        <input id="forgot-confirm" type="password" placeholder="••••••••"
+          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;color:#111;font-size:14px;outline:none;box-sizing:border-box;"
+          onkeydown="if(event.key==='Enter')confirmResetPassword()">
+      </div>
+      <button onclick="confirmResetPassword()" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;" id="forgot-confirm-btn">
+        Şifremi Sıfırla ✓
+      </button>
+      <button onclick="backToLoginFromForgot()" style="width:100%;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">
+        ← İptal
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════ OTP EKRANI ═══════════════ -->
 <div id="otp-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#1d4ed8 100%);">
@@ -1821,6 +1888,178 @@ function exportCurrentTable(name) {
   const wb = XLSX.utils.table_to_book(mainTable, {sheet:'Veri'});
   XLSX.writeFile(wb, name + '_' + new Date().toLocaleDateString('tr-TR').replace(/\./g,'-') + '.xlsx');
   showToast('Excel indirildi!', 'success');
+}
+
+
+// ── ŞİFREMİ UNUTTUM ──
+let resetCode = null;
+let resetExpiry = null;
+let resetUserId = null;
+
+function showForgotScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('forgot-screen').style.display = 'flex';
+  document.getElementById('forgot-step1').style.display = 'block';
+  document.getElementById('forgot-step2').style.display = 'none';
+  document.getElementById('forgot-email').value = '';
+  document.getElementById('forgot-error1').style.display = 'none';
+}
+
+function backToLoginFromForgot() {
+  document.getElementById('forgot-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  resetCode = null; resetUserId = null;
+}
+
+async function sendResetCode() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const errEl = document.getElementById('forgot-error1');
+  errEl.style.display = 'none';
+  if (!email) { errEl.textContent = 'E-posta adresinizi girin.'; errEl.style.display='block'; return; }
+  
+  const btn = document.getElementById('forgot-send-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Gönderiliyor...';
+  
+  // Kullanıcıyı bul
+  const { data, error } = await db.from('users').select('id,name,email').eq('email', email).single();
+  btn.disabled = false; btn.innerHTML = 'Kod Gönder →';
+  
+  if (error || !data) {
+    errEl.textContent = 'Bu e-posta adresi sistemde kayıtlı değil.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  resetCode = generateOTP();
+  resetExpiry = Date.now() + 5 * 60 * 1000;
+  resetUserId = data.id;
+  
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
+      to_email: data.email,
+      to_name: data.name,
+      otp_code: resetCode
+    });
+  } catch(e) { console.warn('EmailJS:', e); }
+  
+  // Adım 2'ye geç
+  document.getElementById('forgot-step1').style.display = 'none';
+  document.getElementById('forgot-step2').style.display = 'block';
+  document.getElementById('forgot-email-hint').textContent = email + ' adresine kod gönderildi';
+  document.getElementById('forgot-code').value = '';
+  document.getElementById('forgot-newpass').value = '';
+  document.getElementById('forgot-confirmpass').value = '';
+}
+
+async function resetPassword() {
+  const code = document.getElementById('forgot-code').value.trim();
+  const newPass = document.getElementById('forgot-newpass').value.trim();
+  const confirm = document.getElementById('forgot-confirmpass').value.trim();
+  const errEl = document.getElementById('forgot-error2');
+  errEl.style.display = 'none';
+  
+  if (!code || !newPass || !confirm) { errEl.textContent = 'Tüm alanları doldurun.'; errEl.style.display='block'; return; }
+  if (Date.now() > resetExpiry) { errEl.textContent = 'Kod süresi doldu. Tekrar deneyin.'; errEl.style.display='block'; return; }
+  if (code !== resetCode) { errEl.textContent = 'Hatalı kod.'; errEl.style.display='block'; return; }
+  if (newPass.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.style.display='block'; return; }
+  if (newPass !== confirm) { errEl.textContent = 'Şifreler eşleşmiyor.'; errEl.style.display='block'; return; }
+  
+  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', resetUserId);
+  if (error) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display='block'; return; }
+  
+  resetCode = null; resetUserId = null;
+  backToLoginFromForgot();
+  showToast('Şifreniz başarıyla sıfırlandı! Giriş yapabilirsiniz.', 'success');
+}
+
+
+// ── ŞİFREMİ UNUTTUM ──
+let resetCode = null;
+let resetExpiry = null;
+let resetUserId = null;
+
+function showForgotScreen() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('forgot-screen').style.display = 'flex';
+  document.getElementById('forgot-step1').style.display = 'block';
+  document.getElementById('forgot-step2').style.display = 'none';
+  document.getElementById('forgot-email').value = '';
+  document.getElementById('forgot-error1').style.display = 'none';
+}
+
+function backToLoginFromForgot() {
+  document.getElementById('forgot-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  resetCode = null; resetUserId = null;
+}
+
+async function sendResetCode() {
+  const email = document.getElementById('forgot-email').value.trim();
+  const errEl = document.getElementById('forgot-error1');
+  errEl.style.display = 'none';
+  if (!email) { errEl.textContent = 'E-posta adresinizi girin.'; errEl.style.display='block'; return; }
+  
+  const btn = document.getElementById('forgot-send-btn');
+  btn.innerHTML = '<span class="spinner"></span> Gönderiliyor...'; btn.disabled = true;
+  
+  // Kullanıcıyı bul
+  const { data, error } = await db.from('users').select('id,name,email').eq('email', email).single();
+  btn.innerHTML = 'Kod Gönder →'; btn.disabled = false;
+  
+  if (error || !data) {
+    errEl.textContent = 'Bu e-posta adresi sistemde kayıtlı değil.';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  // Kod oluştur ve gönder
+  resetCode = generateOTP();
+  resetExpiry = Date.now() + 5 * 60 * 1000;
+  resetUserId = data.id;
+  
+  try {
+    await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
+      to_email: data.email,
+      to_name: data.name,
+      otp_code: resetCode
+    });
+  } catch(e) { console.warn('Mail gönderilemedi:', e); }
+  
+  // Adım 2'ye geç
+  document.getElementById('forgot-step1').style.display = 'none';
+  document.getElementById('forgot-step2').style.display = 'block';
+  document.getElementById('forgot-email-hint').textContent = email;
+  document.getElementById('forgot-code').value = '';
+  document.getElementById('forgot-newpass').value = '';
+  document.getElementById('forgot-confirm').value = '';
+  document.getElementById('forgot-error2').style.display = 'none';
+}
+
+async function confirmResetPassword() {
+  const code = document.getElementById('forgot-code').value.trim();
+  const newPass = document.getElementById('forgot-newpass').value.trim();
+  const confirm = document.getElementById('forgot-confirm').value.trim();
+  const errEl = document.getElementById('forgot-error2');
+  errEl.style.display = 'none';
+  
+  if (!code || !newPass || !confirm) { errEl.textContent = 'Tüm alanları doldurun.'; errEl.style.display='block'; return; }
+  if (Date.now() > resetExpiry) { errEl.textContent = 'Kodun süresi doldu. Tekrar deneyin.'; errEl.style.display='block'; return; }
+  if (code !== resetCode) { errEl.textContent = 'Hatalı kod.'; errEl.style.display='block'; return; }
+  if (newPass.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.style.display='block'; return; }
+  if (newPass !== confirm) { errEl.textContent = 'Şifreler eşleşmiyor.'; errEl.style.display='block'; return; }
+  
+  const btn = document.getElementById('forgot-confirm-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  
+  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', resetUserId);
+  btn.disabled = false; btn.innerHTML = 'Şifremi Sıfırla ✓';
+  
+  if (error) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display='block'; return; }
+  
+  // Başarılı
+  backToLoginFromForgot();
+  showToast('Şifreniz başarıyla sıfırlandı! Giriş yapabilirsiniz.', 'success');
+  resetCode = null; resetUserId = null;
 }
 
 </script>
