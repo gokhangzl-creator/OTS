@@ -293,8 +293,8 @@ tr:hover td { background:#f8fafc; }
 .drawer-foot { padding:16px 22px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:8px; background:var(--surface2); }
 
 /* PANELS */
-#all-panels { display:none; }
-.panel { display:none; }
+#all-panels { display:none; min-height:100vh; }
+.panel { display:none; min-height:100vh; width:100%; }
 
 /* SIDEBAR */
 .sidebar { position:fixed; left:0; top:0; bottom:0; width:236px; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:100; box-shadow:2px 0 12px #00000010; }
@@ -342,7 +342,7 @@ tr:hover td { background:#f8fafc; }
 .chip-role { font-size:10px; color:var(--accent); font-family:'DM Mono',monospace; font-weight:600; }
 .t-logout { background:none; border:1px solid var(--border); border-radius:7px; color:var(--text2); cursor:pointer; font-size:12px; padding:6px 12px; font-family:'DM Sans',sans-serif; transition:all 0.2s; }
 .t-logout:hover { border-color:var(--danger); color:var(--danger); }
-.topbar-main { margin-top:60px; padding:28px; max-width:1300px; margin-left:auto; margin-right:auto; }
+.topbar-main { margin-top:60px; padding:28px; max-width:1300px; margin-left:auto; margin-right:auto; min-height:calc(100vh - 60px); }
 
 /* UPLOAD ZONE */
 .upload-zone { border:2px dashed var(--border2); border-radius:10px; padding:40px; text-align:center; transition:all 0.2s; cursor:pointer; position:relative; background:var(--surface2); }
