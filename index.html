@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    OTS — PANEL THEMED DESIGN
@@ -461,76 +462,10 @@ tr:hover td { background:#f8fafc; }
     <div class="form-group"><label>E-posta</label><input type="email" id="login-email" placeholder="kullanici@sirket.com" oninput="detectRole(this.value)"></div>
     <div class="form-group"><label>Şifre</label><input type="password" id="login-pass" placeholder="••••••••"></div>
     <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="doLogin()" id="login-btn">Giriş Yap →</button>
-    <div style="text-align:center;margin-top:14px;">
-      <a onclick="showForgotScreen()" style="font-size:13px;color:var(--accent);cursor:pointer;text-decoration:none;">Şifremi unuttum</a>
-    </div>
-    
+    <div style="text-align:center;margin-top:14px;"><a onclick="showForgotScreen()" style="font-size:13px;color:var(--accent);cursor:pointer;">Şifremi unuttum</a></div>
   </div>
 </div>
 
-
-
-<!-- ═══════════════ ŞİFREMİ UNUTTUM ═══════════════ -->
-<div id="forgot-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#1d4ed8 100%);">
-  <div style="background:white;border-radius:16px;padding:48px;width:420px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,0.15);animation:fadeUp 0.5s ease;">
-    
-    <!-- ADIM 1: Mail gir -->
-    <div id="forgot-step1">
-      <div style="text-align:center;margin-bottom:28px;">
-        <div style="width:56px;height:56px;background:#eff6ff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">🔑</div>
-        <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 8px;">Şifremi Unuttum</h2>
-        <p style="font-size:13px;color:#6b7280;margin:0;">Kayıtlı e-posta adresinizi girin</p>
-      </div>
-      <div id="forgot-error1" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
-      <div style="margin-bottom:16px;">
-        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">E-posta Adresi</label>
-        <input id="forgot-email" type="email" placeholder="kullanici@sirket.com"
-          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;color:#111;font-size:14px;outline:none;box-sizing:border-box;"
-          onkeydown="if(event.key==='Enter')sendResetCode()">
-      </div>
-      <button onclick="sendResetCode()" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;" id="forgot-send-btn">
-        Kod Gönder →
-      </button>
-      <button onclick="backToLoginFromForgot()" style="width:100%;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">
-        ← Giriş Ekranına Dön
-      </button>
-    </div>
-
-    <!-- ADIM 2: Kod + Yeni şifre -->
-    <div id="forgot-step2" style="display:none;">
-      <div style="text-align:center;margin-bottom:28px;">
-        <div style="width:56px;height:56px;background:#eff6ff;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px;">📧</div>
-        <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 8px;">Kodu Girin</h2>
-        <p style="font-size:13px;color:#6b7280;margin:0;">E-postanıza gönderilen kodu girin</p>
-        <p style="font-size:13px;font-weight:600;color:#1d4ed8;margin:4px 0 0;" id="forgot-email-hint"></p>
-      </div>
-      <div id="forgot-error2" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
-      <div style="margin-bottom:12px;">
-        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Doğrulama Kodu</label>
-        <input id="forgot-code" type="number" placeholder="6 haneli kod" maxlength="6"
-          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px;color:#111;font-size:24px;font-family:monospace;text-align:center;letter-spacing:8px;outline:none;box-sizing:border-box;"
-          oninput="this.value=this.value.slice(0,6)">
-      </div>
-      <div style="margin-bottom:12px;">
-        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Yeni Şifre</label>
-        <input id="forgot-newpass" type="password" placeholder="En az 6 karakter"
-          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;color:#111;font-size:14px;outline:none;box-sizing:border-box;">
-      </div>
-      <div style="margin-bottom:16px;">
-        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Yeni Şifre (Tekrar)</label>
-        <input id="forgot-confirm" type="password" placeholder="••••••••"
-          style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;color:#111;font-size:14px;outline:none;box-sizing:border-box;"
-          onkeydown="if(event.key==='Enter')confirmResetPassword()">
-      </div>
-      <button onclick="confirmResetPassword()" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;" id="forgot-confirm-btn">
-        Şifremi Sıfırla ✓
-      </button>
-      <button onclick="backToLoginFromForgot()" style="width:100%;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">
-        ← İptal
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- ═══════════════ OTP EKRANI ═══════════════ -->
 <div id="otp-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#1d4ed8 100%);">
@@ -580,6 +515,48 @@ tr:hover td { background:#f8fafc; }
   </div>
 </div>
 
+<!-- ŞİFREMİ UNUTTUM -->
+<div id="forgot-screen" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 50%,#1d4ed8 100%);">
+  <div style="background:white;border-radius:16px;padding:48px;width:420px;max-width:calc(100vw - 32px);box-shadow:0 20px 60px rgba(0,0,0,0.15);">
+    <div id="forgot-step1">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="width:52px;height:52px;background:#eff6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 12px;">🔑</div>
+        <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 6px;">Şifremi Unuttum</h2>
+        <p style="font-size:13px;color:#6b7280;margin:0;">Kayıtlı e-posta adresinizi girin</p>
+      </div>
+      <div id="forgot-err1" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:12px;"></div>
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;text-transform:uppercase;">E-posta</label>
+        <input id="forgot-email" type="email" placeholder="kullanici@sirket.com" style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <button onclick="sendResetCode()" id="forgot-send-btn" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">Kod Gönder →</button>
+      <button onclick="backToLoginFromForgot()" style="width:100%;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">← Giriş Ekranına Dön</button>
+    </div>
+    <div id="forgot-step2" style="display:none;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="width:52px;height:52px;background:#eff6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 12px;">📧</div>
+        <h2 style="font-size:20px;font-weight:700;color:#111;margin:0 0 6px;">Kodu Girin</h2>
+        <p id="forgot-email-hint" style="font-size:13px;font-weight:600;color:#1d4ed8;margin:0;"></p>
+      </div>
+      <div id="forgot-err2" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:12px;"></div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;text-transform:uppercase;">Doğrulama Kodu</label>
+        <input id="forgot-code" type="number" placeholder="6 haneli kod" style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px;font-size:24px;font-family:monospace;text-align:center;letter-spacing:8px;outline:none;box-sizing:border-box;" oninput="this.value=this.value.slice(0,6)">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;text-transform:uppercase;">Yeni Şifre</label>
+        <input id="forgot-newpass" type="password" placeholder="En az 6 karakter" style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;text-transform:uppercase;">Yeni Şifre (Tekrar)</label>
+        <input id="forgot-confirm" type="password" placeholder="••••••••" style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:12px 14px;font-size:14px;outline:none;box-sizing:border-box;">
+      </div>
+      <button onclick="confirmResetPassword()" id="forgot-confirm-btn" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;">Şifremi Sıfırla ✓</button>
+      <button onclick="backToLoginFromForgot()" style="width:100%;padding:10px;background:white;color:#6b7280;border:1px solid #e1e5ea;border-radius:8px;font-size:13px;cursor:pointer;">← İptal</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════════ ALL PANELS ═══════════════ -->
 <div id="all-panels">
 
@@ -600,6 +577,7 @@ tr:hover td { background:#f8fafc; }
         <div class="nav-item" onclick="adminPage('users',this)"><span class="nav-icon">👥</span>Kullanıcılar</div>
         <div class="nav-section" style="margin-top:10px;">Sistem</div>
         <div class="nav-item" onclick="adminPage('logs',this)"><span class="nav-icon">📋</span>Audit Log</div>
+        <div class="nav-item" onclick="adminPage('settings',this)"><span class="nav-icon">⚙️</span>Ayarlar</div>
       </nav>
       <div class="sidebar-user">
         <div class="s-avatar" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);" id="admin-avatar">A</div>
@@ -656,6 +634,31 @@ tr:hover td { background:#f8fafc; }
         <div class="card">
           <div class="card-header"><div><h3>İşlem Geçmişi</h3><p>Son 100 kayıt</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('islem_gecmisi')" style="white-space:nowrap;">📊 Excel</button></div></div>
           <div id="admin-logs-list"><div class="empty-state"><span class="icon">⏳</span><p>Yükleniyor...</p></div></div>
+        </div>
+      </div>
+      <!-- SİSTEM AYARLARI -->
+      <div class="subpage" id="admin-settings">
+        <div class="page-header"><div><h1>Sistem Ayarları</h1><p>Giriş ve güvenlik ayarları</p></div></div>
+        <div class="card" style="max-width:560px;">
+          <div class="card-header"><div><h3>🔐 E-posta Doğrulama (OTP)</h3><p>Kullanıcıların giriş sırasında e-postalarına kod alıp almayacağını kontrol eder</p></div></div>
+          <div class="card-body" style="padding:24px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);margin-bottom:16px;">
+              <div>
+                <div style="font-weight:600;font-size:14px;color:var(--text);">E-posta Doğrulama Kodu</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:3px;" id="otp-setting-desc">Yükleniyor...</div>
+              </div>
+              <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+                <div style="position:relative;width:48px;height:26px;">
+                  <input type="checkbox" id="otp-toggle" onchange="saveOtpSetting(this.checked)" style="opacity:0;width:0;height:0;position:absolute;">
+                  <span id="otp-toggle-track" style="position:absolute;inset:0;border-radius:13px;background:var(--border2);transition:0.3s;cursor:pointer;"></span>
+                  <span id="otp-toggle-thumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;transition:0.3s;box-shadow:0 1px 3px #0003;cursor:pointer;"></span>
+                </div>
+              </label>
+            </div>
+            <div style="background:var(--warning-bg);border:1px solid var(--warning-bd);border-radius:8px;padding:12px 16px;font-size:13px;color:var(--warning);">
+              ⚠️ OTP kapatıldığında kullanıcılar sadece e-posta ve şifre ile giriş yapar. Yalnızca test süreçleri için kapatınız.
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -725,6 +728,8 @@ tr:hover td { background:#f8fafc; }
         <div class="nav-item" onclick="finansPage('batches',this)"><span class="nav-icon">📦</span>Batch Listesi</div>
         <div class="nav-section" style="margin-top:10px;">Raporlar</div>
         <div class="nav-item" onclick="finansPage('dashboard',this)"><span class="nav-icon">📊</span>Özet Dashboard</div>
+        <div class="nav-item" onclick="finansPage('banka',this)"><span class="nav-icon">🏦</span>Banka Talimatı</div>
+        <div class="nav-item" onclick="finansPage('rejected',this)"><span class="nav-icon">↩️</span>Reddedilenler <span id="fin-rejected-badge" style="background:#fee2e2;color:#b91c1c;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px;display:none;">0</span></div>
       </nav>
       <div class="sidebar-user">
         <div class="s-avatar" style="background:var(--accent);" id="finans-avatar">F</div>
@@ -773,6 +778,82 @@ tr:hover td { background:#f8fafc; }
           <div class="table-wrap"><table><thead><tr><th>BATCH NO</th><th>TARİH</th><th>YÜKLEYEN</th><th>KAYIT</th><th>TUTAR</th><th>ONAY DURUMU</th><th>İŞLEM</th></tr></thead><tbody id="batch-table"></tbody></table></div>
         </div>
       </div>
+      <!-- BANKA TALİMATI -->
+      <div class="subpage" id="finans-banka">
+        <div class="page-header">
+          <div><h1>Banka Talimatı</h1><p>Onaylanan batch için resmi ödeme talimatı</p></div>
+          <button class="btn btn-secondary btn-sm" onclick="loadBankaTalimati()">🔄 Yenile</button>
+        </div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><div><h3>Batch Seçin</h3><p>Bugün yüklenen ve tüm onayları tamamlanmış paketler</p></div></div>
+          <div class="card-body" style="padding:16px;"><div id="banka-batch-list" style="display:flex;gap:10px;flex-wrap:wrap;"><p style="color:var(--text3);font-size:13px;">Yükleniyor...</p></div></div>
+        </div>
+        <div id="banka-form-section" style="display:none;">
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header"><h3>Banka Bilgileri</h3></div>
+            <div class="card-body" style="padding:16px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div><label style="display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Banka Adı *</label>
+                  <select id="banka-select" onchange="updateBankaTalimati()" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;">
+                    <option value="">-- Banka Seçin --</option>
+                    <option>ZİRAAT</option><option>İŞ BANKASI</option><option>GARANTİ BBVA</option>
+                    <option>YAPI KREDİ</option><option>AKBANK</option><option>HALKBANK</option>
+                    <option>VAKIFBANK</option><option>DENİZBANK</option><option>QNB FİNANSBANK</option>
+                    <option>TEB</option><option>ING BANK</option><option>HSBC</option>
+                  </select></div>
+                <div><label style="display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Şube Adı</label>
+                  <input type="text" id="banka-sube" placeholder="Örn: MERKEZ" oninput="updateBankaTalimati()" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;box-sizing:border-box;"></div>
+                <div><label style="display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Müşteri Numarası</label>
+                  <input type="text" id="banka-musteri-no" placeholder="Müşteri numaranız" oninput="updateBankaTalimati()" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;box-sizing:border-box;"></div>
+                <div><label style="display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Hesap No / IBAN</label>
+                  <input type="text" id="banka-hesap-no" placeholder="TR00 0000..." oninput="updateBankaTalimati()" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;box-sizing:border-box;"></div>
+              </div>
+            </div>
+          </div>
+          <!-- DÖVİZ KURLARI -->
+          <div class="card" id="banka-kur-card" style="margin-bottom:16px;display:none;">
+            <div class="card-header"><div><h3>Döviz Kurları</h3><p>Yabancı para birimi ödemeleri için kur girin</p></div></div>
+            <div class="card-body" style="padding:16px;"><div id="banka-kur-inputs" style="display:flex;gap:14px;flex-wrap:wrap;"></div></div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-header">
+              <div><h3>Talimat Önizleme</h3><p id="banka-ref-display" style="color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;font-weight:700;"></p></div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="copyTalimati()">📋 Kopyala</button>
+                <button class="btn btn-primary btn-sm" onclick="printBankaTalimati()">🖨️ Yazdır/PDF</button>
+                <button class="btn btn-success btn-sm" id="btn-odendi" onclick="markBatchAsPaid()" style="display:none;">✅ Tümünü Ödendi İşaretle</button>
+              </div>
+            </div>
+            <div class="card-body" style="padding:20px;">
+              <div id="banka-talimati-content" style="font-family:'Courier New',monospace;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:24px;min-height:280px;">Banka bilgilerini doldurun...</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div><h3>Ekli Ödeme Listesi</h3><p id="banka-odeme-count">—</p></div><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('banka_tl')">📊 Excel</button></div>
+            <div class="table-wrap"><table id="banka-odeme-table">
+              <thead><tr><th>#</th><th>CARİ UNVAN</th><th>IBAN</th><th style="text-align:right;">TUTAR</th><th>DÖVİZ</th><th>AÇIKLAMA</th><th>VADE</th></tr></thead>
+              <tbody id="banka-odeme-tbody"></tbody>
+              <tfoot id="banka-odeme-tfoot"></tfoot>
+            </table></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REDDEDİLENLER -->
+      <div class="subpage" id="finans-rejected">
+        <div class="page-header"><div><h1>Reddedilen Ödemeler</h1><p>Herhangi bir kademede reddedilen ödemeler</p></div><button class="btn btn-secondary btn-sm" onclick="loadRejected()">🔄</button></div>
+        <div class="card">
+          <div class="card-header">
+            <div><h3>Reddedilen Ödemeler</h3><p id="fin-rej-sub">—</p></div>
+            <button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('reddedilenler')">📊 Excel</button>
+          </div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>CARİ UNVAN</th><th>TUTAR</th><th>DEPARTMAN</th><th>VADE</th><th>BELGE NO</th><th>RED SEBEBİ</th><th>İŞLEM</th></tr></thead>
+            <tbody id="fin-rejected-table"></tbody>
+          </table></div>
+        </div>
+      </div>
+
       <!-- DASHBOARD -->
       <div class="subpage" id="finans-dashboard">
         <div class="page-header"><div><h1>Özet Dashboard</h1><p>Genel ödeme durumu</p></div><button class="btn btn-secondary btn-sm" onclick="loadFinansDashboard()">🔄</button></div>
@@ -781,6 +862,10 @@ tr:hover td { background:#f8fafc; }
           <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-label">ÖDEME</div><div class="stat-value" id="ds-payments">—</div></div>
           <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-label">BEKLEYEN</div><div class="stat-value" id="ds-pending">—</div></div>
           <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">TAMAMLANAN</div><div class="stat-value" id="ds-completed">—</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="card"><div class="card-header"><div><h3>Aylık Ödeme Trendi</h3><p>Son 6 ay</p></div></div><div class="card-body" style="padding:16px;"><canvas id="chart-monthly" height="220"></canvas></div></div>
+          <div class="card"><div class="card-header"><div><h3>Departman Dağılımı</h3><p>Toplam tutara göre</p></div></div><div class="card-body" style="padding:16px;"><canvas id="chart-dept" height="220"></canvas></div></div>
         </div>
         <div class="card"><div class="card-header"><div><h3>Departman Özeti</h3><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('departman_ozeti')" style="white-space:nowrap;">📊 Excel</button></div></div><div class="table-wrap"><table><thead><tr><th>DEPARTMAN</th><th>SAYISI</th><th>TUTAR</th><th>DURUM</th></tr></thead><tbody id="dept-summary-table"></tbody></table></div></div>
       </div>
@@ -1024,7 +1109,7 @@ tr:hover td { background:#f8fafc; }
         <div class="card" >
           <div class="card-header" style="border-color:var(--border);"><div><h3 style="color:var(--accent);">Bekleyen Ödemeler</h3><p id="gm-pending-sub" style="color:var(--text2);">—</p></div><select id="gm-dept-filter" onchange="filterGmDept()" style="background:var(--surface2);border-color:var(--border);color:var(--text);"><option value="">Tüm Departmanlar</option></select></div>
           <div class="select-all-row" style="background:var(--surface2);border-color:var(--border);"><input type="checkbox" class="cb" id="gm-select-all" onchange="gmToggleAll(this.checked)"><label for="gm-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="gm-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
-          <div class="table-wrap"><table><thead><tr><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>ONAY ZİNCİRİ</th><th>İŞLEM</th></tr></thead><tbody id="gm-pending-table"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>VADE</th><th>ONAY ZİNCİRİ</th><th>İŞLEM</th></tr></thead><tbody id="gm-pending-table"></tbody></table></div>
         </div>
       </div>
       <div class="subpage" id="gm-history">
@@ -1144,6 +1229,7 @@ function statusBadge(s) {
     director_pending:['badge-yellow','Direktör Bekliyor'],
     gmy_pending:['badge-yellow','GM Bekliyor'],
     completed:['badge-green','Tamamlandı'],
+    paid:['badge-green','Ödendi ✓'],
     rejected:['badge-red','Reddedildi'],
     active:['badge-blue','Aktif']
   };
@@ -1182,6 +1268,7 @@ function adminPage(page, el) {
   if(page==='departments') loadDepts();
   if(page==='users') loadUsers();
   if(page==='logs') loadAdminLogs();
+  if(page==='settings') loadAdminSettings();
 }
 
 async function loadAdminDashboard() {
@@ -1323,6 +1410,8 @@ function finansPage(page,el){
   if(el)el.classList.add('active');
   if(page==='batches')loadBatches();
   if(page==='dashboard')loadFinansDashboard();
+  if(page==='banka')loadBankaTalimati();
+  if(page==='rejected')loadRejected();
 }
 
 const uploadZoneEl=document.getElementById('upload-zone');
@@ -1401,7 +1490,7 @@ async function loadBatches(){
   const batchIds=data.map(b=>b.id);
   const{data:allPay}=await db.from('payments').select('batch_id,status,amount').in('batch_id',batchIds);
   const bStats={};
-  (allPay||[]).forEach(p=>{if(!bStats[p.batch_id])bStats[p.batch_id]={total:0,count:0,dept_pending:0,manager_pending:0,director_pending:0,gm_pending:0,completed:0,rejected:0};const s=bStats[p.batch_id];s.count++;s.total+=p.amount||0;if(p.status==='department_pending')s.dept_pending++;else if(p.status==='manager_pending')s.manager_pending++;else if(p.status==='director_pending')s.director_pending++;else if(p.status==='gmy_pending')s.gm_pending++;else if(p.status==='completed')s.completed++;else if(p.status==='rejected')s.rejected++;});
+  (allPay||[]).forEach(p=>{if(!bStats[p.batch_id])bStats[p.batch_id]={total:0,count:0,dept_pending:0,manager_pending:0,director_pending:0,gm_pending:0,completed:0,rejected:0};const s=bStats[p.batch_id];s.count++;s.total+=p.amount||0;if(p.status==='department_pending')s.dept_pending++;else if(p.status==='manager_pending')s.manager_pending++;else if(p.status==='director_pending')s.director_pending++;else if(p.status==='gmy_pending')s.gm_pending++;else if(p.status==='completed'||p.status==='paid')s.completed++;else if(p.status==='rejected')s.rejected++;});
   const completedBatches=data.filter(b=>{const s=bStats[b.id];return s&&s.count>0&&s.completed>0&&(s.completed+s.rejected)===s.count;});
   const bannerEl=document.getElementById('completed-banner');
   if(completedBatches.length>0){bannerEl.style.display='block';bannerEl.innerHTML=completedBatches.map((b,i)=>{const s=bStats[b.id];return`<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#10b98112;border:1px solid #10b98130;border-radius:10px;margin-bottom:8px;"><div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🎉</span><div><div style="font-size:14px;font-weight:600;color:var(--success);">B-${String(data.indexOf(b)+1).padStart(3,'0')} — Tüm Onaylar Tamamlandı!</div><div style="font-size:12px;color:var(--text3);margin-top:2px;">${b.description||formatDate(b.created_at)} · ${s.completed} onaylandı${s.rejected>0?`, ${s.rejected} reddedildi`:''}</div></div></div><div style="font-size:12px;font-weight:700;color:var(--success);background:#10b98118;padding:6px 14px;border-radius:20px;border:1px solid #10b98130;">✅ Banka Talimatları Yazılabilir</div></div>`;}).join('');}
@@ -1430,12 +1519,28 @@ async function showBatchDetail(batchId,batchNo){
 }
 function closeDetailModal(){document.getElementById('detail-modal').classList.remove('open');}
 
+let _chartMonthly=null, _chartDept=null;
 async function loadFinansDashboard(){
-  const[b,p,pend,comp]=await Promise.all([db.from('batches').select('id',{count:'exact'}),db.from('payments').select('id',{count:'exact'}),db.from('payments').select('id',{count:'exact'}).in('status',['department_pending','manager_pending','director_pending','gmy_pending']),db.from('payments').select('id',{count:'exact'}).eq('status','completed')]);
+  const[b,p,pend,comp]=await Promise.all([db.from('batches').select('id',{count:'exact'}),db.from('payments').select('id',{count:'exact'}),db.from('payments').select('id',{count:'exact'}).in('status',['department_pending','manager_pending','director_pending','gmy_pending']),db.from('payments').select('id',{count:'exact'}).in('status',['completed','paid'])]);
   document.getElementById('ds-batches').textContent=b.count??0;document.getElementById('ds-payments').textContent=p.count??0;document.getElementById('ds-pending').textContent=pend.count??0;document.getElementById('ds-completed').textContent=comp.count??0;
-  const{data:pays}=await db.from('payments').select('amount,status,departments(name)');
-  const dd={};(pays||[]).forEach(p=>{const name=p.departments?.name||'Belirsiz';if(!dd[name])dd[name]={count:0,total:0,pending:0,completed:0,rejected:0};dd[name].count++;dd[name].total+=p.amount||0;if(['department_pending','manager_pending','director_pending','gmy_pending'].includes(p.status))dd[name].pending++;else if(p.status==='completed')dd[name].completed++;else if(p.status==='rejected')dd[name].rejected++;});
+  const{data:pays}=await db.from('payments').select('amount,status,due_date,departments(name)');
+  // Departman özet tablosu
+  const dd={};(pays||[]).forEach(p=>{const name=p.departments?.name||'Belirsiz';if(!dd[name])dd[name]={count:0,total:0,pending:0,completed:0,rejected:0};dd[name].count++;dd[name].total+=p.amount||0;if(['department_pending','manager_pending','director_pending','gmy_pending'].includes(p.status))dd[name].pending++;else if(['completed','paid'].includes(p.status))dd[name].completed++;else if(p.status==='rejected')dd[name].rejected++;});
   document.getElementById('dept-summary-table').innerHTML=Object.entries(dd).map(([name,d])=>`<tr><td style="font-weight:500;">${name}</td><td style="font-family:'DM Mono',monospace;">${d.count}</td><td style="font-family:'DM Mono',monospace;color:var(--success);">${formatMoney(d.total)}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap;">${d.pending>0?`<span class="badge badge-yellow">${d.pending} bekliyor</span>`:''}${d.completed>0?`<span class="badge badge-green">${d.completed} tamamlandı</span>`:''}${d.rejected>0?`<span class="badge badge-red">${d.rejected} reddedildi</span>`:''}</div></td></tr>`).join('');
+  // Aylık trend (son 6 ay)
+  const now=new Date(), months=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push({label:d.toLocaleDateString('tr-TR',{month:'short',year:'2-digit'}),year:d.getFullYear(),month:d.getMonth()});}
+  const mTotals=months.map(m=>0);
+  (pays||[]).forEach(p=>{if(!p.due_date)return;const d=new Date(p.due_date);const idx=months.findIndex(m=>m.year===d.getFullYear()&&m.month===d.getMonth());if(idx>=0)mTotals[idx]+=(p.amount||0);});
+  if(_chartMonthly){_chartMonthly.destroy();}
+  const ctxM=document.getElementById('chart-monthly').getContext('2d');
+  _chartMonthly=new Chart(ctxM,{type:'bar',data:{labels:months.map(m=>m.label),datasets:[{label:'Toplam Tutar (TL)',data:mTotals,backgroundColor:'rgba(59,130,246,0.7)',borderRadius:6}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v}}}}});
+  // Departman dağılımı (pie)
+  const dLabels=Object.keys(dd), dVals=Object.values(dd).map(d=>d.total);
+  const pieColors=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#84cc16'];
+  if(_chartDept){_chartDept.destroy();}
+  const ctxD=document.getElementById('chart-dept').getContext('2d');
+  _chartDept=new Chart(ctxD,{type:'doughnut',data:{labels:dLabels,datasets:[{data:dVals,backgroundColor:pieColors.slice(0,dLabels.length),borderWidth:2}]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:12}}}}});
 }
 
 // ═══════════════════════════════════════════
@@ -1494,12 +1599,13 @@ function clearDeptSelection(){deptSelectedIds.clear();document.querySelectorAll(
 async function showDeptDrawer(pid){
   const p=deptPayments.find(x=>x.id===pid);if(!p)return;
   document.getElementById('dd-cari').textContent=p.cari;document.getElementById('dd-amount').textContent=formatMoney(p.amount);
-  document.getElementById('dd-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow"><span class="dlabel">Açıklama</span><span class="dval">${p.description||'—'}</span></div><div class="drow"><span class="dlabel">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div class="drow"><span class="dlabel">Durum</span><span class="dval">${statusBadge(p.status)}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="dd-hist">Yükleniyor...</div>`;
+  document.getElementById('dd-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow"><span class="dlabel">Açıklama</span><span class="dval">${p.description||'—'}</span></div><div class="drow"><span class="dlabel">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div class="drow"><span class="dlabel">Durum</span><span class="dval">${statusBadge(p.status)}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="dd-hist">Yükleniyor...</div><div style="margin:16px 0 8px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">📎 Ekli Belgeler</div><div id="dd-files">Yükleniyor...</div>`;
   const isPending=p.status==='department_pending';
   document.getElementById('dd-foot').innerHTML=isPending?`<button class="btn btn-success" style="width:100%;" onclick="openDeptApproveModal(false,'${p.id}');closeDeptDrawer()">✅ Onayla</button><button class="btn btn-danger" style="width:100%;" onclick="openDeptRejectModal(false,'${p.id}');closeDeptDrawer()">❌ Reddet</button>`:`<div style="font-size:13px;color:var(--text3);text-align:center;">Bu ödeme işleme alındı.</div>`;
   document.getElementById('dept-drawer').classList.add('open');
   const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');
   document.getElementById('dd-hist').innerHTML=renderApprovalHistory(approvals);
+  renderFilesSection(pid,'dd-files');
 }
 function closeDeptDrawer(){document.getElementById('dept-drawer').classList.remove('open');}
 
@@ -1527,7 +1633,9 @@ async function confirmDeptApprove(){
       await db.from('payments').update({status:'manager_pending'}).eq('id',pid);
       await logAction(`Departman onayı: ${p?.cari}`,p?.batch_id,pid);
     }
-    closeMod('dept-approve-modal');clearDeptSelection();showToast(`${deptActionTarget.length} ödeme onaylandı!`,'success');loadDeptPayments();
+    closeMod('dept-approve-modal');clearDeptSelection();showToast(`${deptActionTarget.length} ödeme onaylandı!`,'success');
+    db.from('payments').select('amount').eq('status','manager_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('muhasebe_muduru',r.data.length,t);}});
+    loadDeptPayments();
   }catch(err){showToast('Hata: '+err.message,'error');}
   finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}
 }
@@ -1585,16 +1693,19 @@ function clearMudurSelection(){mudurSelectedIds.clear();document.querySelectorAl
 async function showMudurDrawer(pid){
   const p=mudurPending.find(x=>x.id===pid);if(!p)return;
   document.getElementById('md-cari').textContent=p.cari;document.getElementById('md-amount').textContent=formatMoney(p.amount);
-  document.getElementById('md-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow"><span class="dlabel">Açıklama</span><span class="dval">${p.description||'—'}</span></div><div class="drow"><span class="dlabel">Departman</span><span class="dval">${p.departments?.name||'—'}</span></div><div class="drow"><span class="dlabel">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="md-hist">Yükleniyor...</div>`;
+  document.getElementById('md-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow"><span class="dlabel">Açıklama</span><span class="dval">${p.description||'—'}</span></div><div class="drow"><span class="dlabel">Departman</span><span class="dval">${p.departments?.name||'—'}</span></div><div class="drow"><span class="dlabel">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="md-hist">Yükleniyor...</div><div style="margin:16px 0 8px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">📎 Ekli Belgeler</div><div id="md-files">Yükleniyor...</div>`;
   document.getElementById('md-foot').innerHTML=`<button class="btn btn-success" style="width:100%;" onclick="openMudurApproveModal(false,'${p.id}');closeMudurDrawer()">✅ Onayla – Direktöre İlet</button><button class="btn btn-danger" style="width:100%;" onclick="openMudurRejectModal(false,'${p.id}');closeMudurDrawer()">❌ Reddet</button>`;
   document.getElementById('m-drawer').classList.add('open');
   const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');
   document.getElementById('md-hist').innerHTML=renderApprovalHistory(approvals);
+  renderFilesSection(pid,'md-files');
 }
 function closeMudurDrawer(){document.getElementById('m-drawer').classList.remove('open');}
 function openMudurApproveModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-approve-sub').textContent=isBulk?`${mudurSelectedIds.size} ödeme onaylanacak.`:`"${p?.cari}" onaylanacak.`;document.getElementById('m-approve-comment').value='';document.getElementById('m-approve-modal').classList.add('open');}
 function openMudurRejectModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-reject-sub').textContent=isBulk?`${mudurSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;document.getElementById('m-reject-comment').value='';document.getElementById('m-reject-modal').classList.add('open');}
-async function confirmMudurApprove(){const btn=document.getElementById('m-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('m-approve-comment').value.trim();try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'director_pending'}).eq('id',pid);await logAction(`Müdür onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-approve-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme onaylandı! Direktöre iletildi.`,'success');loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
+async function confirmMudurApprove(){const btn=document.getElementById('m-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('m-approve-comment').value.trim();try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'director_pending'}).eq('id',pid);await logAction(`Müdür onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-approve-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme onaylandı! Direktöre iletildi.`,'success');
+    db.from('payments').select('amount').eq('status','director_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('direktor',r.data.length,t);}});
+    loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
 async function confirmMudurReject(){const comment=document.getElementById('m-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('m-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`Müdür reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-reject-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme reddedildi.`,'error');loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 
 async function loadMudurHistory(){const filter=document.getElementById('m-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name),batch_id)').eq('user_id',currentUser.id).eq('stage','muhasebe_muduru').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('m-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('m-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.payments?.cari||'—'}</td><td><span class="badge badge-yellow">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
@@ -1629,11 +1740,13 @@ function renderDirPending(){document.getElementById('dir-pending-sub').textConte
 function updateDirSelection(){dirSelectedIds.clear();let t=0;document.querySelectorAll('.dir-pay-cb:checked').forEach(cb=>{dirSelectedIds.add(cb.dataset.id);t+=parseFloat(cb.dataset.amount)||0;});const c=dirSelectedIds.size;document.getElementById('dir-select-all').checked=c>0&&c===document.querySelectorAll('.dir-pay-cb').length;document.getElementById('dir-selected-count').textContent=c>0?`${c} seçildi`:'';const bar=document.getElementById('dir-bulk-bar');if(c>0){bar.classList.add('show');document.getElementById('dir-bulk-count').textContent=`${c} ödeme`;document.getElementById('dir-bulk-amount').textContent=formatMoney(t);}else bar.classList.remove('show');}
 function dirToggleAll(checked){document.querySelectorAll('.dir-pay-cb').forEach(cb=>{cb.checked=checked;});updateDirSelection();}
 function clearDirSelection(){dirSelectedIds.clear();document.querySelectorAll('.dir-pay-cb').forEach(cb=>{cb.checked=false;});const cb=document.getElementById('dir-select-all');if(cb)cb.checked=false;document.getElementById('dir-bulk-bar').classList.remove('show');document.getElementById('dir-selected-count').textContent='';}
-async function showDirDrawer(pid){const p=dirPending.find(x=>x.id===pid);if(!p)return;document.getElementById('dird-cari').textContent=p.cari;document.getElementById('dird-amount').textContent=formatMoney(p.amount);document.getElementById('dird-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow"><span class="dlabel">Departman</span><span class="dval">${p.departments?.name||'—'}</span></div><div class="drow"><span class="dlabel">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="dird-hist">Yükleniyor...</div>`;document.getElementById('dird-foot').innerHTML=`<button class="btn btn-success" style="width:100%;" onclick="openDirApproveModal(false,'${p.id}');closeDirDrawer()">✅ Onayla – GM'ye İlet</button><button class="btn btn-danger" style="width:100%;" onclick="openDirRejectModal(false,'${p.id}');closeDirDrawer()">❌ Reddet</button>`;document.getElementById('dir-drawer').classList.add('open');const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');document.getElementById('dird-hist').innerHTML=renderApprovalHistory(approvals);}
+async function showDirDrawer(pid){const p=dirPending.find(x=>x.id===pid);if(!p)return;document.getElementById('dird-cari').textContent=p.cari;document.getElementById('dird-amount').textContent=formatMoney(p.amount);document.getElementById('dird-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow"><span class="dlabel">Departman</span><span class="dval">${p.departments?.name||'—'}</span></div><div class="drow"><span class="dlabel">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="dird-hist">Yükleniyor...</div><div style="margin:16px 0 8px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">📎 Ekli Belgeler</div><div id="dird-files">Yükleniyor...</div>`;document.getElementById('dird-foot').innerHTML=`<button class="btn btn-success" style="width:100%;" onclick="openDirApproveModal(false,'${p.id}');closeDirDrawer()">✅ Onayla – GM'ye İlet</button><button class="btn btn-danger" style="width:100%;" onclick="openDirRejectModal(false,'${p.id}');closeDirDrawer()">❌ Reddet</button>`;document.getElementById('dir-drawer').classList.add('open');const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');document.getElementById('dird-hist').innerHTML=renderApprovalHistory(approvals);renderFilesSection(pid,'dird-files');}
 function closeDirDrawer(){document.getElementById('dir-drawer').classList.remove('open');}
 function openDirApproveModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-approve-sub').textContent=isBulk?`${dirSelectedIds.size} ödeme onaylanacak.`:`"${p?.cari}" onaylanacak.`;document.getElementById('dir-approve-comment').value='';document.getElementById('dir-approve-modal').classList.add('open');}
 function openDirRejectModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-reject-sub').textContent=isBulk?`${dirSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;document.getElementById('dir-reject-comment').value='';document.getElementById('dir-reject-modal').classList.add('open');}
-async function confirmDirApprove(){const btn=document.getElementById('dir-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('dir-approve-comment').value.trim();try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'gmy_pending'}).eq('id',pid);await logAction(`Direktör onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-approve-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme onaylandı! GM'ye iletildi.`,'success');loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
+async function confirmDirApprove(){const btn=document.getElementById('dir-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('dir-approve-comment').value.trim();try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'gmy_pending'}).eq('id',pid);await logAction(`Direktör onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-approve-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme onaylandı! GM'ye iletildi.`,'success');
+    db.from('payments').select('amount').eq('status','gmy_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('gm',r.data.length,t);}});
+    loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
 async function confirmDirReject(){const comment=document.getElementById('dir-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('dir-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`Direktör reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-reject-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme reddedildi.`,'error');loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadDirHistory(){const filter=document.getElementById('dir-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','direktor').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('dir-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('dir-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.payments?.cari||'—'}</td><td><span class="badge badge-blue">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
@@ -1662,11 +1775,13 @@ function renderGmPending(){document.getElementById('gm-pending-sub').textContent
 function updateGmSelection(){gmSelectedIds.clear();let t=0;document.querySelectorAll('.gm-pay-cb:checked').forEach(cb=>{gmSelectedIds.add(cb.dataset.id);t+=parseFloat(cb.dataset.amount)||0;});const c=gmSelectedIds.size;document.getElementById('gm-select-all').checked=c>0&&c===document.querySelectorAll('.gm-pay-cb').length;document.getElementById('gm-selected-count').textContent=c>0?`${c} seçildi`:'';const bar=document.getElementById('gm-bulk-bar');if(c>0){bar.classList.add('show');document.getElementById('gm-bulk-count').textContent=`${c} ödeme`;document.getElementById('gm-bulk-amount').textContent=formatMoney(t);}else bar.classList.remove('show');}
 function gmToggleAll(checked){document.querySelectorAll('.gm-pay-cb').forEach(cb=>{cb.checked=checked;});updateGmSelection();}
 function clearGmSelection(){gmSelectedIds.clear();document.querySelectorAll('.gm-pay-cb').forEach(cb=>{cb.checked=false;});const cb=document.getElementById('gm-select-all');if(cb)cb.checked=false;document.getElementById('gm-bulk-bar').classList.remove('show');document.getElementById('gm-selected-count').textContent='';}
-async function showGmDrawer(pid){const p=gmPending.find(x=>x.id===pid);if(!p)return;document.getElementById('gmd-cari').textContent=p.cari;document.getElementById('gmd-amount').textContent=formatMoney(p.amount);document.getElementById('gmd-body').innerHTML=`<div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Departman</span><span class="dval">${p.departments?.name||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Tam Onay Zinciri</div><div id="gmd-hist">Yükleniyor...</div>`;document.getElementById('gmd-foot').innerHTML=`<button class="btn btn-gold" style="width:100%;" onclick="openGmApproveModal(false,'${p.id}');closeGmDrawer()">👑 Final Onay Ver</button><button class="btn btn-danger" style="width:100%;" onclick="openGmRejectModal(false,'${p.id}');closeGmDrawer()">❌ Reddet</button>`;document.getElementById('gm-drawer').classList.add('open');const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');document.getElementById('gmd-hist').innerHTML=renderApprovalHistory(approvals);}
+async function showGmDrawer(pid){const p=gmPending.find(x=>x.id===pid);if(!p)return;document.getElementById('gmd-cari').textContent=p.cari;document.getElementById('gmd-amount').textContent=formatMoney(p.amount);document.getElementById('gmd-body').innerHTML=`<div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Belge No</span><span class="dval">${p.doc_no||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Departman</span><span class="dval">${p.departments?.name||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Vade</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${p.iban||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Tam Onay Zinciri</div><div id="gmd-hist">Yükleniyor...</div><div style="margin:16px 0 8px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">📎 Ekli Belgeler</div><div id="gmd-files">Yükleniyor...</div>`;document.getElementById('gmd-foot').innerHTML=`<button class="btn btn-gold" style="width:100%;" onclick="openGmApproveModal(false,'${p.id}');closeGmDrawer()">👑 Final Onay Ver</button><button class="btn btn-danger" style="width:100%;" onclick="openGmRejectModal(false,'${p.id}');closeGmDrawer()">❌ Reddet</button>`;document.getElementById('gm-drawer').classList.add('open');const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');document.getElementById('gmd-hist').innerHTML=renderApprovalHistory(approvals);renderFilesSection(pid,'gmd-files');}
 function closeGmDrawer(){document.getElementById('gm-drawer').classList.remove('open');}
 function openGmApproveModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-approve-sub').textContent=isBulk?`${gmSelectedIds.size} ödeme final onayına alınacak.`:`"${p?.cari}" tamamlanacak.`;document.getElementById('gm-approve-comment').value='';document.getElementById('gm-approve-modal').classList.add('open');}
 function openGmRejectModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-reject-sub').textContent=isBulk?`${gmSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;document.getElementById('gm-reject-comment').value='';document.getElementById('gm-reject-modal').classList.add('open');}
-async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'completed'}).eq('id',pid);await logAction(`GM Final Onay: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-approve-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme tamamlandı! 🎉`,'success');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='👑 Final Onay Ver';}}
+async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'completed'}).eq('id',pid);await logAction(`GM Final Onay: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-approve-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme tamamlandı! 🎉`,'success');
+    notifyFinans(gmActionTarget.length,0);
+    loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='👑 Final Onay Ver';}}
 async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadGmHistory(){const filter=document.getElementById('gm-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','genel_mudur').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('gm-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('gm-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr style="border-color:var(--border);"><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${a.payments?.cari||'—'}</td><td><span class="badge badge-gold">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
@@ -1692,7 +1807,11 @@ function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-window.doLogin = async function() {
+function isOtpEnabled() {
+  return localStorage.getItem('ots_otp_enabled') !== 'false';
+}
+
+async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value.trim();
   const errEl = document.getElementById('login-error');
@@ -1704,9 +1823,18 @@ window.doLogin = async function() {
   btn.innerHTML = 'Giriş Yap →'; btn.disabled = false;
   if (error || !data) { errEl.textContent = 'E-posta veya şifre hatalı.'; errEl.style.display='block'; return; }
   otpUser = data;
+  // OTP kapalıysa direkt giriş yap
+  if (!isOtpEnabled()) {
+    currentUser = otpUser;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('all-panels').style.visibility = 'visible';
+    await logAction('Sisteme giriş yapıldı (OTP kapalı)', null, null);
+    routeByRole(currentUser);
+    return;
+  }
   // OTP gönder
   otpCode = generateOTP();
-  otpExpiry = Date.now() + 5 * 60 * 1000; // 5 dakika
+  otpExpiry = Date.now() + 5 * 60 * 1000;
   try {
     await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
       to_email: data.email,
@@ -1715,7 +1843,6 @@ window.doLogin = async function() {
     });
     showOTPScreen();
   } catch(e) {
-    // EmailJS hata verirse (test maili) direkt geç
     showOTPScreen();
     console.warn('EmailJS:', e);
   }
@@ -1729,7 +1856,7 @@ function showOTPScreen() {
   document.getElementById('otp-input').focus();
 }
 
-window.verifyOTP = async function() {
+async function verifyOTP() {
   const entered = document.getElementById('otp-input').value.trim();
   const errEl = document.getElementById('otp-error');
   errEl.style.display = 'none';
@@ -1744,13 +1871,13 @@ window.verifyOTP = async function() {
   routeByRole(currentUser);
 }
 
-window.backToLogin = function() {
+function backToLogin() {
   document.getElementById('otp-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   otpCode = null; otpUser = null;
 }
 
-window.resendOTP = async function() {
+async function resendOTP() {
   if (!otpUser) return;
   otpCode = generateOTP();
   otpExpiry = Date.now() + 5 * 60 * 1000;
@@ -1787,17 +1914,17 @@ async function sendApprovalNotification(toEmail, toName, pendingCount, pendingAm
 }
 
 // ── ŞİFRE DEĞİŞTİRME ──
-window.openChangePassword = function() {
+function openChangePassword() {
   document.getElementById('change-pass-modal').classList.add('open');
   document.getElementById('cp-current').value = '';
   document.getElementById('cp-new').value = '';
   document.getElementById('cp-confirm').value = '';
   document.getElementById('cp-error').style.display = 'none';
 }
-window.closeChangePassword = function() {
+function closeChangePassword() {
   document.getElementById('change-pass-modal').classList.remove('open');
 }
-window.saveNewPassword = async function() {
+async function saveNewPassword() {
   const current = document.getElementById('cp-current').value.trim();
   const newPass = document.getElementById('cp-new').value.trim();
   const confirm = document.getElementById('cp-confirm').value.trim();
@@ -1876,7 +2003,7 @@ function showRejectionNotification(message) {
 }
 
 
-window.exportCurrentTable = function(name) {
+function exportCurrentTable(name) {
   // Aktif paneldeki tabloyu bul
   const activePanel = document.querySelector('.panel.active');
   if (!activePanel) { showToast('Panel bulunamadı', 'error'); return; }
@@ -1891,121 +2018,394 @@ window.exportCurrentTable = function(name) {
 }
 
 
-// ── ŞİFREMİ UNUTTUM ──
-let resetCode = null;
-let resetExpiry = null;
-let resetUserId = null;
-
-window.showForgotScreen = function() {
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('forgot-screen').style.display = 'flex';
-  document.getElementById('forgot-step1').style.display = 'block';
-  document.getElementById('forgot-step2').style.display = 'none';
-  document.getElementById('forgot-email').value = '';
-  document.getElementById('forgot-error1').style.display = 'none';
+/* ── ŞİFREMİ UNUTTUM ── */
+var _resetCode = null, _resetExpiry = null, _resetUserId = null;
+function showForgotScreen(){document.getElementById('login-screen').style.display='none';document.getElementById('forgot-screen').style.display='flex';document.getElementById('forgot-step1').style.display='block';document.getElementById('forgot-step2').style.display='none';document.getElementById('forgot-email').value='';document.getElementById('forgot-err1').style.display='none';}
+function backToLoginFromForgot(){document.getElementById('forgot-screen').style.display='none';document.getElementById('login-screen').style.display='flex';_resetCode=null;_resetUserId=null;}
+async function sendResetCode(){
+  var email=document.getElementById('forgot-email').value.trim();
+  var err=document.getElementById('forgot-err1');
+  err.style.display='none';
+  if(!email){err.textContent='E-posta adresinizi girin.';err.style.display='block';return;}
+  var btn=document.getElementById('forgot-send-btn');
+  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
+  var res=await db.from('users').select('id,name,email').eq('email',email).single();
+  btn.innerHTML='Kod Gönder →';btn.disabled=false;
+  if(res.error||!res.data){err.textContent='Bu e-posta sistemde kayıtlı değil.';err.style.display='block';return;}
+  _resetCode=Math.floor(100000+Math.random()*900000).toString();
+  _resetExpiry=Date.now()+5*60*1000;
+  _resetUserId=res.data.id;
+  try{await emailjs.send('service_ots','template_mrnhjpb',{to_email:res.data.email,to_name:res.data.name,otp_code:_resetCode});}catch(e){console.warn(e);}
+  document.getElementById('forgot-step1').style.display='none';
+  document.getElementById('forgot-step2').style.display='block';
+  document.getElementById('forgot-email-hint').textContent=email;
+  document.getElementById('forgot-err2').style.display='none';
+}
+async function confirmResetPassword(){
+  var code=document.getElementById('forgot-code').value.trim();
+  var newp=document.getElementById('forgot-newpass').value.trim();
+  var conf=document.getElementById('forgot-confirm').value.trim();
+  var err=document.getElementById('forgot-err2');
+  err.style.display='none';
+  if(!code||!newp||!conf){err.textContent='Tüm alanları doldurun.';err.style.display='block';return;}
+  if(Date.now()>_resetExpiry){err.textContent='Kodun süresi doldu.';err.style.display='block';return;}
+  if(code!==_resetCode){err.textContent='Hatalı kod.';err.style.display='block';return;}
+  if(newp.length<6){err.textContent='Şifre en az 6 karakter olmalı.';err.style.display='block';return;}
+  if(newp!==conf){err.textContent='Şifreler eşleşmiyor.';err.style.display='block';return;}
+  var btn=document.getElementById('forgot-confirm-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  var res=await db.from('users').update({password_hash:newp}).eq('id',_resetUserId);
+  btn.disabled=false;btn.innerHTML='Şifremi Sıfırla ✓';
+  if(res.error){err.textContent='Hata: '+res.error.message;err.style.display='block';return;}
+  backToLoginFromForgot();
+  showToast('Şifreniz sıfırlandı! Giriş yapabilirsiniz.','success');
+  _resetCode=null;_resetUserId=null;
 }
 
-window.backToLoginFromForgot = function() {
-  document.getElementById('forgot-screen').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-  resetCode = null; resetUserId = null;
+
+/* ── ONAY AKIŞI MAİL ── */
+async function notifyRole(role,count,amount){
+  try{
+    var res=await db.from('users').select('email,name').eq('role',role);
+    if(!res.data)return;
+    for(var u of res.data){
+      await emailjs.send('service_ots','template_k66ic99',{to_email:u.email,to_name:u.name,pending_count:count,pending_amount:formatMoney(amount),message:count+' adet odeme onayinizi bekliyor. Toplam: '+formatMoney(amount),subject:'Onayinizi Bekleyen Odemeler'});
+    }
+  }catch(e){console.warn('Mail goenderilemedi:',e);}
+}
+async function notifyDeptRejection(deptId,reason,count){
+  try{
+    var res=await db.from('users').select('email,name').eq('role','departman').eq('department_id',deptId);
+    if(!res.data)return;
+    for(var u of res.data){
+      await emailjs.send('service_ots','template_k66ic99',{to_email:u.email,to_name:u.name,pending_count:count,pending_amount:'—',message:count+' odeme reddedildi. Neden: '+reason,subject:'Odeme Talebiniz Reddedildi'});
+    }
+    showRejectionNotification(count+' odeme reddedildi. Neden: '+reason);
+  }catch(e){console.warn(e);}
+}
+async function notifyFinans(count,amount){
+  try{
+    var res=await db.from('users').select('email,name').eq('role','finans');
+    if(!res.data)return;
+    for(var u of res.data){
+      await emailjs.send('service_ots','template_k66ic99',{to_email:u.email,to_name:u.name,pending_count:count,pending_amount:formatMoney(amount),message:'Tum onaylar tamamlandi! '+count+' odeme icin banka talimati hazirlanabilir.',subject:'Banka Talimati Hazirlanabilir'});
+    }
+  }catch(e){console.warn(e);}
+}
+function showRejectionNotification(msg){
+  var n=document.createElement('div');
+  n.style.cssText='position:fixed;top:20px;right:20px;background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:16px 20px;max-width:320px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.15);';
+  n.innerHTML='<div style="display:flex;gap:10px;"><span style="font-size:20px;">❌</span><div><p style="margin:0 0 4px;font-weight:700;color:#b91c1c;">Odeme Reddedildi</p><p style="margin:0;font-size:13px;color:#374151;">'+msg+'</p></div></div>';
+  document.body.appendChild(n);
+  setTimeout(function(){n.remove();},6000);
 }
 
-window.sendResetCode = async function() {
-  const email = document.getElementById('forgot-email').value.trim();
-  const errEl = document.getElementById('forgot-error1');
-  errEl.style.display = 'none';
-  if (!email) { errEl.textContent = 'E-posta adresinizi girin.'; errEl.style.display='block'; return; }
-  
-  const btn = document.getElementById('forgot-send-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Gönderiliyor...';
-  
-  // Kullanıcıyı bul
-  const { data, error } = await db.from('users').select('id,name,email').eq('email', email).single();
-  btn.disabled = false; btn.innerHTML = 'Kod Gönder →';
-  
-  if (error || !data) {
-    errEl.textContent = 'Bu e-posta adresi sistemde kayıtlı değil.';
-    errEl.style.display = 'block';
-    return;
+
+/* ── BANKA TALİMATI ── */
+var bankaOdemeler = [];
+var _bankaRef = null;
+
+async function loadBankaTalimati(){
+  var bugun = new Date();
+  var bugunStr = bugun.getFullYear()+'-'+String(bugun.getMonth()+1).padStart(2,'0')+'-'+String(bugun.getDate()).padStart(2,'0');
+  var res = await db.from('batches').select('*').eq('upload_date',bugunStr).order('created_at',{ascending:false});
+  var batches = res.data || [];
+  var listEl = document.getElementById('banka-batch-list');
+  document.getElementById('banka-form-section').style.display='none';
+  if(batches.length===0){listEl.innerHTML='<p style="color:var(--text3);font-size:13px;">Bugün yüklenmiş batch bulunamadı.</p>';return;}
+  var bilgi=[];
+  for(var i=0;i<batches.length;i++){
+    var b=batches[i];
+    var pr=await db.from('payments').select('status,amount').eq('batch_id',b.id);
+    var pays=pr.data||[];
+    var tamam=pays.length>0&&pays.every(function(p){return p.status==='completed';});
+    bilgi.push({b:b,pays:pays,tamam:tamam,top:pays.reduce(function(s,p){return s+(p.amount||0);},0)});
   }
-  
-  resetCode = generateOTP();
-  resetExpiry = Date.now() + 5 * 60 * 1000;
-  resetUserId = data.id;
-  
-  try {
-    await emailjs.send(EMAILJS_SERVICE, EMAILJS_OTP_TPL, {
-      to_email: data.email,
-      to_name: data.name,
-      otp_code: resetCode
+  listEl.innerHTML='';
+  bilgi.forEach(function(item){
+    var div=document.createElement('div');
+    div.style.cssText='border:2px solid '+(item.tamam?'var(--success-bd)':'var(--border)')+';border-radius:12px;padding:14px 18px;cursor:'+(item.tamam?'pointer':'default')+';background:'+(item.tamam?'var(--success-bg)':'var(--surface2)')+';min-width:180px;'+(item.tamam?'':'opacity:0.6;');
+    if(item.tamam){div.addEventListener('click',function(){selectBankaBatch(item.b.id,item.b.description||item.b.id.substring(0,8));});}
+    div.innerHTML='<div style="font-weight:700;font-size:13px;margin-bottom:4px;">'+(item.b.description||'Batch')+'</div><div style="font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:6px;">'+item.pays.length+' odeme | '+formatMoney(item.top)+'</div>'+(item.tamam?'<span style="background:var(--success-bg);color:var(--success);border:1px solid var(--success-bd);border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px;">✅ TAMAMLANDI</span>':'<span style="background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-bd);border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px;">⏳ ONAY BEKLIYOR</span>');
+    listEl.appendChild(div);
+  });
+  var tamam=bilgi.filter(function(x){return x.tamam;});
+  if(tamam.length===1){selectBankaBatch(tamam[0].b.id,tamam[0].b.description||tamam[0].b.id.substring(0,8));}
+}
+
+var _currentBatchId=null;
+async function selectBankaBatch(batchId,batchAd){
+  _currentBatchId=batchId;
+  var bugun=new Date();
+  var g=String(bugun.getDate()).padStart(2,'0'),a=String(bugun.getMonth()+1).padStart(2,'0'),y=bugun.getFullYear();
+  _bankaRef='OTS-'+y+a+g+'-'+batchId.substring(0,6).toUpperCase();
+  document.getElementById('banka-ref-display').textContent='Ref: '+_bankaRef;
+  var res=await db.from('payments').select('*,departments(name)').eq('batch_id',batchId).eq('status','completed').order('due_date',{ascending:true});
+  bankaOdemeler=res.data||[];
+  document.getElementById('banka-form-section').style.display='block';
+  // Ödendi butonu göster
+  document.getElementById('btn-odendi').style.display='inline-flex';
+  var count=bankaOdemeler.length;
+  var total=bankaOdemeler.reduce(function(s,p){return s+(p.amount||0);},0);
+  document.getElementById('banka-odeme-count').textContent=count+' onaylı ödeme / Toplam: '+formatMoney(total);
+  // Döviz kuru girişleri
+  var currencies=[...new Set(bankaOdemeler.map(function(p){return p.currency||'TRY';}).filter(function(c){return c!=='TRY';}))];
+  var kurCard=document.getElementById('banka-kur-card');
+  var kurInputs=document.getElementById('banka-kur-inputs');
+  if(currencies.length>0){
+    kurCard.style.display='block';
+    kurInputs.innerHTML=currencies.map(function(c){return '<div style="display:flex;flex-direction:column;gap:6px;"><label style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;">'+c+'/TRY Kuru</label><input type="number" id="kur-'+c+'" placeholder="örn: 32.50" step="0.01" min="0" oninput="updateBankaTalimati()" style="width:140px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;"></div>';}).join('');
+  } else {
+    kurCard.style.display='none';
+  }
+  var tbody=document.getElementById('banka-odeme-tbody');
+  var tfoot=document.getElementById('banka-odeme-tfoot');
+  tbody.innerHTML=bankaOdemeler.map(function(p,i){var cur=p.currency||'TRY';var kurEl=document.getElementById('kur-'+cur);var kur=kurEl?parseFloat(kurEl.value)||1:1;var tryTutar=cur==='TRY'?p.amount:(p.amount*kur);return '<tr><td style="font-size:11px;color:var(--text3);">'+(i+1)+'</td><td style="font-weight:600;">'+(p.cari||'—')+'</td><td style="font-size:11px;font-family:monospace;color:var(--text3);">'+(p.iban||'—')+'</td><td style="font-family:monospace;color:var(--accent);font-weight:700;text-align:right;">'+formatMoney(p.amount)+'</td><td style="font-size:12px;font-weight:600;color:'+(cur==='TRY'?'var(--text3)':'var(--warning)')+';">'+cur+'</td><td style="font-size:12px;color:var(--text2);">'+(p.description||'—')+'</td><td style="font-size:12px;">'+formatDate(p.due_date)+'</td></tr>';}).join('');
+  tfoot.innerHTML='<tr style="background:var(--surface2);"><td colspan="3" style="font-weight:700;padding:10px 16px;">TOPLAM</td><td style="font-weight:700;font-family:monospace;color:var(--accent);text-align:right;padding:10px 16px;">'+formatMoney(total)+'</td><td colspan="3"></td></tr>';
+  updateBankaTalimati();
+}
+
+function updateBankaTalimati(){
+  var banka=document.getElementById('banka-select')?document.getElementById('banka-select').value:'';
+  var sube=document.getElementById('banka-sube')?document.getElementById('banka-sube').value.trim():'';
+  var mustNo=document.getElementById('banka-musteri-no')?document.getElementById('banka-musteri-no').value.trim():'';
+  var hesap=document.getElementById('banka-hesap-no')?document.getElementById('banka-hesap-no').value.trim():'';
+  var el=document.getElementById('banka-talimati-content');
+  if(!el)return;
+  if(!banka){el.textContent='Banka bilgilerini doldurun...';return;}
+  // Kur hesaplama
+  function getKur(cur){if(cur==='TRY')return 1;var inp=document.getElementById('kur-'+cur);return inp&&parseFloat(inp.value)>0?parseFloat(inp.value):null;}
+  var bugun=new Date();
+  var tarih=String(bugun.getDate()).padStart(2,'0')+'/'+String(bugun.getMonth()+1).padStart(2,'0')+'/'+bugun.getFullYear();
+  // TRY toplamı (yabancı dövizleri kur ile çevir)
+  var tryToplam=bankaOdemeler.reduce(function(s,p){var cur=p.currency||'TRY';var kur=getKur(cur);return s+(kur?p.amount*kur:0);},0);
+  var subeStr=sube?sube+' SUBESI':'..............................';
+  var mustStr=mustNo||'.................................';
+  var hesapStr=hesap||'...........................................................';
+  var s=[];
+  s.push(banka+' BANKASI '+subeStr+' MUDURLUGUNE');
+  s.push('');
+  s.push('Tarih   : '+tarih);
+  s.push('Ref No  : '+(_bankaRef||'—'));
+  s.push('');
+  s.push('Konu    : Para Transferi Talimati');
+  s.push('');
+  s.push('Bankanizin '+mustStr+' numarali musterisiyim.');
+  s.push('Subeniz nezdinde bulunan IBAN: '+hesapStr);
+  s.push('hesabimdan, ekte yer alan hesaplara '+formatMoney(tryToplam)+' TL tutarin');
+  s.push('aktarilmasini arz ederim.');
+  s.push('');
+  // Döviz dökümü varsa ekle
+  var currencies=[...new Set(bankaOdemeler.map(function(p){return p.currency||'TRY';}).filter(function(c){return c!=='TRY';}))];
+  if(currencies.length>0){
+    s.push('Doviz Dokumu:');
+    currencies.forEach(function(cur){
+      var kur=getKur(cur);var curTop=bankaOdemeler.filter(function(p){return (p.currency||'TRY')===cur;}).reduce(function(a,p){return a+p.amount;},0);
+      s.push('  '+cur+': '+curTop.toFixed(2)+(kur?' (Kur: '+kur.toFixed(4)+' → '+formatMoney(curTop*kur)+' TL)':' (Kur girilmedi)'));
     });
-  } catch(e) { console.warn('EmailJS:', e); }
-  
-  // Adım 2'ye geç
-  document.getElementById('forgot-step1').style.display = 'none';
-  document.getElementById('forgot-step2').style.display = 'block';
-  document.getElementById('forgot-email-hint').textContent = email + ' adresine kod gönderildi';
-  document.getElementById('forgot-code').value = '';
-  document.getElementById('forgot-newpass').value = '';
-  document.getElementById('forgot-confirmpass').value = '';
+    s.push('');
+  }
+  s.push('Gereğinin yapılmasını arz ederim.');
+  s.push('');s.push('');
+  s.push('            Kase + Imza');
+  s.push('  ________________________________');
+  s.push('');s.push('');
+  s.push('--------------------------------------------------');
+  s.push('EKLI LISTE ('+bankaOdemeler.length+' ADET ODEME)');
+  s.push('--------------------------------------------------');
+  s.push('');
+  if(bankaOdemeler.length===0){s.push('(Odeme bulunamadi)');}
+  else{
+    s.push('NO   CARI UNVAN                   IBAN                        TUTAR        DÖVİZ');
+    s.push('-'.repeat(80));
+    bankaOdemeler.forEach(function(p,i){
+      var cur=p.currency||'TRY';
+      s.push(String(i+1).padEnd(5)+String(p.cari||'—').substring(0,28).padEnd(30)+String(p.iban||'—').substring(0,24).padEnd(26)+formatMoney(p.amount).padStart(14)+'  '+cur);
+    });
+    s.push('-'.repeat(80));
+    s.push(String('').padEnd(55)+('TRY TOPLAM: '+formatMoney(tryToplam)).padStart(25));
+  }
+  el.textContent=s.join("\n");
 }
 
-async function resetPassword() {
-  const code = document.getElementById('forgot-code').value.trim();
-  const newPass = document.getElementById('forgot-newpass').value.trim();
-  const confirm = document.getElementById('forgot-confirmpass').value.trim();
-  const errEl = document.getElementById('forgot-error2');
-  errEl.style.display = 'none';
-  
-  if (!code || !newPass || !confirm) { errEl.textContent = 'Tüm alanları doldurun.'; errEl.style.display='block'; return; }
-  if (Date.now() > resetExpiry) { errEl.textContent = 'Kod süresi doldu. Tekrar deneyin.'; errEl.style.display='block'; return; }
-  if (code !== resetCode) { errEl.textContent = 'Hatalı kod.'; errEl.style.display='block'; return; }
-  if (newPass.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.style.display='block'; return; }
-  if (newPass !== confirm) { errEl.textContent = 'Şifreler eşleşmiyor.'; errEl.style.display='block'; return; }
-  
-  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', resetUserId);
-  if (error) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display='block'; return; }
-  
-  resetCode = null; resetUserId = null;
-  backToLoginFromForgot();
-  showToast('Şifreniz başarıyla sıfırlandı! Giriş yapabilirsiniz.', 'success');
+function copyTalimati(){
+  var t=document.getElementById('banka-talimati-content').textContent;
+  navigator.clipboard.writeText(t).then(function(){showToast('Talimat kopyalandi!','success');}).catch(function(){showToast('Kopyalama basarisiz.','error');});
 }
 
+function printBankaTalimati(){
+  var banka=document.getElementById('banka-select').value;
+  if(!banka){showToast('Lutfen banka secin.','error');return;}
+  var t=document.getElementById('banka-talimati-content').textContent;
+  var w=window.open('','_blank');
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+(_bankaRef||'Talimat')+'</title>';
+  h+='<style>body{font-family:"Courier New",monospace;font-size:11px;margin:30px 40px;line-height:1.8;}pre{white-space:pre-wrap;}@media print{body{margin:0;font-size:10px;}}</style>';
+  h+='</head><body><pre>'+t+'</pre><scr'+'ipt>window.onload=function(){window.print();}</'+'script></body></html>';
+  w.document.write(h);w.document.close();
+}
 
-// ── ŞİFREMİ UNUTTUM ──
+// ═══════════════════════════════════════════
+// E: BATCH ÖDENDİ İŞARETLE
+// ═══════════════════════════════════════════
+async function markBatchAsPaid(){
+  if(!_currentBatchId){showToast('Önce batch seçin.','error');return;}
+  if(!confirm('Bu batch içindeki tüm tamamlanmış ödemeler "Ödendi ✓" olarak işaretlenecek. Devam edilsin mi?'))return;
+  var btn=document.getElementById('btn-odendi');
+  btn.disabled=true;btn.textContent='İşleniyor...';
+  try{
+    var ids=bankaOdemeler.map(function(p){return p.id;});
+    for(var i=0;i<ids.length;i+=50){
+      var chunk=ids.slice(i,i+50);
+      var{error}=await db.from('payments').update({status:'paid'}).in('id',chunk);
+      if(error)throw error;
+    }
+    await db.from('batches').update({status:'paid'}).eq('id',_currentBatchId);
+    await logAction('Batch ödendi işaretlendi: '+_currentBatchId,_currentBatchId,null);
+    showToast(ids.length+' ödeme "Ödendi ✓" olarak işaretlendi!','success');
+    btn.style.display='none';
+    bankaOdemeler=[];
+    document.getElementById('banka-form-section').style.display='none';
+    _currentBatchId=null;
+    loadBankaTalimati();
+  }catch(err){showToast('Hata: '+err.message,'error');}
+  finally{btn.disabled=false;btn.textContent='✅ Tümünü Ödendi İşaretle';}
+}
 
+// ═══════════════════════════════════════════
+// D: REDDEDİLEN ÖDEMELERİ TEKRAR GÖNDER
+// ═══════════════════════════════════════════
+var _rejectedPayments=[];
+async function loadRejected(){
+  var{data}=await db.from('payments')
+    .select('*,departments(name),batches(description,upload_date),approvals(stage,status,comment,users(name))')
+    .eq('status','rejected')
+    .order('created_at',{ascending:false});
+  _rejectedPayments=data||[];
+  var badge=document.getElementById('fin-rejected-badge');
+  if(_rejectedPayments.length>0){badge.textContent=_rejectedPayments.length;badge.style.display='inline';}
+  else{badge.style.display='none';}
+  renderRejected();
+}
 
+function renderRejected(){
+  var tbody=document.getElementById('fin-rejected-table');
+  var sub=document.getElementById('fin-rej-sub');
+  sub.textContent=_rejectedPayments.length+' kayıt';
+  if(_rejectedPayments.length===0){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><span class="icon">🎉</span><p>Reddedilen ödeme yok.</p></div></td></tr>';return;
+  }
+  tbody.innerHTML=_rejectedPayments.map(function(p){
+    var lastRej=(p.approvals||[]).filter(function(a){return a.status==='rejected';}).pop();
+    var redNedeni=lastRej?((lastRej.users?.name||'')+(lastRej.comment?' — '+lastRej.comment:'')):'—';
+    return '<tr>'
+      +'<td style="font-weight:600;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+p.cari+'</td>'
+      +'<td style="font-family:monospace;color:var(--accent);">'+formatMoney(p.amount)+'</td>'
+      +'<td><span class="badge badge-yellow">'+(p.departments?.name||'—')+'</span></td>'
+      +'<td style="font-size:12px;color:var(--text2);">'+(p.due_date||'—')+'</td>'
+      +'<td style="font-size:12px;font-family:monospace;color:var(--text3);">'+(p.doc_no||'—')+'</td>'
+      +'<td style="font-size:12px;color:var(--danger);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+redNedeni+'</td>'
+      +'<td><button class="btn btn-secondary btn-sm" onclick="resubmitPayment(\''+p.id+'\')">↩ Tekrar Gönder</button></td>'
+      +'</tr>';
+  }).join('');
+}
 
+async function resubmitPayment(pid){
+  var p=_rejectedPayments.find(function(x){return x.id===pid;});
+  if(!p)return;
+  if(!confirm('"'+p.cari+'" ödemesi departman onayına geri gönderilecek. Devam?'))return;
+  try{
+    await db.from('payments').update({status:'department_pending'}).eq('id',pid);
+    await db.from('approvals').delete().eq('payment_id',pid).eq('status','rejected');
+    await logAction('Red sonrası tekrar gönderildi: '+p.cari,p.batch_id,pid);
+    showToast('"'+p.cari+'" tekrar sürece alındı.','success');
+    loadRejected();
+  }catch(err){showToast('Hata: '+err.message,'error');}
+}
 
+// ═══════════════════════════════════════════
+// C: ÖDEME DOSYA EKİ (Supabase Storage)
+// ═══════════════════════════════════════════
+async function loadPaymentFiles(paymentId){
+  try{
+    var{data,error}=await db.from('payment_files').select('*').eq('payment_id',paymentId).order('created_at',{ascending:false});
+    if(error)return[];
+    return data||[];
+  }catch(e){return[];}
+}
 
+async function renderFilesSection(paymentId,containerId){
+  var el=document.getElementById(containerId);
+  if(!el)return;
+  el.innerHTML='<div style="font-size:12px;color:var(--text3);">Yükleniyor...</div>';
+  var files=await loadPaymentFiles(paymentId);
+  var html='<div style="margin-top:4px;">';
+  if(files.length===0){html+='<div style="font-size:12px;color:var(--text3);padding:8px 0;">Henüz dosya eklenmemiş.</div>';}
+  else{
+    html+=files.map(function(f){
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">'
+        +'<span style="font-size:14px;">📎</span>'
+        +'<a href="'+f.url+'" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+f.name+'</a>'
+        +'<span style="font-size:11px;color:var(--text3);">'+formatFileSize(f.size)+'</span>'
+        +'<button onclick="deletePaymentFile(\''+f.id+'\',\''+paymentId+'\',\''+containerId+'\',\''+f.storage_path+'\')" style="background:none;border:none;cursor:pointer;color:var(--danger);font-size:13px;padding:2px 4px;">✕</button>'
+        +'</div>';
+    }).join('');
+  }
+  html+='<label style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;">'
+    +'<input type="file" accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls,.docx" style="display:none;" onchange="uploadPaymentFile(\''+paymentId+'\',this,\''+containerId+'\')">'
+    +'+ Dosya Ekle</label>';
+  html+='</div>';
+  el.innerHTML=html;
+}
 
+function formatFileSize(bytes){if(!bytes)return '';if(bytes<1024)return bytes+'B';if(bytes<1048576)return (bytes/1024).toFixed(0)+'KB';return (bytes/1048576).toFixed(1)+'MB';}
 
-window.confirmResetPassword = async function() {
-  const code = document.getElementById('forgot-code').value.trim();
-  const newPass = document.getElementById('forgot-newpass').value.trim();
-  const confirm = document.getElementById('forgot-confirm').value.trim();
-  const errEl = document.getElementById('forgot-error2');
-  errEl.style.display = 'none';
-  
-  if (!code || !newPass || !confirm) { errEl.textContent = 'Tüm alanları doldurun.'; errEl.style.display='block'; return; }
-  if (Date.now() > resetExpiry) { errEl.textContent = 'Kodun süresi doldu. Tekrar deneyin.'; errEl.style.display='block'; return; }
-  if (code !== resetCode) { errEl.textContent = 'Hatalı kod.'; errEl.style.display='block'; return; }
-  if (newPass.length < 6) { errEl.textContent = 'Şifre en az 6 karakter olmalı.'; errEl.style.display='block'; return; }
-  if (newPass !== confirm) { errEl.textContent = 'Şifreler eşleşmiyor.'; errEl.style.display='block'; return; }
-  
-  const btn = document.getElementById('forgot-confirm-btn');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
-  
-  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', resetUserId);
-  btn.disabled = false; btn.innerHTML = 'Şifremi Sıfırla ✓';
-  
-  if (error) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display='block'; return; }
-  
-  // Başarılı
-  backToLoginFromForgot();
-  showToast('Şifreniz başarıyla sıfırlandı! Giriş yapabilirsiniz.', 'success');
-  resetCode = null; resetUserId = null;
+async function uploadPaymentFile(paymentId,input,containerId){
+  var file=input.files[0];if(!file)return;
+  if(file.size>10*1024*1024){showToast('Dosya 10MB den büyük olamaz.','error');return;}
+  showToast('Yükleniyor...','success');
+  try{
+    var path='payments/'+paymentId+'/'+Date.now()+'_'+file.name;
+    var{data:upData,error:upErr}=await db.storage.from('payment-files').upload(path,file,{upsert:false});
+    if(upErr)throw upErr;
+    var{data:urlData}=db.storage.from('payment-files').getPublicUrl(path);
+    await db.from('payment_files').insert({payment_id:paymentId,name:file.name,size:file.size,url:urlData.publicUrl,storage_path:path,uploaded_by:currentUser.id});
+    showToast('Dosya eklendi: '+file.name,'success');
+    renderFilesSection(paymentId,containerId);
+  }catch(err){showToast('Yükleme hatası: '+err.message,'error');}
+  input.value='';
+}
+
+function loadAdminSettings(){
+  const enabled=isOtpEnabled();
+  const toggle=document.getElementById('otp-toggle');
+  const track=document.getElementById('otp-toggle-track');
+  const thumb=document.getElementById('otp-toggle-thumb');
+  const desc=document.getElementById('otp-setting-desc');
+  if(toggle)toggle.checked=enabled;
+  if(track)track.style.background=enabled?'var(--accent)':'var(--border2)';
+  if(thumb)thumb.style.left=enabled?'25px':'3px';
+  if(desc)desc.textContent=enabled?'Aktif — Kullanıcılar e-posta kodu ile giriş yapar':'İnaktif — Kullanıcılar direkt şifre ile giriş yapar';
+}
+
+function saveOtpSetting(checked){
+  localStorage.setItem('ots_otp_enabled',checked?'true':'false');
+  const track=document.getElementById('otp-toggle-track');
+  const thumb=document.getElementById('otp-toggle-thumb');
+  const desc=document.getElementById('otp-setting-desc');
+  if(track)track.style.background=checked?'var(--accent)':'var(--border2)';
+  if(thumb)thumb.style.left=checked?'25px':'3px';
+  if(desc)desc.textContent=checked?'Aktif — Kullanıcılar e-posta kodu ile giriş yapar':'İnaktif — Kullanıcılar direkt şifre ile giriş yapar';
+  showToast(checked?'OTP doğrulaması aktif edildi.':'OTP doğrulaması kapatıldı. Test modu aktif.',checked?'success':'error');
+}
+
+async function deletePaymentFile(fileId,paymentId,containerId,storagePath){
+  if(!confirm('Bu dosya silinecek. Emin misiniz?'))return;
+  try{
+    if(storagePath)await db.storage.from('payment-files').remove([storagePath]);
+    await db.from('payment_files').delete().eq('id',fileId);
+    showToast('Dosya silindi.','success');
+    renderFilesSection(paymentId,containerId);
+  }catch(err){showToast('Silme hatası: '+err.message,'error');}
 }
 
 </script>
