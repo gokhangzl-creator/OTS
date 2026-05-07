@@ -1840,7 +1840,8 @@ function generateOTP() {
 }
 
 function isOtpEnabled() {
-  return localStorage.getItem('ots_otp_enabled') !== 'false';
+  // Varsayılan: KAPALI. Admin panelinden açıkça 'true' yapılmadıkça OTP çalışmaz.
+  return localStorage.getItem('ots_otp_enabled') === 'true';
 }
 
 async function doLogin() {
@@ -1875,8 +1876,11 @@ async function doLogin() {
     });
     showOTPScreen();
   } catch(e) {
-    showOTPScreen();
-    console.warn('EmailJS:', e);
+    console.warn('EmailJS hatası:', e);
+    // Email gönderilemedi — kullanıcıyı bilgilendir, login ekranına geri dön
+    errEl.textContent = 'Doğrulama e-postası gönderilemedi. Lütfen internet bağlantınızı kontrol edin veya admin ile iletişime geçin.';
+    errEl.style.display = 'block';
+    otpCode = null; otpUser = null;
   }
 }
 
