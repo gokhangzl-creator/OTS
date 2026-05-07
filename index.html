@@ -784,9 +784,32 @@ tr:hover td { background:#f8fafc; }
           <div><h1>Banka Talimatı</h1><p>Onaylanan batch için resmi ödeme talimatı</p></div>
           <button class="btn btn-secondary btn-sm" onclick="loadBankaTalimati()">🔄 Yenile</button>
         </div>
+        <!-- TARİH ARALIĞI FİLTRESİ -->
         <div class="card" style="margin-bottom:16px;">
-          <div class="card-header"><div><h3>Batch Seçin</h3><p>Bugün yüklenen ve tüm onayları tamamlanmış paketler</p></div></div>
-          <div class="card-body" style="padding:16px;"><div id="banka-batch-list" style="display:flex;gap:10px;flex-wrap:wrap;"><p style="color:var(--text3);font-size:13px;">Yükleniyor...</p></div></div>
+          <div class="card-header"><div><h3>Tarih Aralığı Seçin</h3><p>Onayları tamamlanmış batch'leri listeleyin</p></div></div>
+          <div class="card-body" style="padding:16px;">
+            <div style="display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;">
+              <div>
+                <label style="display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Başlangıç Tarihi</label>
+                <input type="date" id="banka-baslangic" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;">
+              </div>
+              <div>
+                <label style="display:block;font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600;text-transform:uppercase;">Bitiş Tarihi</label>
+                <input type="date" id="banka-bitis" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);outline:none;">
+              </div>
+              <button class="btn btn-primary" onclick="loadBankaTalimati()">🔍 Listele</button>
+            </div>
+          </div>
+        </div>
+        <!-- TAMAMLANAN BATCH LİSTESİ -->
+        <div id="banka-batch-list-wrap" style="margin-bottom:16px;display:none;">
+          <div class="card">
+            <div class="card-header"><div><h3>Tamamlanan Batch'ler</h3><p id="banka-batch-count">—</p></div></div>
+            <div class="table-wrap"><table>
+              <thead><tr><th>NO</th><th>YÜKLEME TARİHİ</th><th>AÇIKLAMA</th><th>ÖDEME SAYISI</th><th>TOPLAM TUTAR</th><th>İŞLEM</th></tr></thead>
+              <tbody id="banka-batch-tbody"></tbody>
+            </table></div>
+          </div>
         </div>
         <div id="banka-form-section" style="display:none;">
           <div class="card" style="margin-bottom:16px;">
@@ -820,7 +843,9 @@ tr:hover td { background:#f8fafc; }
               <div><h3>Talimat Önizleme</h3><p id="banka-ref-display" style="color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;font-weight:700;"></p></div>
               <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="btn btn-secondary btn-sm" onclick="copyTalimati()">📋 Kopyala</button>
-                <button class="btn btn-primary btn-sm" onclick="printBankaTalimati()">🖨️ Yazdır/PDF</button>
+                <button class="btn btn-primary btn-sm" onclick="printBankaTalimati()">🖨️ PDF</button>
+                <button class="btn btn-secondary btn-sm" onclick="exportBankaTalimatWord()">📄 Word</button>
+                <button class="btn btn-secondary btn-sm" onclick="exportBankaTalimatExcel()">📊 Excel</button>
                 <button class="btn btn-success btn-sm" id="btn-odendi" onclick="markBatchAsPaid()" style="display:none;">✅ Tümünü Ödendi İşaretle</button>
               </div>
             </div>
@@ -1410,7 +1435,14 @@ function finansPage(page,el){
   if(el)el.classList.add('active');
   if(page==='batches')loadBatches();
   if(page==='dashboard')loadFinansDashboard();
-  if(page==='banka')loadBankaTalimati();
+  if(page==='banka'){
+    var _now=new Date();
+    var _y=_now.getFullYear(),_m=String(_now.getMonth()+1).padStart(2,'0');
+    var _lastDay=new Date(_now.getFullYear(),_now.getMonth()+1,0).getDate();
+    var basEl=document.getElementById('banka-baslangic'),bitEl=document.getElementById('banka-bitis');
+    if(basEl&&!basEl.value)basEl.value=_y+'-'+_m+'-01';
+    if(bitEl&&!bitEl.value)bitEl.value=_y+'-'+_m+'-'+String(_lastDay).padStart(2,'0');
+  }
   if(page==='rejected')loadRejected();
 }
 
@@ -2106,31 +2138,49 @@ var bankaOdemeler = [];
 var _bankaRef = null;
 
 async function loadBankaTalimati(){
-  var bugun = new Date();
-  var bugunStr = bugun.getFullYear()+'-'+String(bugun.getMonth()+1).padStart(2,'0')+'-'+String(bugun.getDate()).padStart(2,'0');
-  var res = await db.from('batches').select('*').eq('upload_date',bugunStr).order('created_at',{ascending:false});
-  var batches = res.data || [];
-  var listEl = document.getElementById('banka-batch-list');
+  var bas=document.getElementById('banka-baslangic').value;
+  var bit=document.getElementById('banka-bitis').value;
+  if(!bas||!bit){showToast('Lütfen başlangıç ve bitiş tarihini girin.','error');return;}
   document.getElementById('banka-form-section').style.display='none';
-  if(batches.length===0){listEl.innerHTML='<p style="color:var(--text3);font-size:13px;">Bugün yüklenmiş batch bulunamadı.</p>';return;}
+  var wrap=document.getElementById('banka-batch-list-wrap');
+  var tbody=document.getElementById('banka-batch-tbody');
+  wrap.style.display='block';
+  tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">⏳</span><p>Yükleniyor...</p></div></td></tr>';
+  var res=await db.from('batches').select('*,users(name)').gte('upload_date',bas).lte('upload_date',bit).order('upload_date',{ascending:false});
+  var batches=res.data||[];
+  if(batches.length===0){
+    document.getElementById('banka-batch-count').textContent='Sonuç bulunamadı';
+    tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Seçilen tarih aralığında batch bulunamadı.</p></div></td></tr>';
+    return;
+  }
   var bilgi=[];
   for(var i=0;i<batches.length;i++){
     var b=batches[i];
     var pr=await db.from('payments').select('status,amount').eq('batch_id',b.id);
     var pays=pr.data||[];
-    var tamam=pays.length>0&&pays.every(function(p){return p.status==='completed';});
-    bilgi.push({b:b,pays:pays,tamam:tamam,top:pays.reduce(function(s,p){return s+(p.amount||0);},0)});
+    var aktif=pays.filter(function(p){return p.status!=='rejected';});
+    var tamam=aktif.length>0&&aktif.every(function(p){return p.status==='completed'||p.status==='paid';});
+    var tamamlananPays=pays.filter(function(p){return p.status==='completed'||p.status==='paid';});
+    var top=tamamlananPays.reduce(function(s,p){return s+(p.amount||0);},0);
+    if(tamam)bilgi.push({b:b,pays:pays,tamamlanan:tamamlananPays,top:top});
   }
-  listEl.innerHTML='';
-  bilgi.forEach(function(item){
-    var div=document.createElement('div');
-    div.style.cssText='border:2px solid '+(item.tamam?'var(--success-bd)':'var(--border)')+';border-radius:12px;padding:14px 18px;cursor:'+(item.tamam?'pointer':'default')+';background:'+(item.tamam?'var(--success-bg)':'var(--surface2)')+';min-width:180px;'+(item.tamam?'':'opacity:0.6;');
-    if(item.tamam){div.addEventListener('click',function(){selectBankaBatch(item.b.id,item.b.description||item.b.id.substring(0,8));});}
-    div.innerHTML='<div style="font-weight:700;font-size:13px;margin-bottom:4px;">'+(item.b.description||'Batch')+'</div><div style="font-size:11px;color:var(--text3);font-family:monospace;margin-bottom:6px;">'+item.pays.length+' odeme | '+formatMoney(item.top)+'</div>'+(item.tamam?'<span style="background:var(--success-bg);color:var(--success);border:1px solid var(--success-bd);border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px;">✅ TAMAMLANDI</span>':'<span style="background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-bd);border-radius:20px;font-size:10px;font-weight:700;padding:2px 8px;">⏳ ONAY BEKLIYOR</span>');
-    listEl.appendChild(div);
-  });
-  var tamam=bilgi.filter(function(x){return x.tamam;});
-  if(tamam.length===1){selectBankaBatch(tamam[0].b.id,tamam[0].b.description||tamam[0].b.id.substring(0,8));}
+  document.getElementById('banka-batch-count').textContent=bilgi.length+' tamamlanmış batch';
+  if(bilgi.length===0){
+    tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">⏳</span><p>Seçilen tarih aralığında onayları tamamlanmış batch bulunamadı.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=bilgi.map(function(item,i){
+    var bNo='B-'+String(i+1).padStart(3,'0');
+    var desc=(item.b.description||'—').replace(/'/g,'&#39;');
+    return '<tr>'
+      +'<td style="font-family:\'DM Mono\',monospace;font-weight:700;color:var(--text2);">'+bNo+'</td>'
+      +'<td style="font-size:12px;color:var(--text2);">'+formatDate(item.b.upload_date||item.b.created_at)+'</td>'
+      +'<td style="font-weight:500;">'+desc+'</td>'
+      +'<td style="font-family:\'DM Mono\',monospace;text-align:center;">'+item.tamamlanan.length+'</td>'
+      +'<td style="font-family:\'DM Mono\',monospace;color:var(--success);font-weight:700;">'+formatMoney(item.top)+'</td>'
+      +'<td><button class="btn btn-primary btn-sm" onclick="selectBankaBatch(\''+item.b.id+'\',\''+desc+'\')">🏦 Talimat Oluştur</button></td>'
+      +'</tr>';
+  }).join('');
 }
 
 var _currentBatchId=null;
@@ -2140,7 +2190,7 @@ async function selectBankaBatch(batchId,batchAd){
   var g=String(bugun.getDate()).padStart(2,'0'),a=String(bugun.getMonth()+1).padStart(2,'0'),y=bugun.getFullYear();
   _bankaRef='OTS-'+y+a+g+'-'+batchId.substring(0,6).toUpperCase();
   document.getElementById('banka-ref-display').textContent='Ref: '+_bankaRef;
-  var res=await db.from('payments').select('*,departments(name)').eq('batch_id',batchId).eq('status','completed').order('due_date',{ascending:true});
+  var res=await db.from('payments').select('*,departments(name)').eq('batch_id',batchId).in('status',['completed','paid']).order('due_date',{ascending:true});
   bankaOdemeler=res.data||[];
   document.getElementById('banka-form-section').style.display='block';
   // Ödendi butonu göster
@@ -2205,10 +2255,7 @@ function updateBankaTalimati(){
     });
     s.push('');
   }
-  s.push('Gereğinin yapılmasını arz ederim.');
-  s.push('');s.push('');
-  s.push('            Kase + Imza');
-  s.push('  ________________________________');
+  s.push('Gereğinin yapılmasını saygılarımla arz ederim.');
   s.push('');s.push('');
   s.push('--------------------------------------------------');
   s.push('EKLI LISTE ('+bankaOdemeler.length+' ADET ODEME)');
@@ -2233,15 +2280,269 @@ function copyTalimati(){
   navigator.clipboard.writeText(t).then(function(){showToast('Talimat kopyalandi!','success');}).catch(function(){showToast('Kopyalama basarisiz.','error');});
 }
 
+/* Ortak veri hazırlama — print, word ve excel tarafından kullanılır */
+function _buildPrintData(){
+  var banka=document.getElementById('banka-select').value;
+  var sube=(document.getElementById('banka-sube').value.trim()||'').toUpperCase();
+  var mustNo=document.getElementById('banka-musteri-no').value.trim();
+  var hesap=document.getElementById('banka-hesap-no').value.trim();
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function getKur(cur){if(cur==='TRY')return 1;var inp=document.getElementById('kur-'+cur);return inp&&parseFloat(inp.value)>0?parseFloat(inp.value):null;}
+  var bugun=new Date();
+  var tarih=String(bugun.getDate()).padStart(2,'0')+'/'+String(bugun.getMonth()+1).padStart(2,'0')+'/'+bugun.getFullYear();
+  var tryToplam=bankaOdemeler.reduce(function(s,p){var cur=p.currency||'TRY';var kur=getKur(cur);return s+(kur?p.amount*kur:0);},0);
+  var currencies=[...new Set(bankaOdemeler.map(function(p){return p.currency||'TRY';}).filter(function(c){return c!=='TRY';}))];
+  var kurHtml='';
+  if(currencies.length>0){
+    kurHtml='<div class="kur-box"><strong>Döviz Dökümü:</strong><ul>';
+    currencies.forEach(function(cur){var kur=getKur(cur);var curTop=bankaOdemeler.filter(function(p){return(p.currency||'TRY')===cur;}).reduce(function(a,p){return a+p.amount;},0);kurHtml+='<li>'+esc(cur)+': '+curTop.toFixed(2)+(kur?' — Kur: '+kur.toFixed(4)+' → '+formatMoney(curTop*kur)+' TL':' (Kur girilmedi)')+'</li>';});
+    kurHtml+='</ul></div>';
+  }
+  /* Sütunlar: #, Cari Unvan, IBAN, Tutar, Ödeme Açıklaması */
+  var odemeRows=bankaOdemeler.map(function(p,i){
+    var cur=p.currency||'TRY';
+    var tutarStr=cur==='TRY'?formatMoney(p.amount):p.amount.toFixed(2)+' '+cur;
+    return '<tr>'
+      +'<td class="tc">'+(i+1)+'</td>'
+      +'<td>'+esc(p.cari||'—')+'</td>'
+      +'<td class="mono">'+esc(p.iban||'—')+'</td>'
+      +'<td class="tr"><strong>'+tutarStr+'</strong></td>'
+      +'<td>'+esc(p.description||'—')+'</td>'
+      +'</tr>';
+  }).join('');
+  var logoLg='<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">'
+    +'<rect width="48" height="48" rx="11" fill="#1a5c3a"/>'
+    +'<rect x="7" y="7" width="34" height="34" rx="7" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>'
+    +'<text x="24" y="17" text-anchor="middle" font-family="Arial" font-size="7" font-weight="700" fill="rgba(255,255,255,0.6)" letter-spacing="1.5">DENEME</text>'
+    +'<text x="24" y="30" text-anchor="middle" font-family="Arial" font-size="14" font-weight="900" fill="#ffffff">DS</text>'
+    +'<text x="24" y="39" text-anchor="middle" font-family="Arial" font-size="5.5" fill="rgba(255,255,255,0.5)" letter-spacing="0.8">A.Ş.</text>'
+    +'</svg>';
+  var logoSm='<svg width="30" height="30" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">'
+    +'<rect width="48" height="48" rx="11" fill="#1a5c3a"/>'
+    +'<rect x="7" y="7" width="34" height="34" rx="7" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/>'
+    +'<text x="24" y="17" text-anchor="middle" font-family="Arial" font-size="7" font-weight="700" fill="rgba(255,255,255,0.6)" letter-spacing="1.5">DENEME</text>'
+    +'<text x="24" y="30" text-anchor="middle" font-family="Arial" font-size="14" font-weight="900" fill="#ffffff">DS</text>'
+    +'<text x="24" y="39" text-anchor="middle" font-family="Arial" font-size="5.5" fill="rgba(255,255,255,0.5)" letter-spacing="0.8">A.Ş.</text>'
+    +'</svg>';
+  return {banka,sube,mustNo,hesap,esc,getKur,tarih,tryToplam,kurHtml,odemeRows,logoLg,logoSm};
+}
+
+/* ── Her sayfada antet/footer tekrar — wrapper-table yaklaşımı ── */
+function _makePrintHtml(d, withPrint){
+  var css='@page{size:A4;margin:5mm}'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:Arial,Helvetica,sans-serif;font-size:10.5pt;color:#1a1a1a}'
+    /* OUTER WRAPPER TABLE */
+    +'.wt{width:100%;border-collapse:collapse}'
+    +'.wt>thead>tr>td{padding:5mm 13mm 3mm;border-bottom:2.5px solid #1a5c3a}'
+    +'.wt>tfoot>tr>td{padding:3mm 13mm;border-top:2px solid #1a5c3a}'
+    +'.wt>tbody>tr>td{padding:6mm 13mm 4mm;vertical-align:top}'
+    /* HEADER */
+    +'.hdr{display:flex;justify-content:space-between;align-items:center}'
+    +'.hdr-l{display:flex;align-items:center;gap:12px}'
+    +'.hdr-co h1{font-size:14pt;font-weight:900;color:#1a5c3a;letter-spacing:-0.3px;line-height:1.15}'
+    +'.hdr-co .dept{font-size:7pt;color:#888;letter-spacing:1.4px;text-transform:uppercase;margin-top:3px}'
+    +'.hdr-co .slo{font-size:7.5pt;color:#bbb;font-style:italic;margin-top:2px}'
+    +'.hdr-r{text-align:right;font-size:8pt;color:#666;line-height:1.75}'
+    +'.hdr-r strong{color:#333}'
+    /* FOOTER */
+    +'.ftr{display:flex;justify-content:space-between;align-items:center}'
+    +'.ftr-l{display:flex;align-items:center;gap:9px}'
+    +'.ftr-co strong{font-size:8pt;color:#1a5c3a;display:block}'
+    +'.ftr-co span{font-size:7pt;color:#999;display:block}'
+    +'.ftr-r{text-align:right;font-size:7.5pt;color:#999;line-height:1.7}'
+    +'.ftr-r strong{color:#555}'
+    /* LETTER */
+    +'.meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}'
+    +'.doc-title{font-size:13pt;font-weight:800;color:#1a5c3a}'
+    +'.refs{text-align:right;font-size:9pt;color:#555;line-height:1.85}'
+    +'.refs strong{color:#1a1a1a}'
+    +'.rcpt{background:#f4f8f5;border-left:4px solid #1a5c3a;padding:9px 14px;margin-bottom:18px}'
+    +'.rcpt .lbl{font-size:7pt;color:#999;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:3px}'
+    +'.rcpt .val{font-weight:700;font-size:11.5pt}'
+    +'.lbody p{margin-bottom:10px;line-height:1.85}'
+    +'.kur-box{background:#fffbeb;border:1px solid #fde68a;border-radius:4px;padding:8px 12px;margin-bottom:12px;font-size:9.5pt}'
+    +'.kur-box ul{margin:4px 0 0 18px}'
+    +'.sig{margin-top:28px;display:flex;justify-content:flex-end}'
+    +'.sig-box{text-align:center;width:200px}'
+    +'.sig-space{height:55px}'
+    +'.sig-line{border-top:1.5px solid #555;margin-bottom:5px}'
+    +'.sig-label{font-size:9pt;font-weight:700;color:#333}'
+    +'.sig-sub{font-size:7.5pt;color:#999;margin-top:3px}'
+    /* LIST */
+    +'.list-hdr{margin-top:20px;border-top:2px dashed #ccc;padding-top:10px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}'
+    +'.list-title{font-size:9.5pt;font-weight:700;color:#1a5c3a;text-transform:uppercase}'
+    +'.list-cnt{font-size:8.5pt;color:#888}'
+    /* INNER PAYMENT TABLE — sadece .pt sınıfına uygula */
+    +'table.pt{width:100%;border-collapse:collapse;font-size:9pt}'
+    +'table.pt thead{display:table-header-group}'
+    +'table.pt thead tr{background:#1a5c3a;color:#fff}'
+    +'table.pt thead th{padding:6px 9px;text-align:left;font-weight:700;font-size:8pt;text-transform:uppercase;letter-spacing:0.4px}'
+    +'table.pt tbody tr:nth-child(even){background:#f9fafb}'
+    +'table.pt tbody td{padding:6px 9px;border-bottom:1px solid #e5e7eb;vertical-align:middle}'
+    +'table.pt tfoot tr{background:#f0fdf4;font-weight:700}'
+    +'table.pt tfoot td{padding:8px 9px;border-top:2.5px solid #1a5c3a}'
+    +'.tc{text-align:center}.tr{text-align:right}'
+    +'.mono{font-family:"Courier New",monospace;font-size:8pt;color:#555}'
+    +'@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}';
+
+  var body=''
+    /* ── WRAPPER TABLE BAŞLANGICI ── */
+    +'<table class="wt">'
+    /* === HEADER (her sayfada tekrar eder) === */
+    +'<thead><tr><td>'
+    +'<div class="hdr"><div class="hdr-l">'+d.logoLg
+    +'<div class="hdr-co"><h1>DENEME ŞİRKETİ A.Ş.</h1>'
+    +'<div class="dept">Finans &amp; Muhasebe Departmanı</div>'
+    +'<div class="slo">Güvenilir Ödeme Yönetimi</div></div></div>'
+    +'<div class="hdr-r">'
+    +'<div><strong>Adres:</strong> Örnek Mah. Test Cad. No:1, Ankara / TÜRKİYE</div>'
+    +'<div><strong>Tel:</strong> 0312 000 00 00 &nbsp;|&nbsp; <strong>Faks:</strong> 0312 000 00 01</div>'
+    +'<div><strong>E-posta:</strong> finans@denemesirketi.com.tr</div>'
+    +'</div></div>'
+    +'</td></tr></thead>'
+    /* === FOOTER (her sayfada tekrar eder) === */
+    +'<tfoot><tr><td>'
+    +'<div class="ftr"><div class="ftr-l">'+d.logoSm
+    +'<div class="ftr-co"><strong>DENEME ŞİRKETİ A.Ş.</strong>'
+    +'<span>Örnek Mah. Test Cad. No:1, Ankara &nbsp;|&nbsp; 0312 000 00 00</span>'
+    +'<span>finans@denemesirketi.com.tr</span></div></div>'
+    +'<div class="ftr-r"><div><strong>Ref:</strong> '+d.esc(_bankaRef||'—')+'</div>'
+    +'<div><strong>Tarih:</strong> '+d.tarih+'</div>'
+    +'<div>Ödeme Takip Sistemi</div></div></div>'
+    +'</td></tr></tfoot>'
+    /* === CONTENT (tek seferlik, sayfalara bölünür) === */
+    +'<tbody><tr><td>'
+    +'<div class="meta">'
+    +'<div class="doc-title">PARA TRANSFERİ TALİMATI</div>'
+    +'<div class="refs"><div><strong>Tarih:</strong> '+d.tarih+'</div>'
+    +'<div><strong>Ref No:</strong> '+d.esc(_bankaRef||'—')+'</div></div></div>'
+    +'<div class="rcpt"><div class="lbl">Alıcı</div>'
+    +'<div class="val">'+d.esc(d.banka)+' BANKASI'+(d.sube?' — '+d.esc(d.sube)+' ŞUBESİ MÜDÜRLÜĞÜNE':' MÜDÜRLÜĞÜNE')+'</div></div>'
+    +'<div class="lbody">'
+    +'<p>Bankanızın <strong>'+d.esc(d.mustNo||'………………………………')+'</strong> numaralı müşterisiyim.</p>'
+    +'<p>Şubeniz nezdinde bulunan <strong>'+d.esc(d.hesap||'TR……………………………………………………')+'</strong> numaralı hesabımdan, ekte yer alan listeye göre toplam <strong>'+formatMoney(d.tryToplam)+' TL</strong> tutarın ilgili hesaplara aktarılmasını arz ederim.</p>'
+    +d.kurHtml
+    +'<p>Gereğinin yapılmasını saygılarımla arz ederim.</p>'
+    +'</div>'
+    +'<div class="sig"><div class="sig-box"><div class="sig-space"></div>'
+    +'<div class="sig-line"></div><div class="sig-label">Yetkili İmza / Kaşe</div>'
+    +'<div class="sig-sub">Finansal Yetkili</div></div></div>'
+    /* EKLİ LİSTE */
+    +'<div class="list-hdr">'
+    +'<div class="list-title">Ekli Ödeme Listesi</div>'
+    +'<div class="list-cnt">'+bankaOdemeler.length+' adet &nbsp;|&nbsp; Toplam: '+formatMoney(d.tryToplam)+'</div></div>'
+    +'<table class="pt"><thead><tr>'
+    +'<th class="tc" style="width:30px;">#</th>'
+    +'<th>Cari Unvan</th><th>IBAN</th>'
+    +'<th class="tr">Tutar</th>'
+    +'<th>Ödeme Açıklaması</th>'
+    +'</tr></thead>'
+    +'<tbody>'+d.odemeRows+'</tbody>'
+    +'<tfoot><tr>'
+    +'<td colspan="3" class="tr" style="font-size:9pt;">TRY Toplam:</td>'
+    +'<td colspan="2" class="tr" style="font-size:11pt;color:#1a5c3a;">'+formatMoney(d.tryToplam)+'</td>'
+    +'</tr></tfoot></table>'
+    +'</td></tr></tbody>'
+    +'</table>';
+
+  return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'
+    +'<title>'+d.esc(_bankaRef||'Banka Talimatı')+'</title>'
+    +'<style>'+css+'</style></head><body>'+body
+    +(withPrint?'<scr'+'ipt>window.onload=function(){window.print();};<'+'/script>':'')
+    +'</body></html>';
+}
+
 function printBankaTalimati(){
   var banka=document.getElementById('banka-select').value;
-  if(!banka){showToast('Lutfen banka secin.','error');return;}
-  var t=document.getElementById('banka-talimati-content').textContent;
-  var w=window.open('','_blank');
-  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+(_bankaRef||'Talimat')+'</title>';
-  h+='<style>body{font-family:"Courier New",monospace;font-size:11px;margin:30px 40px;line-height:1.8;}pre{white-space:pre-wrap;}@media print{body{margin:0;font-size:10px;}}</style>';
-  h+='</head><body><pre>'+t+'</pre><scr'+'ipt>window.onload=function(){window.print();}</'+'script></body></html>';
-  w.document.write(h);w.document.close();
+  if(!banka){showToast('Lütfen banka seçin.','error');return;}
+  var d=_buildPrintData();
+  var html=_makePrintHtml(d,true);
+  var w=window.open('','_blank');w.document.write(html);w.document.close();
+}
+
+function exportBankaTalimatWord(){
+  var banka=document.getElementById('banka-select').value;
+  if(!banka){showToast('Lütfen banka seçin.','error');return;}
+  var d=_buildPrintData();
+  /* Word için HTML içeriği — SVG logo kaldırılır, tablo kenarlıkları eklenir */
+  var rows=bankaOdemeler.map(function(p,i){
+    var cur=p.currency||'TRY';
+    return '<tr><td>'+d.esc(String(i+1))+'</td><td>'+d.esc(p.cari||'')+'</td><td>'+d.esc(p.iban||'')+'</td>'
+      +'<td align="right">'+(cur==='TRY'?formatMoney(p.amount):p.amount.toFixed(2)+' '+cur)+'</td>'
+      +'<td>'+d.esc(p.description||'')+'</td></tr>';
+  }).join('');
+  var wordHtml="<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>"
+    +"<head><meta charset='utf-8'><title>Banka Talimatı</title><style>"
+    +"body{font-family:Arial;font-size:11pt;margin:2cm;}"
+    +".hdr-box{border-bottom:3px solid #1a5c3a;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between;}"
+    +".co h1{font-size:18pt;font-weight:bold;color:#1a5c3a;}"
+    +".co .dept{font-size:8pt;color:#888;letter-spacing:1px;text-transform:uppercase;}"
+    +".cc{text-align:right;font-size:8.5pt;color:#555;line-height:1.75;}"
+    +".rcpt{background:#f4f8f5;border-left:4px solid #1a5c3a;padding:8px 14px;margin:16px 0;}"
+    +"table{width:100%;border-collapse:collapse;font-size:9.5pt;}"
+    +"th{background:#1a5c3a;color:#fff;padding:6px 9px;text-align:left;font-size:8.5pt;}"
+    +"td{padding:5px 9px;border-bottom:1px solid #ccc;}"
+    +"tr:nth-child(even) td{background:#f9fafb;}"
+    +".tot td{background:#f0fdf4;font-weight:bold;border-top:2px solid #1a5c3a;}"
+    +"</style></head><body>"
+    +"<div class='hdr-box'><div class='co'><h1>DENEME ŞİRKETİ A.Ş.</h1><div class='dept'>Finans &amp; Muhasebe Departmanı</div></div>"
+    +"<div class='cc'><div>Örnek Mah. Test Cad. No:1, Ankara</div><div>Tel: 0312 000 00 00 | Faks: 0312 000 00 01</div><div>finans@denemesirketi.com.tr</div></div></div>"
+    +"<h2 style='color:#1a5c3a;font-size:13pt;margin-bottom:12px;'>PARA TRANSFERİ TALİMATI</h2>"
+    +"<p><strong>Tarih:</strong> "+d.tarih+" &nbsp;&nbsp; <strong>Ref No:</strong> "+d.esc(_bankaRef||'—')+"</p>"
+    +"<div class='rcpt'><small style='color:#999;text-transform:uppercase;letter-spacing:1px;'>Alıcı</small><br>"
+    +"<strong style='font-size:12pt;'>"+d.esc(d.banka)+' BANKASI'+(d.sube?' — '+d.esc(d.sube)+' ŞUBESİ MÜDÜRLÜĞÜNE':' MÜDÜRLÜĞÜNE')+"</strong></div>"
+    +"<p>Bankanızın <strong>"+d.esc(d.mustNo||'………………………………')+"</strong> numaralı müşterisiyim.</p><br>"
+    +"<p>Şubeniz nezdinde bulunan <strong>"+d.esc(d.hesap||'TR……………………………………………………')+"</strong> numaralı hesabımdan, ekte yer alan listeye göre toplam <strong>"+formatMoney(d.tryToplam)+" TL</strong> tutarın ilgili hesaplara aktarılmasını arz ederim.</p><br>"
+    +"<p>Gereğinin yapılmasını saygılarımla arz ederim.</p>"
+    +"<div style='margin-top:40px;text-align:right;'><div style='display:inline-block;text-align:center;width:200px;'>"
+    +"<div style='height:50px;'></div><div style='border-top:1.5px solid #333;padding-top:5px;'><strong>Yetkili İmza / Kaşe</strong><br><small>Finansal Yetkili</small></div></div></div>"
+    +"<hr style='margin:24px 0;border:1px dashed #ccc;'>"
+    +"<h3 style='color:#1a5c3a;margin-bottom:10px;'>Ekli Ödeme Listesi ("+bankaOdemeler.length+" adet)</h3>"
+    +"<table><thead><tr><th>#</th><th>Cari Unvan</th><th>IBAN</th><th>Tutar</th><th>Ödeme Açıklaması</th></tr></thead>"
+    +"<tbody>"+rows+"</tbody>"
+    +"<tr class='tot'><td colspan='3' align='right'>TRY Toplam:</td><td colspan='2'>"+formatMoney(d.tryToplam)+"</td></tr>"
+    +"</table></body></html>";
+  var blob=new Blob(['﻿'+wordHtml],{type:'application/msword'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=(_bankaRef||'banka-talimati')+'.doc';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(url);},1000);
+}
+
+function exportBankaTalimatExcel(){
+  var banka=document.getElementById('banka-select').value;
+  if(!banka){showToast('Lütfen banka seçin.','error');return;}
+  if(typeof XLSX==='undefined'){showToast('XLSX kütüphanesi yüklenemedi.','error');return;}
+  var d=_buildPrintData();
+  var wb=XLSX.utils.book_new();
+  /* Sheet 1: Talimat Bilgileri */
+  var info=[
+    ['DENEME ŞİRKETİ A.Ş.','','Finans & Muhasebe Departmanı'],
+    [],
+    ['PARA TRANSFERİ TALİMATI'],
+    [],
+    ['Ref No',_bankaRef||'—'],
+    ['Tarih',d.tarih],
+    ['Banka',d.banka+(d.sube?' — '+d.sube+' ŞUBESİ':'')],
+    ['Müşteri No',d.mustNo||'—'],
+    ['Hesap / IBAN',d.hesap||'—'],
+    [],
+    ['Toplam TRY',d.tryToplam],
+  ];
+  var ws1=XLSX.utils.aoa_to_sheet(info);
+  XLSX.utils.book_append_sheet(wb,ws1,'Talimat Bilgileri');
+  /* Sheet 2: Ödeme Listesi */
+  var rows=[['#','Cari Unvan','IBAN','Tutar','Döviz','Ödeme Açıklaması']];
+  bankaOdemeler.forEach(function(p,i){
+    rows.push([i+1,p.cari||'',p.iban||'',p.amount||0,p.currency||'TRY',p.description||'']);
+  });
+  rows.push([]);
+  rows.push(['','','','TRY Toplam:',d.tryToplam,'']);
+  var ws2=XLSX.utils.aoa_to_sheet(rows);
+  ws2['!cols']=[{wch:4},{wch:30},{wch:28},{wch:14},{wch:7},{wch:35}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Ödeme Listesi');
+  XLSX.writeFile(wb,(_bankaRef||'banka-talimati')+'.xlsx');
 }
 
 // ═══════════════════════════════════════════
