@@ -2531,56 +2531,7 @@ function _makePrintHtml(d, withPrint){
 
   return '<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8">'
     +'<title>'+d.esc(_bankaRef||'Banka Talimatı')+'</title>'
-    +'<style>'+css+'
-/* ═══ UNIFIED DESIGN ENHANCEMENTS ═══ */
-
-/* Department badge in topbar area */
-#dept-panel-badge { border-radius:20px !important; font-size:12px !important; }
-
-/* Card hover refinement */
-.card { transition:box-shadow 0.15s; }
-
-/* Drawer body alternating rows for drow */
-.drow:nth-child(even) { background:rgba(0,0,0,0.018); }
-
-/* Page header divider line */
-.page-header { padding-bottom:20px; border-bottom:1px solid var(--border); }
-
-/* Search input with icon feel */
-.search-input { border-radius:20px !important; padding:7px 16px !important; }
-
-/* Stats grid responsive (3 col on medium) */
-@media screen and (max-width:1100px) and (min-width:901px) {
-  .stats-grid { grid-template-columns:repeat(2,1fr) !important; }
-}
-
-/* Table header accent per panel */
-th { color:var(--accent) !important; }
-
-/* Active nav item icon color */
-.nav-item.active .nav-icon { opacity:1; }
-
-/* Sidebar scrollbar - thin & translucent */
-.sidebar-nav::-webkit-scrollbar { width:4px; }
-.sidebar-nav::-webkit-scrollbar-track { background:transparent; }
-.sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:4px; }
-
-/* Topbar notification badge */
-.topbar .notif-btn { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:white; }
-
-/* Button primary uses accent gradient */
-.btn-primary { background:linear-gradient(135deg, var(--accent), var(--accent-l)); }
-.btn-primary:hover { background:linear-gradient(135deg, var(--grad-from,var(--accent)), var(--accent)); transform:translateY(-1px); }
-
-/* Card header left accent line */
-.card-header { border-left:4px solid var(--accent); padding-left:16px !important; }
-
-/* Empty state icon size */
-.empty-state .icon { opacity:0.5; }
-
-/* Dept mini cards on hover */
-.dept-mini:hover { box-shadow:0 6px 20px rgba(0,0,0,0.1) !important; }
-</style></head><body>'+body
+    +'<style>'+css+'</style></head><body>'+body
     +(withPrint?'<scr'+'ipt>window.onload=function(){window.print();};<'+'/script>':'')
     +'</body></html>';
 }
@@ -2617,56 +2568,7 @@ function exportBankaTalimatWord(){
     +"td{padding:5px 9px;border-bottom:1px solid #ccc;}"
     +"tr:nth-child(even) td{background:#f9fafb;}"
     +".tot td{background:#f0fdf4;font-weight:bold;border-top:2px solid #1a5c3a;}"
-    +"
-/* ═══ UNIFIED DESIGN ENHANCEMENTS ═══ */
-
-/* Department badge in topbar area */
-#dept-panel-badge { border-radius:20px !important; font-size:12px !important; }
-
-/* Card hover refinement */
-.card { transition:box-shadow 0.15s; }
-
-/* Drawer body alternating rows for drow */
-.drow:nth-child(even) { background:rgba(0,0,0,0.018); }
-
-/* Page header divider line */
-.page-header { padding-bottom:20px; border-bottom:1px solid var(--border); }
-
-/* Search input with icon feel */
-.search-input { border-radius:20px !important; padding:7px 16px !important; }
-
-/* Stats grid responsive (3 col on medium) */
-@media screen and (max-width:1100px) and (min-width:901px) {
-  .stats-grid { grid-template-columns:repeat(2,1fr) !important; }
-}
-
-/* Table header accent per panel */
-th { color:var(--accent) !important; }
-
-/* Active nav item icon color */
-.nav-item.active .nav-icon { opacity:1; }
-
-/* Sidebar scrollbar - thin & translucent */
-.sidebar-nav::-webkit-scrollbar { width:4px; }
-.sidebar-nav::-webkit-scrollbar-track { background:transparent; }
-.sidebar-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:4px; }
-
-/* Topbar notification badge */
-.topbar .notif-btn { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:8px; color:white; }
-
-/* Button primary uses accent gradient */
-.btn-primary { background:linear-gradient(135deg, var(--accent), var(--accent-l)); }
-.btn-primary:hover { background:linear-gradient(135deg, var(--grad-from,var(--accent)), var(--accent)); transform:translateY(-1px); }
-
-/* Card header left accent line */
-.card-header { border-left:4px solid var(--accent); padding-left:16px !important; }
-
-/* Empty state icon size */
-.empty-state .icon { opacity:0.5; }
-
-/* Dept mini cards on hover */
-.dept-mini:hover { box-shadow:0 6px 20px rgba(0,0,0,0.1) !important; }
-</style></head><body>"
+    +"</style></head><body>"
     +"<div class='hdr-box'><div class='co'><h1>DENEME ŞİRKETİ A.Ş.</h1><div class='dept'>Finans &amp; Muhasebe Departmanı</div></div>"
     +"<div class='cc'><div>Örnek Mah. Test Cad. No:1, Ankara</div><div>Tel: 0312 000 00 00 | Faks: 0312 000 00 01</div><div>finans@denemesirketi.com.tr</div></div></div>"
     +"<h2 style='color:#1a5c3a;font-size:13pt;margin-bottom:12px;'>PARA TRANSFERİ TALİMATI</h2>"
