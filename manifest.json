@@ -1,0 +1,38 @@
+{
+  "name": "Ödeme Takip Sistemi",
+  "short_name": "Ödeme Takip",
+  "description": "Kurumsal ödeme onay ve takip sistemi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1d4ed8",
+  "theme_color": "#1d4ed8",
+  "orientation": "any",
+  "lang": "tr",
+  "dir": "ltr",
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Onay Bekleyenler",
+      "short_name": "Onaylar",
+      "description": "Onay bekleyen ödemeleri görüntüle",
+      "url": "./"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
