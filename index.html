@@ -525,8 +525,8 @@ th { color:var(--accent) !important; }
     <h2 class="login-title">Hoş Geldiniz</h2>
     <p class="login-sub">Sisteme giriş yapın. Rolünüze göre otomatik olarak ilgili panele yönlendirileceksiniz.</p>
     <div class="error-msg" id="login-error">E-posta veya şifre hatalı.</div>
-    <div class="form-group"><label>E-posta</label><input type="email" id="login-email" placeholder="kullanici@sirket.com" oninput="detectRole(this.value)"></div>
-    <div class="form-group"><label>Şifre</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+    <div class="form-group"><label>E-posta</label><input type="email" id="login-email" placeholder="kullanici@sirket.com" autocomplete="email" oninput="detectRole(this.value)"></div>
+    <div class="form-group"><label>Şifre</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"></div>
     <button class="btn btn-primary btn-full" style="margin-top:8px;" onclick="doLogin()" id="login-btn">Giriş Yap →</button>
     <div style="text-align:center;margin-top:14px;"><a onclick="showForgotScreen()" style="font-size:13px;color:var(--accent);cursor:pointer;">Şifremi unuttum</a></div>
   </div>
@@ -1296,6 +1296,7 @@ async function doLogout() {
     window._realtimeChannel = null;
   }
   currentUser = null; parsedRows = [];
+  localStorage.removeItem('ots_session');
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('all-panels').style.visibility='hidden';
   document.getElementById('login-screen').style.display='flex'; document.getElementById('login-screen').style.visibility='visible';
@@ -1933,6 +1934,7 @@ async function doLogin() {
   // OTP kapalıysa direkt giriş yap
   if (!isOtpEnabled()) {
     currentUser = otpUser;
+    _saveSession(currentUser);
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('all-panels').style.visibility = 'visible';
     await logAction('Sisteme giriş yapıldı (OTP kapalı)', null, null);
@@ -1975,6 +1977,7 @@ async function verifyOTP() {
   if (entered !== otpCode) { errEl.textContent = 'Hatalı kod. Tekrar deneyin.'; errEl.style.display='block'; return; }
   // OTP doğru
   currentUser = otpUser;
+  _saveSession(currentUser);
   document.getElementById('otp-screen').style.display = 'none';
   document.getElementById('all-panels').style.visibility = 'visible';
   await logAction('Sisteme giriş yapıldı', null, null);
@@ -1985,6 +1988,42 @@ function backToLogin() {
   document.getElementById('otp-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   otpCode = null; otpUser = null;
+}
+
+// ── Oturum kalıcılığı (30 gün) ──────────────────────────────────
+const SESSION_TTL = 30 * 24 * 60 * 60 * 1000; // 30 gün ms
+
+function _saveSession(user) {
+  try {
+    localStorage.setItem('ots_session', JSON.stringify({
+      userId: user.id,
+      expires: Date.now() + SESSION_TTL
+    }));
+  } catch(e) {}
+}
+
+async function _restoreSession() {
+  try {
+    const raw = localStorage.getItem('ots_session');
+    if (!raw) return false;
+    const sess = JSON.parse(raw);
+    if (!sess.userId || Date.now() > sess.expires) {
+      localStorage.removeItem('ots_session');
+      return false;
+    }
+    // Kullanıcıyı Supabase'den taze çek
+    const { data, error } = await db
+      .from('users')
+      .select('*, departments(id,name)')
+      .eq('id', sess.userId)
+      .single();
+    if (error || !data) { localStorage.removeItem('ots_session'); return false; }
+    currentUser = data;
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('all-panels').style.visibility = 'visible';
+    routeByRole(currentUser);
+    return true;
+  } catch(e) { return false; }
 }
 
 async function resendOTP() {
@@ -2799,7 +2838,7 @@ async function deletePaymentFile(fileId,paymentId,containerId,storagePath){
 // ── VAPID Public Key (background push için)
 // Kendi anahtarlarınızı üretmek için: https://web-push-codelab.glitch.me/
 // veya terminalde: npx web-push generate-vapid-keys
-const VAPID_PUBLIC_KEY = 'YOUR_VAPID_PUBLIC_KEY_HERE';
+const VAPID_PUBLIC_KEY = 'BOl2iqhcI1LL-T6WbIn2Fbd6hHACtblpTQzbw9i7rnjJzbuHFfOHlsG9fEgN4Qp-uqqjOaS5v-M0toP2C8Df-kk';
 
 // ── Service Worker Kaydı ──
 async function registerServiceWorker() {
@@ -2968,6 +3007,7 @@ function _refreshCurrentPanel() {
 
 // ── Uygulama başlatma ──
 registerServiceWorker();
+_restoreSession(); // Kayıtlı oturum varsa otomatik giriş yap
 
 </script>
 </body>
