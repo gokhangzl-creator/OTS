@@ -545,10 +545,10 @@ th { color:var(--accent) !important; }
     <div id="otp-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:13px;color:#b91c1c;margin-bottom:14px;"></div>
     <div style="margin-bottom:16px;">
       <label style="display:block;font-size:11px;color:#374151;margin-bottom:6px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">Doğrulama Kodu</label>
-      <input id="otp-input" type="number" placeholder="6 haneli kod" maxlength="6"
+      <input id="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" placeholder="6 haneli kod" maxlength="6"
         style="width:100%;background:#f7f8fa;border:1.5px solid #e1e5ea;border-radius:8px;padding:14px;color:#111;font-size:24px;font-family:monospace;text-align:center;letter-spacing:8px;outline:none;box-sizing:border-box;"
         onkeydown="if(event.key==='Enter')verifyOTP()"
-        oninput="this.value=this.value.slice(0,6)">
+        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,6)">
     </div>
     <button onclick="verifyOTP()" style="width:100%;padding:13px;background:#1d4ed8;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px;">
       Doğrula →
@@ -1582,6 +1582,8 @@ async function saveBatch(){
     const payments=parsedRows.map(r=>{const key=r.journal_batch_name.toUpperCase();return{batch_id:batch.id,cari:r.cari,amount:r.amount,department_id:deptMap[key]||null,due_date:r.due_date,status:'department_pending',doc_no:r.doc_no,description:r.description,iban:r.iban,currency:r.currency,journal_batch_name:r.journal_batch_name};});
     for(let i=0;i<payments.length;i+=100){const{error:pErr}=await db.from('payments').insert(payments.slice(i,i+100));if(pErr)throw pErr;}
     await logAction(`Batch oluşturuldu: ${parsedRows.length} kayıt, ${formatMoney(total)}`,batch.id,null);
+    // Departmanlara bildirim gönder
+    notifyDeptUpload(payments, total);
     closeConfirmModal();resetUpload();
     showToast(`Batch oluşturuldu! ${parsedRows.length} kayıt kaydedildi.`,'success');
     finansPage('batches',document.querySelectorAll('#panel-finans .nav-item')[1]);
@@ -1813,7 +1815,7 @@ function openMudurRejectModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudu
 async function confirmMudurApprove(){const btn=document.getElementById('m-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('m-approve-comment').value.trim();try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'director_pending'}).eq('id',pid);await logAction(`Müdür onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-approve-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme onaylandı! Direktöre iletildi.`,'success');
     db.from('payments').select('amount').eq('status','director_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('direktor',r.data.length,t);}});
     loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
-async function confirmMudurReject(){const comment=document.getElementById('m-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('m-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`Müdür reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-reject-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme reddedildi.`,'error');loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
+async function confirmMudurReject(){const comment=document.getElementById('m-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('m-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`Müdür reddi: ${p?.cari}`,p?.batch_id,pid);}var mDepts={};mudurActionTarget.forEach(pid=>{const p=mudurPending.find(x=>x.id===pid);if(p?.department_id)mDepts[p.department_id]=(mDepts[p.department_id]||0)+1;});Object.entries(mDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('m-reject-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme reddedildi.`,'error');loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 
 async function loadMudurHistory(){const filter=document.getElementById('m-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name),batch_id)').eq('user_id',currentUser.id).eq('stage','muhasebe_muduru').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('m-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('m-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.payments?.cari||'—'}</td><td><span class="badge badge-yellow">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
@@ -1854,7 +1856,7 @@ function openDirRejectModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelec
 async function confirmDirApprove(){const btn=document.getElementById('dir-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('dir-approve-comment').value.trim();try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'gmy_pending'}).eq('id',pid);await logAction(`Direktör onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-approve-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme onaylandı! GM'ye iletildi.`,'success');
     db.from('payments').select('amount').eq('status','gmy_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('gm',r.data.length,t);}});
     loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
-async function confirmDirReject(){const comment=document.getElementById('dir-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('dir-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`Direktör reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-reject-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme reddedildi.`,'error');loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
+async function confirmDirReject(){const comment=document.getElementById('dir-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('dir-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`Direktör reddi: ${p?.cari}`,p?.batch_id,pid);}var dDepts={};dirActionTarget.forEach(pid=>{const p=dirPending.find(x=>x.id===pid);if(p?.department_id)dDepts[p.department_id]=(dDepts[p.department_id]||0)+1;});Object.entries(dDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('dir-reject-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme reddedildi.`,'error');loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadDirHistory(){const filter=document.getElementById('dir-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','direktor').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('dir-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('dir-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.payments?.cari||'—'}</td><td><span class="badge badge-blue">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
 // ═══════════════════════════════════════════
@@ -1889,7 +1891,7 @@ function openGmRejectModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelected
 async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'completed'}).eq('id',pid);await logAction(`GM Final Onay: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-approve-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme tamamlandı! 🎉`,'success');
     notifyFinans(gmActionTarget.length,0);
     loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='👑 Final Onay Ver';}}
-async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
+async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid);await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}var gDepts={};gmActionTarget.forEach(pid=>{const p=gmPending.find(x=>x.id===pid);if(p?.department_id)gDepts[p.department_id]=(gDepts[p.department_id]||0)+1;});Object.entries(gDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadGmHistory(){const filter=document.getElementById('gm-history-filter').value;let q=db.from('approvals').select('*,payments(cari,amount,due_date,departments(name))').eq('user_id',currentUser.id).eq('stage','genel_mudur').order('created_at',{ascending:false});if(filter!=='all')q=q.eq('status',filter);const{data}=await q;document.getElementById('gm-history-sub').textContent=`${(data||[]).length} kayıt`;const tbody=document.getElementById('gm-history-table');if(!data||data.length===0){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><span class="icon">📭</span><p>Kayıt yok.</p></div></td></tr>';return;}tbody.innerHTML=data.map(a=>`<tr style="border-color:var(--border);"><td style="font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${a.payments?.cari||'—'}</td><td><span class="badge badge-gold">${a.payments?.departments?.name||'—'}</span></td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${formatMoney(a.payments?.amount)}</td><td><span class="badge ${a.status==='approved'?'badge-green':'badge-red'}">${a.status==='approved'?'Onaylandı':'Reddedildi'}</span></td><td style="font-size:12px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.comment||'—'}</td><td style="font-size:12px;color:var(--text2);">${formatDate(a.created_at)}</td></tr>`).join('');}
 
 function toggleSidebar(btn){var panel=btn.closest('.panel');var sidebar=panel.querySelector('.sidebar');var overlay=panel.querySelector('.sidebar-overlay');if(!sidebar)return;var isOpen=sidebar.classList.contains('mob-open');if(isOpen){sidebar.classList.remove('mob-open');if(overlay)overlay.classList.remove('open');btn.innerHTML='☰';}else{sidebar.classList.add('mob-open');if(overlay)overlay.classList.add('open');btn.innerHTML='✕';}}
@@ -2133,8 +2135,8 @@ function sendPushNotification(title, body) {
   if (Notification.permission === 'granted') {
     new Notification(title, {
       body: body,
-      icon: '/OTS/favicon.ico',
-      badge: '/OTS/favicon.ico'
+      icon: './icon.svg',
+      badge: './icon.svg'
     });
   }
 }
@@ -2235,7 +2237,42 @@ async function notifyDeptRejection(deptId,reason,count){
       await emailjs.send('service_ots','template_k66ic99',{to_email:u.email,to_name:u.name,pending_count:count,pending_amount:'—',message:count+' odeme reddedildi. Neden: '+reason,subject:'Odeme Talebiniz Reddedildi'});
     }
     showRejectionNotification(count+' odeme reddedildi. Neden: '+reason);
+    sendPushToRole('departman', '❌ Ödeme Reddedildi', count+' adet ödemeniz reddedildi. Neden: '+reason);
   }catch(e){console.warn(e);}
+}
+
+async function notifyDeptUpload(payments, totalAmount){
+  try{
+    // Departman bazında grupla: {dept_id: count}
+    var deptCounts = {};
+    for(var p of payments){
+      if(p.department_id){
+        deptCounts[p.department_id] = (deptCounts[p.department_id]||0) + 1;
+      }
+    }
+    var deptIds = Object.keys(deptCounts);
+    if(deptIds.length === 0) return;
+
+    // Her departmanın kullanıcılarına mail gönder
+    for(var deptId of deptIds){
+      var count = deptCounts[deptId];
+      var res = await db.from('users').select('email,name').eq('role','departman').eq('department_id',deptId);
+      if(!res.data) continue;
+      for(var u of res.data){
+        await emailjs.send('service_ots','template_k66ic99',{
+          to_email: u.email,
+          to_name: u.name,
+          pending_count: count,
+          pending_amount: formatMoney(totalAmount),
+          message: count+' adet yeni odeme talebi onayinizi bekliyor.',
+          subject: 'Yeni Odeme Talebi — Onayiniz Bekleniyor'
+        });
+      }
+    }
+
+    // Push bildirimi — tüm departman kullanıcılarına
+    sendPushToRole('departman', '📋 Yeni Ödeme Talebi', payments.length+' adet ödeme onayınızı bekliyor.');
+  }catch(e){ console.warn('Dept upload notify hatası:', e); }
 }
 async function notifyFinans(count,amount){
   try{
@@ -2245,13 +2282,6 @@ async function notifyFinans(count,amount){
       await emailjs.send('service_ots','template_k66ic99',{to_email:u.email,to_name:u.name,pending_count:count,pending_amount:formatMoney(amount),message:'Tum onaylar tamamlandi! '+count+' odeme icin banka talimati hazirlanabilir.',subject:'Banka Talimati Hazirlanabilir'});
     }
   }catch(e){console.warn(e);}
-}
-function showRejectionNotification(msg){
-  var n=document.createElement('div');
-  n.style.cssText='position:fixed;top:20px;right:20px;background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:16px 20px;max-width:320px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.15);';
-  n.innerHTML='<div style="display:flex;gap:10px;"><span style="font-size:20px;">❌</span><div><p style="margin:0 0 4px;font-weight:700;color:#b91c1c;">Odeme Reddedildi</p><p style="margin:0;font-size:13px;color:#374151;">'+msg+'</p></div></div>';
-  document.body.appendChild(n);
-  setTimeout(function(){n.remove();},6000);
 }
 
 
