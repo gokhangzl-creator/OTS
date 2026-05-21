@@ -477,31 +477,64 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
 
   /* ── Temel sıfırlama ── */
   *{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}
-  html,body{overflow-x:hidden;height:100%;overscroll-behavior:none;-webkit-font-smoothing:antialiased;}
+  html{height:-webkit-fill-available;height:100%;}
+  body{
+    overflow-x:hidden;
+    height:100%;
+    overscroll-behavior:none;
+    -webkit-font-smoothing:antialiased;
+    -webkit-text-size-adjust:100%;
+  }
 
-  /* ── App layout: sidebar gizle, panel full-width ── */
+  /* ── App layout: sidebar + hamburger gizle, panel full-width flex-column ── */
   .app{flex-direction:column!important;}
   .sidebar{display:none!important;}
-  .panel{width:100%!important;min-height:100dvh;}
-  .main-content{padding:0!important;padding-top:var(--mob-hdr)!important;padding-bottom:var(--mob-nav)!important;-webkit-overflow-scrolling:touch!important;}
+  .mob-menu-btn{display:none!important;}
+  .panel{width:100%!important;}
+  .panel.active{
+    display:flex!important;
+    flex-direction:column!important;
+    height:100vh;
+    height:-webkit-fill-available;
+    height:100dvh;
+    height:var(--mob-vvh, 100dvh)!important;
+  }
+  .main-content{
+    padding:0!important;
+    flex:1!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    isolation:isolate!important;
+  }
   .subpage.active{padding:16px!important;padding-bottom:8px!important;}
   .page-header{display:none!important;}
   .card-header h3{font-size:14px!important;}
 
-  /* ── Mobile Header ── */
+  /* ── Mobile Header — normal akışta (position:fixed değil) ── */
   .mob-header{
     display:flex!important;
-    position:fixed;top:0;left:0;right:0;
-    height:var(--mob-hdr);
-    padding-top:env(safe-area-inset-top, 0px);
-    background:var(--surface);
-    border-bottom:1px solid var(--border);
-    box-shadow:0 1px 8px rgba(0,0,0,.06);
-    z-index:300;
-    align-items:center;
-    padding-left:16px;padding-right:16px;
-    gap:12px;
+    position:relative!important;
+    top:auto!important;left:auto!important;right:auto!important;
+    width:100%!important;
+    height:var(--mob-hdr)!important;
+    padding-top:env(safe-area-inset-top, 0px)!important;
+    background:var(--surface)!important;
+    border-bottom:1px solid var(--border)!important;
+    box-shadow:0 1px 8px rgba(0,0,0,.06)!important;
+    z-index:10!important;
+    align-items:center!important;
+    padding-left:16px!important;padding-right:16px!important;
+    gap:12px!important;
+    flex-shrink:0!important;
+    overflow:hidden!important;
+    transition:height .35s cubic-bezier(.4,0,.2,1),
+               padding-top .35s cubic-bezier(.4,0,.2,1),
+               padding-left .35s cubic-bezier(.4,0,.2,1),
+               padding-right .35s cubic-bezier(.4,0,.2,1)!important;
   }
+
+  /* ── Header Auto-Hide ── */
   .mob-header-logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-l));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0;cursor:pointer;}
   .mob-header-title{flex:1;font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .mob-header-sub{font-size:11px;color:var(--text3);margin-top:1px;}
@@ -655,25 +688,42 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
   /* ── Mobile Bottom Nav ── */
   .mob-bottom-nav{
     display:flex!important;
-    position:fixed;bottom:0;left:0;right:0;
-    background:var(--surface);
-    border-top:1px solid var(--border);
+    position:relative!important;
+    width:100%!important;
+    flex-shrink:0!important;
+    align-items:flex-start!important;
+    background:var(--surface)!important;
+    border-top:1px solid var(--border)!important;
     backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-    padding-bottom:env(safe-area-inset-bottom, 0px);
-    z-index:300;
+    padding-bottom:env(safe-area-inset-bottom, 0px)!important;
+    z-index:400!important;
+    isolation:isolate!important;
   }
   .mob-nav-item{
-    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:3px;padding:8px 4px;border:none;background:transparent;
-    cursor:pointer;touch-action:manipulation;user-select:none;
-    min-height:56px;transition:all .15s;
+    flex:1!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    padding:10px 4px 8px!important;
+    border:none!important;
+    background:transparent!important;
+    cursor:pointer!important;
+    touch-action:manipulation!important;
+    user-select:none!important;
+    height:56px!important;
+    position:relative!important;
+    z-index:1!important;
+    transition:opacity .15s, transform .15s!important;
+    -webkit-tap-highlight-color:transparent!important;
   }
-  .mob-nav-item:active{transform:scale(.93);opacity:.75;}
-  .mob-nav-icon{font-size:22px;line-height:1;transition:transform .2s;}
-  .mob-nav-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.2px;transition:color .15s;}
+  .mob-nav-item:active{transform:scale(.93)!important;opacity:.75!important;}
+  .mob-nav-icon{font-size:22px;line-height:1;transition:transform .2s;pointer-events:none;}
+  .mob-nav-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.2px;transition:color .15s;pointer-events:none;}
   .mob-nav-item.mob-active .mob-nav-label{color:var(--accent);}
   .mob-nav-item.mob-active .mob-nav-icon{transform:scale(1.12);}
-  .mob-nav-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);margin-top:2px;display:none;}
+  .mob-nav-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);margin-top:2px;display:none;pointer-events:none;}
   .mob-nav-item.mob-active .mob-nav-dot{display:block;}
 
   /* ── Stat Cards ── */
@@ -753,9 +803,9 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
   .profile-card{flex-direction:column!important;align-items:center!important;text-align:center!important;}
   .profile-avatar-big{width:80px!important;height:80px!important;border-radius:20px!important;font-size:32px!important;}
 
-  /* ── Page geçiş animasyonu ── */
-  .subpage.active{animation:mobPageIn .22s ease both!important;}
-  @keyframes mobPageIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  /* ── Page geçiş animasyonu — transform:none ile stacking context oluşturma ── */
+  .subpage.active{animation:mobPageIn .22s ease forwards!important;}
+  @keyframes mobPageIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 
   /* ── Pressable ── */
   .mob-pressable:active{transform:scale(.97);opacity:.8;}
@@ -845,14 +895,15 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
   #admin-departments .search-row,
   #admin-users .search-row{display:flex!important;gap:8px!important;}
 
-  /* ── Global Filter (tarih seçici) — tüm paneller ── */
+  /* ── Global Filter (tarih seçici) — header normal akışta olduğu için top:0 ── */
   .global-filter{
     padding:8px 14px!important;
     gap:6px!important;
     flex-wrap:wrap!important;
-    position:relative!important;
-    top:auto!important;
-    z-index:1!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:290!important;
+    background:var(--surface)!important;
   }
   .gf-label{font-size:10px!important;letter-spacing:.4px!important;}
   .gf-date{height:34px!important;font-size:13px!important;padding:0 8px!important;flex:1!important;min-width:120px!important;}
@@ -1200,6 +1251,36 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
   #gm-history .page-header > div{flex:1!important;min-width:0!important;}
   #gm-history .page-header select{flex-shrink:0!important;height:34px!important;font-size:12px!important;border-radius:10px!important;margin-left:8px!important;}
   #gm-history .card-header > .mob-accordion-chev{margin-left:auto!important;flex-shrink:0!important;}
+
+  /* ── iOS Safe Area: nav butonlarının üstüne çıkmasın ── */
+  .mob-bottom-nav{
+    padding-bottom:max(env(safe-area-inset-bottom, 0px), 0px)!important;
+  }
+
+  /* ── iPhone SE (375px ve altı) — küçük ekran uyumu ── */
+  @media(max-width:375px){
+    .mob-nav-label{font-size:9px!important;}
+    .mob-nav-icon{font-size:20px!important;}
+    .mob-nav-item{height:52px!important;gap:2px!important;}
+    .mob-header-title{font-size:14px!important;}
+    :root{--mob-hdr:56px!important;}
+  }
+
+  /* ── iPhone Plus/Max/Pro Max (430px+) ── */
+  @media(min-width:390px) and (max-width:768px){
+    .mob-nav-item{height:58px!important;}
+  }
+
+  /* ── iOS keyboard: input focus olunca nav'ı koru ── */
+  .mob-bottom-nav{
+    will-change:auto!important;
+    transform:translateZ(0)!important;
+  }
+
+  /* ── Görünmez overlay'lar alt menüyü engellemesin ── */
+  .drawer:not(.open){pointer-events:none!important;}
+  .sidebar-overlay:not(.open){pointer-events:none!important;}
+  .bulk-bar:not(.show){pointer-events:none!important;}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1335,35 +1416,6 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="mob-header-avatar" id="admin-mob-avatar" onclick="mobMenuGoProfil()" title="Profilim">A</div>
       <button class="mob-header-logout" onclick="doLogout()" title="Çıkış Yap">⏻</button>
     </div>
-
-    <!-- 📱 MOBİL BOTTOM NAV (admin) -->
-    <nav class="mob-bottom-nav" id="admin-mob-nav">
-      <button class="mob-nav-item mob-active" onclick="adminMobNav('dashboard',this)">
-        <span class="mob-nav-icon">🏠</span>
-        <span class="mob-nav-label">Ana Sayfa</span>
-        <span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="adminMobNav('departments',this)">
-        <span class="mob-nav-icon">🏢</span>
-        <span class="mob-nav-label">Deptlar</span>
-        <span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="adminMobNav('users',this)">
-        <span class="mob-nav-icon">👥</span>
-        <span class="mob-nav-label">Kullanıcılar</span>
-        <span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="adminMobNav('settings',this)">
-        <span class="mob-nav-icon">⚙️</span>
-        <span class="mob-nav-label">Ayarlar</span>
-        <span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="adminMobNav('profil',this)">
-        <span class="mob-nav-icon">👤</span>
-        <span class="mob-nav-label">Profil</span>
-        <span class="mob-nav-dot"></span>
-      </button>
-    </nav>
 
     <!-- 📱 FAB (Dept & User ekle) -->
     <button class="mob-fab" id="admin-mob-fab" onclick="adminMobFab()" title="Yeni Ekle">＋</button>
@@ -1509,6 +1561,34 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
     </div>
+    <!-- 📱 MOBİL BOTTOM NAV (admin) -->
+    <nav class="mob-bottom-nav" id="admin-mob-nav">
+      <button class="mob-nav-item mob-active" onclick="adminMobNav('dashboard',this)">
+        <span class="mob-nav-icon">🏠</span>
+        <span class="mob-nav-label">Ana Sayfa</span>
+        <span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="adminMobNav('departments',this)">
+        <span class="mob-nav-icon">🏢</span>
+        <span class="mob-nav-label">Deptlar</span>
+        <span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="adminMobNav('users',this)">
+        <span class="mob-nav-icon">👥</span>
+        <span class="mob-nav-label">Kullanıcılar</span>
+        <span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="adminMobNav('settings',this)">
+        <span class="mob-nav-icon">⚙️</span>
+        <span class="mob-nav-label">Ayarlar</span>
+        <span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="adminMobNav('profil',this)">
+        <span class="mob-nav-icon">👤</span>
+        <span class="mob-nav-label">Profil</span>
+        <span class="mob-nav-dot"></span>
+      </button>
+    </nav>
     <!-- Admin Modals -->
     <div class="modal-overlay" id="dept-modal">
       <div class="modal">
@@ -1572,24 +1652,6 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="mob-header-avatar" id="finans-mob-avatar" onclick="finansMobGoProfil()" title="Profilim">F</div>
       <button class="mob-header-logout" onclick="doLogout()" title="Çıkış Yap">⏻</button>
     </div>
-    <!-- 📱 MOBİL BOTTOM NAV (finans) -->
-    <nav class="mob-bottom-nav" id="finans-mob-nav">
-      <button class="mob-nav-item mob-active" onclick="finansMobNav('upload',this)">
-        <span class="mob-nav-icon">📤</span><span class="mob-nav-label">Yükle</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="finansMobNav('dashboard',this)">
-        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Özet</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="finansMobNav('banka',this)">
-        <span class="mob-nav-icon">🏦</span><span class="mob-nav-label">Banka</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="finansMobNav('onay-takip',this)">
-        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="finansMobNav('profil',this)">
-        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
-      </button>
-    </nav>
     <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
     <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
@@ -1863,6 +1925,24 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
     </div>
+    <!-- 📱 MOBİL BOTTOM NAV (finans) -->
+    <nav class="mob-bottom-nav" id="finans-mob-nav">
+      <button class="mob-nav-item mob-active" onclick="finansMobNav('upload',this)">
+        <span class="mob-nav-icon">📤</span><span class="mob-nav-label">Yükle</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="finansMobNav('dashboard',this)">
+        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Özet</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="finansMobNav('banka',this)">
+        <span class="mob-nav-icon">🏦</span><span class="mob-nav-label">Banka</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="finansMobNav('onay-takip',this)">
+        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="finansMobNav('profil',this)">
+        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
+      </button>
+    </nav>
     <!-- Finans Modals -->
     <div class="modal-overlay" id="confirm-modal">
       <div class="modal" style="width:520px;">
@@ -1897,18 +1977,6 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="mob-header-avatar" id="dept-mob-avatar" onclick="deptMobGoProfil()" title="Profilim">D</div>
       <button class="mob-header-logout" onclick="doLogout()" title="Çıkış Yap">⏻</button>
     </div>
-    <!-- 📱 MOBİL BOTTOM NAV (departman) -->
-    <nav class="mob-bottom-nav" id="dept-mob-nav">
-      <button class="mob-nav-item mob-active" onclick="deptMobNav('odemelerim',this)">
-        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Ödemelerim</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="deptMobNav('onay-takip',this)">
-        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Onay Takip</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="deptMobNav('profil',this)">
-        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
-      </button>
-    </nav>
     <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
     <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
@@ -2002,6 +2070,18 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
     </div>
+    <!-- 📱 MOBİL BOTTOM NAV (departman) -->
+    <nav class="mob-bottom-nav" id="dept-mob-nav">
+      <button class="mob-nav-item mob-active" onclick="deptMobNav('odemelerim',this)">
+        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Ödemelerim</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="deptMobNav('onay-takip',this)">
+        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Onay Takip</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="deptMobNav('profil',this)">
+        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
+      </button>
+    </nav>
     <!-- Dept Modals -->
     <div class="modal-overlay" id="dept-approve-modal">
       <div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="dept-approve-sub">—</p>
@@ -2038,24 +2118,6 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="mob-header-avatar" id="mudur-mob-avatar" onclick="mudurMobGoProfil()" title="Profilim">M</div>
       <button class="mob-header-logout" onclick="doLogout()" title="Çıkış Yap">⏻</button>
     </div>
-    <!-- 📱 MOBİL BOTTOM NAV (müdür) -->
-    <nav class="mob-bottom-nav" id="mudur-mob-nav">
-      <button class="mob-nav-item mob-active" onclick="mudurMobNav('pending',this)">
-        <span class="mob-nav-icon">⏳</span><span class="mob-nav-label">Bekleyen</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="mudurMobNav('history',this)">
-        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Geçmiş</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="mudurMobNav('summary',this)">
-        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Özet</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="mudurMobNav('onay-takip',this)">
-        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="mudurMobNav('profil',this)">
-        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
-      </button>
-    </nav>
     <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
     <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
@@ -2205,6 +2267,24 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
     </div>
+    <!-- 📱 MOBİL BOTTOM NAV (müdür) -->
+    <nav class="mob-bottom-nav" id="mudur-mob-nav">
+      <button class="mob-nav-item mob-active" onclick="mudurMobNav('pending',this)">
+        <span class="mob-nav-icon">⏳</span><span class="mob-nav-label">Bekleyen</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="mudurMobNav('history',this)">
+        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Geçmiş</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="mudurMobNav('summary',this)">
+        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Özet</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="mudurMobNav('onay-takip',this)">
+        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="mudurMobNav('profil',this)">
+        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
+      </button>
+    </nav>
     <div class="modal-overlay" id="m-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="m-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="m-approve-comment" placeholder="Onay notu..."></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="m-approve-btn" onclick="confirmMudurApprove()">✅ Onayla</button></div></div></div>
     <div class="modal-overlay" id="m-reject-modal"><div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="m-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="m-reject-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="m-reject-btn" onclick="confirmMudurReject()">❌ Reddet</button></div></div></div>
     <div class="bulk-bar" id="m-bulk-bar"><div class="bulk-info"><span id="m-bulk-count">0 seçildi</span><div class="bulk-div"></div><span id="m-bulk-amount" style="font-family:'DM Mono',monospace;color:white;"></span></div><div class="bulk-btns"><button class="bulk-btn ok" onclick="openMudurApproveModal(true)">✅ Toplu Onayla</button><button class="bulk-btn no" onclick="openMudurRejectModal(true)">❌ Toplu Reddet</button><button class="bulk-btn" onclick="clearMudurSelection()">✕</button></div></div>
@@ -2223,24 +2303,6 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="mob-header-avatar" id="dir-mob-avatar" onclick="dirMobGoProfil()" title="Profilim">D</div>
       <button class="mob-header-logout" onclick="doLogout()" title="Çıkış Yap">⏻</button>
     </div>
-    <!-- 📱 MOBİL BOTTOM NAV (direktör) -->
-    <nav class="mob-bottom-nav" id="dir-mob-nav">
-      <button class="mob-nav-item mob-active" onclick="dirMobNav('overview',this)">
-        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Genel</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="dirMobNav('pending',this)">
-        <span class="mob-nav-icon">⏳</span><span class="mob-nav-label">Bekleyen</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="dirMobNav('history',this)">
-        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Geçmiş</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="dirMobNav('onay-takip',this)">
-        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="dirMobNav('profil',this)">
-        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
-      </button>
-    </nav>
     <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
     <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
@@ -2347,6 +2409,24 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
     </div>
+    <!-- 📱 MOBİL BOTTOM NAV (direktör) -->
+    <nav class="mob-bottom-nav" id="dir-mob-nav">
+      <button class="mob-nav-item mob-active" onclick="dirMobNav('overview',this)">
+        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Genel</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="dirMobNav('pending',this)">
+        <span class="mob-nav-icon">⏳</span><span class="mob-nav-label">Bekleyen</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="dirMobNav('history',this)">
+        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Geçmiş</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="dirMobNav('onay-takip',this)">
+        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="dirMobNav('profil',this)">
+        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
+      </button>
+    </nav>
     <div class="modal-overlay" id="dir-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="dir-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="dir-approve-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="dir-approve-btn" onclick="confirmDirApprove()">✅ Onayla</button></div></div></div>
     <div class="modal-overlay" id="dir-reject-modal"><div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="dir-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="dir-reject-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="dir-reject-btn" onclick="confirmDirReject()">❌ Reddet</button></div></div></div>
     <div class="bulk-bar" id="dir-bulk-bar"><div class="bulk-info"><span id="dir-bulk-count">0 seçildi</span><div class="bulk-div"></div><span id="dir-bulk-amount" style="font-family:'DM Mono',monospace;color:white;"></span></div><div class="bulk-btns"><button class="bulk-btn ok" onclick="openDirApproveModal(true)">✅ Toplu Onayla</button><button class="bulk-btn no" onclick="openDirRejectModal(true)">❌ Toplu Reddet</button><button class="bulk-btn" onclick="clearDirSelection()">✕</button></div></div>
@@ -2365,24 +2445,6 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="mob-header-avatar" id="gm-mob-avatar" onclick="gmMobGoProfil()" title="Profilim">G</div>
       <button class="mob-header-logout" onclick="doLogout()" title="Çıkış Yap">⏻</button>
     </div>
-    <!-- 📱 MOBİL BOTTOM NAV (GM) -->
-    <nav class="mob-bottom-nav" id="gm-mob-nav">
-      <button class="mob-nav-item mob-active" onclick="gmMobNav('pending',this)">
-        <span class="mob-nav-icon">👑</span><span class="mob-nav-label">Final Onay</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="gmMobNav('dashboard',this)">
-        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Genel</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="gmMobNav('history',this)">
-        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Geçmiş</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="gmMobNav('onay-takip',this)">
-        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
-      </button>
-      <button class="mob-nav-item" onclick="gmMobNav('profil',this)">
-        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
-      </button>
-    </nav>
     <button class="mob-menu-btn" onclick="toggleSidebar(this)">☰</button>
     <div class="sidebar-overlay" onclick="closeSidebar(this)"></div>
     <div class="sidebar">
@@ -2499,6 +2561,24 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
     </div>
+    <!-- 📱 MOBİL BOTTOM NAV (GM) -->
+    <nav class="mob-bottom-nav" id="gm-mob-nav">
+      <button class="mob-nav-item mob-active" onclick="gmMobNav('pending',this)">
+        <span class="mob-nav-icon">👑</span><span class="mob-nav-label">Final Onay</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="gmMobNav('dashboard',this)">
+        <span class="mob-nav-icon">📊</span><span class="mob-nav-label">Genel</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="gmMobNav('history',this)">
+        <span class="mob-nav-icon">📋</span><span class="mob-nav-label">Geçmiş</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="gmMobNav('onay-takip',this)">
+        <span class="mob-nav-icon">🔗</span><span class="mob-nav-label">Takip</span><span class="mob-nav-dot"></span>
+      </button>
+      <button class="mob-nav-item" onclick="gmMobNav('profil',this)">
+        <span class="mob-nav-icon">👤</span><span class="mob-nav-label">Profil</span><span class="mob-nav-dot"></span>
+      </button>
+    </nav>
     <div class="modal-overlay" id="gm-approve-modal"><div class="modal"><h3>👑 Final Onay</h3><p class="msub" id="gm-approve-sub">—</p><div class="form-group"><label>GM Notu (opsiyonel)</label><textarea id="gm-approve-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('gm-approve-modal')">İptal</button><button class="btn btn-gold btn-sm" id="gm-approve-btn" onclick="confirmGmApprove()">👑 Final Onay Ver</button></div></div></div>
     <div class="modal-overlay" id="gm-reject-modal"><div class="modal"><h3>Reddet</h3><p class="msub" id="gm-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="gm-reject-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('gm-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="gm-reject-btn" onclick="confirmGmReject()">❌ Reddet</button></div></div></div>
     <div class="bulk-bar" id="gm-bulk-bar"><div class="bulk-info"><span id="gm-bulk-count">0 seçildi</span><div class="bulk-div"></div><span id="gm-bulk-amount" style="font-family:'DM Mono',monospace;color:white;"></span></div><div class="bulk-btns"><button class="bulk-btn ok" onclick="openGmApproveModal(true)">✅ Final Onayla</button><button class="bulk-btn no" onclick="openGmRejectModal(true)">❌ Reddet</button><button class="bulk-btn" onclick="clearGmSelection()">✕</button></div></div>
@@ -5397,12 +5477,22 @@ routeByRole = function(user) {
     if (user.role === 'finans') initFinansMob();
     else setTimeout(function(){ initOtMobPipeline(mobPanel); }, 200);
   }
+  // Header auto-hide: login tamamlanınca tetikle
+  if (MOB_IS_MOBILE && typeof window._mobHdrLoginReady === 'function') {
+    setTimeout(window._mobHdrLoginReady, 100);
+  }
 };
 
-// ── Ekran boyutu değişince yeniden hesapla ──
-window.matchMedia('(max-width:768px)').addEventListener('change', function(e) {
-  MOB_IS_MOBILE = e.matches;
-});
+// ── Ekran boyutu değişince yeniden hesapla (iOS Safari uyumlu) ──
+(function(){
+  var _mql = window.matchMedia('(max-width:768px)');
+  function _onMQLChange(e){ MOB_IS_MOBILE = e.matches; }
+  try {
+    _mql.addEventListener('change', _onMQLChange);
+  } catch(e1) {
+    try { _mql.addListener(_onMQLChange); } catch(e2) { /* eski iOS fallback */ }
+  }
+})();
 
 // ══════════════════════════════════════════════
 //  📱 FİNANS PANELİ MOBİL FONKSİYONLARI
@@ -6404,6 +6494,171 @@ function mobFitStatValues() {
     });
     setTimeout(mobFitStatValues, 500);
   });
+})();
+
+// ── Mobil Header Auto-Hide — body class YOK, doğrudan style.height ───────────
+(function(){
+  if(!MOB_IS_MOBILE) return;
+
+  var HIDE_DELAY  = 4000; // gizlenme gecikmesi (ms)
+  var SHOW_THR    = 28;   // touch yukarı eşiği (px)
+  var _hdrTimer   = null;
+  var _hdrHidden  = false;
+
+  // ── Tüm aktif paneldeki mob-header'ları bul ──
+  function _getHdrs() {
+    return document.querySelectorAll('.panel.active .mob-header');
+  }
+
+  // ── Header'ı gizle: height → 0, içerik yukarı kayar ──
+  function _hideHdr() {
+    if (_hdrHidden) return;
+    _hdrHidden = true;
+    _getHdrs().forEach(function(h) {
+      h.style.height       = '0';
+      h.style.paddingTop   = '0';
+      h.style.paddingLeft  = '0';
+      h.style.paddingRight = '0';
+    });
+  }
+
+  // ── Header'ı göster: inline stil sıfırla, CSS değerleri devreye girer ──
+  function _showHdr() {
+    _hdrHidden = false;
+    _getHdrs().forEach(function(h) {
+      h.style.height       = '';
+      h.style.paddingTop   = '';
+      h.style.paddingLeft  = '';
+      h.style.paddingRight = '';
+    });
+    clearTimeout(_hdrTimer);
+    _hdrTimer = setTimeout(_hideHdr, HIDE_DELAY);
+  }
+
+  // ── routeByRole hook: login tamamlanınca çağrılır ──
+  window._mobHdrLoginReady = function() {
+    _hdrHidden = false;
+    // Tüm panellerdeki header'ları sıfırla (sadece aktif olanı görünür, diğerleri display:none zaten)
+    document.querySelectorAll('.mob-header').forEach(function(h) {
+      h.style.height       = '';
+      h.style.paddingTop   = '';
+      h.style.paddingLeft  = '';
+      h.style.paddingRight = '';
+    });
+    clearTimeout(_hdrTimer);
+    _hdrTimer = setTimeout(_hideHdr, HIDE_DELAY);
+  };
+
+  // ── Alt nav tıklamasında header'ı göster ──
+  document.addEventListener('click', function(e) {
+    var t = e.target;
+    while (t && t !== document.body) {
+      if (t.classList && t.classList.contains('mob-nav-item')) {
+        _showHdr();
+        break;
+      }
+      t = t.parentElement;
+    }
+  }, false);
+
+  // ── Touch: parmak aşağı kaydırdı = içerik yukarı gitti = header göster ──
+  var _touchStartY = 0;
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches && e.touches.length > 0) {
+      _touchStartY = e.touches[0].clientY;
+    }
+  }, {passive: true});
+
+  document.addEventListener('touchend', function(e) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      var dy = e.changedTouches[0].clientY - _touchStartY;
+      if (dy > SHOW_THR) _showHdr();
+    }
+  }, {passive: true});
+
+  // ── Scroll (desktop / overflow-y:auto container) ──
+  var _lastScrollTops = {};
+  function _attachScrollListeners() {
+    document.querySelectorAll('.main-content').forEach(function(mc, i) {
+      if (mc._hdrScrollBound) return;
+      mc._hdrScrollBound = true;
+      mc.addEventListener('scroll', function() {
+        var prev = _lastScrollTops[i] || 0;
+        var cur  = mc.scrollTop;
+        if ((prev - cur) > 8) _showHdr();
+        _lastScrollTops[i] = cur;
+      }, {passive: true});
+    });
+  }
+
+  if (document.readyState !== 'loading') _attachScrollListeners();
+  else document.addEventListener('DOMContentLoaded', _attachScrollListeners);
+})();
+
+// ── iOS Safari: Klavye / viewport yüksekliğini güvenli yönet ─────────────────
+(function(){
+  if (!MOB_IS_MOBILE || !window.visualViewport) return;
+
+  var _vpTimer = null;
+  var _root = document.documentElement;
+
+  function _isFormField(el) {
+    return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT');
+  }
+
+  function _resetMobVvh() {
+    _root.style.removeProperty('--mob-vvh');
+  }
+
+  function _syncMobVvh() {
+    clearTimeout(_vpTimer);
+    _vpTimer = setTimeout(function() {
+      var active = document.activeElement;
+      var isEditing = _isFormField(active);
+      var vvh = Math.round(window.visualViewport.height || window.innerHeight);
+      var winH = Math.round(window.innerHeight || vvh);
+
+      // Sadece klavye gerçekten viewport'u daraltırken uygula; aksi halde CSS fallback çalışsın.
+      if (isEditing && vvh > 320 && vvh < winH - 80) {
+        _root.style.setProperty('--mob-vvh', vvh + 'px');
+      } else {
+        _resetMobVvh();
+      }
+    }, 60);
+  }
+
+  window.visualViewport.addEventListener('resize', _syncMobVvh, {passive:true});
+  window.visualViewport.addEventListener('scroll', _syncMobVvh, {passive:true});
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(_vpTimer);
+    _resetMobVvh();
+    setTimeout(_syncMobVvh, 250);
+  }, {passive:true});
+  window.addEventListener('pageshow', _resetMobVvh, {passive:true});
+  document.addEventListener('focusin', function(e){ if (_isFormField(e.target)) _syncMobVvh(); }, true);
+  document.addEventListener('focusout', function(e){ if (_isFormField(e.target)) { clearTimeout(_vpTimer); setTimeout(_resetMobVvh, 120); } }, true);
+})();
+
+// ── iOS Safari: Kapalı katmanlar alt menüyü engellemesin ─────────────────────
+(function(){
+  if (!MOB_IS_MOBILE) return;
+
+  function _normalizeClosedLayers() {
+    document.querySelectorAll('.drawer:not(.open), .sidebar-overlay:not(.open), .bulk-bar:not(.show)').forEach(function(el) {
+      el.style.pointerEvents = 'none';
+    });
+    document.querySelectorAll('.drawer.open, .sidebar-overlay.open, .bulk-bar.show').forEach(function(el) {
+      el.style.pointerEvents = '';
+    });
+  }
+
+  if (document.readyState !== 'loading') _normalizeClosedLayers();
+  else document.addEventListener('DOMContentLoaded', _normalizeClosedLayers);
+
+  document.addEventListener('touchstart', _normalizeClosedLayers, {passive:true, capture:true});
+  document.addEventListener('click', _normalizeClosedLayers, true);
+  window.addEventListener('pageshow', _normalizeClosedLayers, {passive:true});
+  window.addEventListener('orientationchange', function(){ setTimeout(_normalizeClosedLayers, 150); }, {passive:true});
 })();
 </script>
 </body>
