@@ -263,7 +263,8 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
 .toast.error{background:rgba(127,29,29,0.94);border-left:3px solid #ef4444;}
 .toast.warning{background:rgba(120,53,15,0.94);border-left:3px solid #f59e0b;}
 
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0b1220 0%,#1e3a8a 55%,#064e3b 100%);padding:20px;}
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background-color:#0b1220;background-image:linear-gradient(135deg,rgba(11,18,32,0.30),rgba(6,78,59,0.22)),url('login-bg.png');background-position:center center;background-size:cover;background-repeat:no-repeat;}
+@media(max-width:768px){#login-screen{background-size:contain;}}
 .login-card{background:rgba(255,255,255,0.97);border-radius:20px;padding:44px 40px;width:440px;max-width:calc(100vw - 32px);box-shadow:0 24px 80px rgba(0,0,0,0.22);animation:fadeUp 0.45s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden;}
 .login-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#1d4ed8,#059669);}
 .login-logo{display:flex;align-items:center;gap:14px;margin-bottom:28px;}
@@ -1504,7 +1505,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <div class="subpage" id="admin-logs">
         <div class="page-header"><div><h1>Audit Log</h1><p>Tüm sistem aktiviteleri</p></div></div>
         <div class="card">
-          <div class="card-header"><div><h3>İşlem Geçmişi</h3><p>Son 100 kayıt</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('islem_gecmisi')" style="white-space:nowrap;">📊 Excel</button></div></div>
+          <div class="card-header"><div><h3>İşlem Geçmişi</h3><p>Son 500 kayıt</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('islem_gecmisi')" style="white-space:nowrap;">📊 Excel</button></div><div style="display:flex;gap:8px;"><input id="admin-log-search" class="search-input" placeholder="🔍 Kullanıcı veya işlem ara..." oninput="filterAdminLogs(this.value)"></div></div>
           <div id="admin-logs-list"><div class="empty-state"><span class="icon">⏳</span><p>Yükleniyor...</p></div></div>
         </div>
       </div>
@@ -2016,7 +2017,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         <div class="dept-tab-bar" style="display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;width:fit-content;margin-bottom:24px;border:1px solid var(--border);">
           <div class="dept-tab active" onclick="deptTab('pending',this)">⏳ Bekleyen</div>
           <div class="dept-tab" onclick="deptTab('approved',this)">✅ Onayladıklarım</div>
-          <div class="dept-tab" onclick="deptTab('rejected',this)">❌ Reddettiklerim</div>
+          <div class="dept-tab" onclick="deptTab('rejected',this)">❌ Reddedilenler</div>
           <div class="dept-tab" onclick="deptTab('all',this)">📋 Tümü</div>
         </div>
         <div class="stats-grid">
@@ -2667,6 +2668,7 @@ async function doLogout() {
     window._realtimeChannel = null;
   }
   currentUser = null; parsedRows = [];
+  try{ if(navigator.clearAppBadge) navigator.clearAppBadge(); }catch(e){}
   localStorage.removeItem('ots_session');
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('all-panels').style.visibility='hidden';
@@ -2831,7 +2833,7 @@ async function deleteDept(id,name){
 
 async function loadUsers(){
   await loadDepts();
-  const{data}=await db.from('users').select('id,name,email,role,department_id,departments(name)').order('name');
+  const{data}=await db.from('users').select('id,name,email,role,department_id,is_active,departments(name)').order('name');
   allUsers=data||[];renderUsers(allUsers);
 }
 function renderUsers(users){
@@ -2839,12 +2841,34 @@ function renderUsers(users){
   const tbody=document.getElementById('user-table');
   if(users.length===0){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><span class="icon">👥</span><p>Henüz kullanıcı eklenmedi.</p></div></td></tr>';return;}
   const roleMap={admin:'Admin',finans:'Finans',departman:'Departman',muhasebe_muduru:'Muhasebe Müd.',direktor:'Direktör',gm:'Genel Müdür'};
-  tbody.innerHTML=users.map(u=>`<tr><td style="font-weight:500;">${u.name}</td><td style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;">${u.email}</td><td><span class="badge badge-blue">${roleMap[u.role]||u.role}</span></td><td style="color:var(--text3);">${escHtml(u.departments?.name||'—')}</td><td><div style="display:flex;gap:6px;"><button class="btn btn-secondary btn-sm" onclick='editUser(${JSON.stringify(u).replace(/'/g,"&#39;")})'>✏️</button><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}','${u.name}')">🗑️</button></div></td></tr>`).join('');
+  tbody.innerHTML=users.map(u=>{
+    var active = u.is_active !== false;
+    var stBadge = active
+      ? '<span class="badge badge-green" style="font-size:9px;margin-left:6px;">AKTİF</span>'
+      : '<span class="badge" style="font-size:9px;margin-left:6px;background:var(--surface2);color:var(--text3);">PASİF</span>';
+    var toggleBtn = active
+      ? `<button class="btn btn-secondary btn-sm" title="Pasifleştir (girişini kapat)" onclick="setUserActive('${u.id}',false)">🚫</button>`
+      : `<button class="btn btn-secondary btn-sm" title="Aktifleştir" onclick="setUserActive('${u.id}',true)">🔓</button>`;
+    return `<tr style="${active?'':'opacity:.5;'}"><td style="font-weight:500;">${escHtml(u.name)}${stBadge}</td><td style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;">${escHtml(u.email)}</td><td><span class="badge badge-blue">${roleMap[u.role]||escHtml(u.role)}</span></td><td style="color:var(--text3);">${escHtml(u.departments?.name||'—')}</td><td><div style="display:flex;gap:6px;">${toggleBtn}<button class="btn btn-secondary btn-sm" onclick='editUser(${JSON.stringify(u).replace(/'/g,"&#39;")})'>✏️</button><button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}','${escHtml(u.name).replace(/'/g,"\\'")}')">🗑️</button></div></td></tr>`;
+  }).join('');
+}
+async function setUserActive(id, active){
+  if(id===currentUser.id && !active){ showToast('Kendinizi pasifleştiremezsiniz!','error'); return; }
+  var u=(allUsers||[]).find(x=>x.id===id); var nm=u?u.name:'Kullanıcı';
+  const adminPw=_askAdminPw(); if(!adminPw) return;
+  const { data:res, error } = await db.rpc('admin_set_active', { p_admin_id: currentUser.id, p_admin_password: adminPw, p_target_id: id, p_active: active });
+  if(error){showToast('Hata: '+error.message,'error');return;}
+  if(!res || res.success!==true){ showToast(res && res.error==='not_admin' ? 'Şifreniz yanlış veya yetkiniz yok.' : 'İşlem başarısız.','error'); return; }
+  showToast(active?`${nm} aktifleştirildi.`:`${nm} pasifleştirildi (girişi kapatıldı).`,'success');
+  await logAction((active?'Kullanıcı aktifleştirildi: ':'Kullanıcı pasifleştirildi: ')+nm,null,null);
+  loadUsers();
 }
 function filterUsers(q){renderUsers(allUsers.filter(u=>u.name.toLowerCase().includes(q.toLowerCase())||u.email.toLowerCase().includes(q.toLowerCase())));}
 function openUserModal(){editingUserId=null;document.getElementById('user-modal-title').textContent='Yeni Kullanıcı';['user-name-input','user-email-input','user-pass-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('user-role-input').value='departman';document.getElementById('user-dept-input').value='';document.getElementById('user-modal').classList.add('open');}
 function closeUserModal(){document.getElementById('user-modal').classList.remove('open');}
 function editUser(u){editingUserId=u.id;document.getElementById('user-modal-title').textContent='Kullanıcıyı Düzenle';document.getElementById('user-name-input').value=u.name;document.getElementById('user-email-input').value=u.email;document.getElementById('user-pass-input').value='';document.getElementById('user-role-input').value=u.role;document.getElementById('user-dept-input').value=u.department_id||'';document.getElementById('user-modal').classList.add('open');}
+// Güvenlik: admin işlemleri için admin şifresini bir kez sor
+function _askAdminPw(){ return (window.prompt('Güvenlik için şifrenizi girin:') || '').trim(); }
 async function saveUser(){
   const name=document.getElementById('user-name-input').value.trim();
   const email=document.getElementById('user-email-input').value.trim();
@@ -2852,33 +2876,48 @@ async function saveUser(){
   const role=document.getElementById('user-role-input').value;
   const dept=document.getElementById('user-dept-input').value||null;
   if(!name||!email){showToast('Ad ve e-posta zorunludur!','error');return;}
-  if(editingUserId){
-    const upd={name,email,role,department_id:dept};if(pass)upd.password_hash=pass;
-    await db.from('users').update(upd).eq('id',editingUserId);
-    await logAction(`Kullanıcı güncellendi: ${name}`,null,null);showToast('Güncellendi!','success');
-  } else {
-    if(!pass){showToast('Yeni kullanıcı için şifre zorunludur!','error');return;}
-    await db.from('users').insert({name,email,password_hash:pass,role,department_id:dept});
-    await logAction(`Yeni kullanıcı eklendi: ${name} (${role})`,null,null);showToast('Kullanıcı eklendi!','success');
-  }
+  if(!editingUserId && !pass){showToast('Yeni kullanıcı için şifre zorunludur!','error');return;}
+  const adminPw=_askAdminPw(); if(!adminPw)return;
+  const { data:res, error } = await db.rpc('admin_save_user', {
+    p_admin_id: currentUser.id, p_admin_password: adminPw,
+    p_target_id: editingUserId || null, p_name: name, p_email: email,
+    p_role: role, p_department_id: dept, p_password: pass || null
+  });
+  if(error){showToast('Hata: '+error.message,'error');return;}
+  if(!res || res.success!==true){ showToast(res && res.error==='not_admin' ? 'Şifreniz yanlış veya yetkiniz yok.' : 'İşlem başarısız.','error'); return; }
+  await logAction(editingUserId?`Kullanıcı güncellendi: ${name}`:`Yeni kullanıcı eklendi: ${name} (${role})`,null,null);
+  showToast(editingUserId?'Güncellendi!':'Kullanıcı eklendi!','success');
   closeUserModal();loadUsers();
 }
 async function deleteUser(id,name){
   if(id===currentUser.id){showToast('Kendinizi silemezsiniz!','error');return;}
   showDeleteModal(`"${name}" kullanıcısı silinecek. Emin misiniz?`, async () => {
-    const { error } = await db.from('users').delete().eq('id', id);
+    const adminPw=_askAdminPw(); if(!adminPw) throw new Error('İptal edildi.');
+    const { data:res, error } = await db.rpc('admin_delete_user', { p_admin_id: currentUser.id, p_admin_password: adminPw, p_target_id: id });
     if (error) throw new Error(error.message);
+    if(!res || res.success!==true) throw new Error(res && res.error==='not_admin' ? 'Şifreniz yanlış veya yetkiniz yok.' : 'İşlem başarısız.');
     await logAction(`Kullanıcı silindi: ${name}`, null, null);
     showToast('Kullanıcı silindi.', 'success');
     loadUsers();
   });
 }
 
+let allAdminLogs=[];
 async function loadAdminLogs(){
-  const{data}=await db.from('audit_log').select('*,users(name)').order('created_at',{ascending:false}).limit(100);
+  const{data}=await db.from('audit_log').select('*,users(name)').order('created_at',{ascending:false}).limit(500);
+  allAdminLogs=data||[];
+  const s=document.getElementById('admin-log-search'); if(s) s.value='';
+  renderAdminLogs(allAdminLogs);
+}
+function renderAdminLogs(list){
   const el=document.getElementById('admin-logs-list');
-  if(!data||data.length===0){el.innerHTML='<div class="empty-state"><span class="icon">📭</span><p>Log kaydı yok.</p></div>';return;}
-  el.innerHTML=data.map(l=>`<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin-top:4px;flex-shrink:0;"></div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);flex-shrink:0;width:130px;">${formatDate(l.created_at)}</div><div><span style="color:var(--accent);font-weight:500;">${escHtml(l.users?.name||'Sistem')}</span> — ${l.action}</div></div>`).join('');
+  if(!list||list.length===0){el.innerHTML='<div class="empty-state"><span class="icon">📭</span><p>Kayıt bulunamadı.</p></div>';return;}
+  el.innerHTML=list.map(l=>`<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;"><div style="width:7px;height:7px;border-radius:50%;background:#3b82f6;margin-top:4px;flex-shrink:0;"></div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);flex-shrink:0;width:130px;">${formatDate(l.created_at)}</div><div><span style="color:var(--accent);font-weight:500;">${escHtml(l.users?.name||'Sistem')}</span> — ${escHtml(l.action||'')}</div></div>`).join('');
+}
+function filterAdminLogs(q){
+  q=(q||'').toLowerCase().trim();
+  if(!q){renderAdminLogs(allAdminLogs);return;}
+  renderAdminLogs(allAdminLogs.filter(l=>(((l.users&&l.users.name)||'sistem').toLowerCase().includes(q))||((l.action||'').toLowerCase().includes(q))));
 }
 
 // ═══════════════════════════════════════════
@@ -2954,7 +2993,8 @@ function buildPreview(rows,headers,rawRows){
   document.getElementById('preview-head').innerHTML=showIdx.map(i=>`<th>${headers[i]}</th>`).join('');
   document.getElementById('preview-body').innerHTML=rawRows.slice(0,20).map(r=>`<tr>${showIdx.map(i=>`<td>${r[i]??''}</td>`).join('')}</tr>`).join('');
   document.getElementById('preview-title').textContent=`${rows.length} kayıt hazır`;
-  document.getElementById('preview-sub').textContent=`${Object.keys(deptSummary).length} departman · ${formatMoney(rows.reduce((s,r)=>s+r.amount,0))}`;
+  var _skipped=(rawRows?rawRows.length:rows.length)-rows.length;
+  document.getElementById('preview-sub').textContent=`${Object.keys(deptSummary).length} departman · ${formatMoney(rows.reduce((s,r)=>s+r.amount,0))}`+(_skipped>0?` · ${_skipped} satır atlandı (boş cari / 0 tutar)`:'');
   document.getElementById('preview-card').style.display='block';
   showToast(`${rows.length} kayıt okundu!`,'success');
 }
@@ -3128,10 +3168,19 @@ function openDeptApproveModal(isBulk,singleId){
   document.getElementById('dept-approve-comment').value='';
   document.getElementById('dept-approve-modal').classList.add('open');
 }
+// Red modalı bağlamı: onaycı reddetmeden önce cari + tutar + açıklama görsün
+function _rejectDetailHtml(p, count, isBulk){
+  if(isBulk) return count+' ödeme reddedilecek.';
+  if(!p) return 'Ödeme reddedilecek.';
+  return '<strong>'+escHtml(p.cari||'—')+'</strong> · <span style="font-family:\'DM Mono\',monospace;">'+formatMoney(p.amount)+'</span>'
+    + (p.doc_no?' · '+escHtml(p.doc_no):'')
+    + (p.description?'<div style="font-size:12px;color:var(--text2);margin-top:4px;">'+escHtml(p.description)+'</div>':'')
+    + '<div style="font-size:12px;color:#ef4444;margin-top:6px;font-weight:600;">Bu ödeme reddedilecek.</div>';
+}
 function openDeptRejectModal(isBulk,singleId){
   deptActionTarget=isBulk?[...deptSelectedIds]:[singleId];
   const p=!isBulk?deptPayments.find(x=>x.id===singleId):null;
-  document.getElementById('dept-reject-sub').textContent=isBulk?`${deptSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;
+  document.getElementById('dept-reject-sub').innerHTML=_rejectDetailHtml(p, deptSelectedIds.size, isBulk);
   document.getElementById('dept-reject-comment').value='';
   document.getElementById('dept-reject-modal').classList.add('open');
 }
@@ -3217,7 +3266,7 @@ async function showMudurDrawer(pid){
 }
 function closeMudurDrawer(){document.getElementById('m-drawer').classList.remove('open');}
 function openMudurApproveModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-approve-sub').textContent=isBulk?`${mudurSelectedIds.size} ödeme onaylanacak.`:`"${p?.cari}" onaylanacak.`;document.getElementById('m-approve-comment').value='';document.getElementById('m-approve-modal').classList.add('open');}
-function openMudurRejectModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-reject-sub').textContent=isBulk?`${mudurSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;document.getElementById('m-reject-comment').value='';document.getElementById('m-reject-modal').classList.add('open');}
+function openMudurRejectModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-reject-sub').innerHTML=_rejectDetailHtml(p, mudurSelectedIds.size, isBulk);document.getElementById('m-reject-comment').value='';document.getElementById('m-reject-modal').classList.add('open');}
 async function confirmMudurApprove(){const btn=document.getElementById('m-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('m-approve-comment').value.trim();try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'director_pending'}).eq('id',pid).eq('status','manager_pending');await logAction(`Müdür onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-approve-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme onaylandı! Direktöre iletildi.`,'success');
     db.from('payments').select('amount').eq('status','director_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('direktor',r.data.length,t);}});
     loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
@@ -3409,7 +3458,7 @@ function clearDirSelection(){dirSelectedIds.clear();document.querySelectorAll('.
 async function showDirDrawer(pid){const p=dirPending.find(x=>x.id===pid);if(!p)return;document.getElementById('dird-cari').textContent=p.cari;document.getElementById('dird-amount').textContent=formatMoney(p.amount);document.getElementById('dird-body').innerHTML=`<div class="drow"><span class="dlabel">Belge No</span><span class="dval">${escHtml(p.doc_no||'—')}</span></div><div class="drow"><span class="dlabel">Departman</span><span class="dval">${escHtml(p.departments?.name||'—')}</span></div><div class="drow"><span class="dlabel">Nakil Tarihi</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow"><span class="dlabel">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${escHtml(p.iban||'—')}</span></div><div class="drow"><span class="dlabel">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">Onay Geçmişi</div><div id="dird-hist">Yükleniyor...</div><div style="margin:16px 0 8px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;">📎 Ekli Belgeler</div><div id="dird-files">Yükleniyor...</div>`;document.getElementById('dird-foot').innerHTML=`<button class="btn btn-success" style="width:100%;" onclick="openDirApproveModal(false,'${p.id}');closeDirDrawer()">✅ Onayla – GM'ye İlet</button><button class="btn btn-danger" style="width:100%;" onclick="openDirRejectModal(false,'${p.id}');closeDirDrawer()">❌ Reddet</button>`;document.getElementById('dir-drawer').classList.add('open');const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');document.getElementById('dird-hist').innerHTML=renderApprovalHistory(approvals);renderFilesSection(pid,'dird-files');}
 function closeDirDrawer(){document.getElementById('dir-drawer').classList.remove('open');}
 function openDirApproveModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-approve-sub').textContent=isBulk?`${dirSelectedIds.size} ödeme onaylanacak.`:`"${p?.cari}" onaylanacak.`;document.getElementById('dir-approve-comment').value='';document.getElementById('dir-approve-modal').classList.add('open');}
-function openDirRejectModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-reject-sub').textContent=isBulk?`${dirSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;document.getElementById('dir-reject-comment').value='';document.getElementById('dir-reject-modal').classList.add('open');}
+function openDirRejectModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-reject-sub').innerHTML=_rejectDetailHtml(p, dirSelectedIds.size, isBulk);document.getElementById('dir-reject-comment').value='';document.getElementById('dir-reject-modal').classList.add('open');}
 async function confirmDirApprove(){const btn=document.getElementById('dir-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('dir-approve-comment').value.trim();try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'gmy_pending'}).eq('id',pid).eq('status','director_pending');await logAction(`Direktör onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-approve-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme onaylandı! GM'ye iletildi.`,'success');
     db.from('payments').select('amount').eq('status','gmy_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('gm',r.data.length,t);}});
     loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
@@ -3481,7 +3530,7 @@ function clearGmSelection(){gmSelectedIds.clear();document.querySelectorAll('.gm
 async function showGmDrawer(pid){const p=gmPending.find(x=>x.id===pid);if(!p)return;document.getElementById('gmd-cari').textContent=p.cari;document.getElementById('gmd-amount').textContent=formatMoney(p.amount);document.getElementById('gmd-body').innerHTML=`<div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Belge No</span><span class="dval">${escHtml(p.doc_no||'—')}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Departman</span><span class="dval">${escHtml(p.departments?.name||'—')}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Nakil Tarihi</span><span class="dval">${p.due_date||'—'}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">IBAN</span><span class="dval" style="font-size:11px;font-family:'DM Mono',monospace;">${escHtml(p.iban||'—')}</span></div><div class="drow" style="border-color:var(--border);"><span class="dlabel" style="color:var(--text3);">Döviz</span><span class="dval">${p.currency||'TRY'}</span></div><div style="margin:16px 0 10px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Tam Onay Zinciri</div><div id="gmd-hist">Yükleniyor...</div><div style="margin:16px 0 8px;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;">📎 Ekli Belgeler</div><div id="gmd-files">Yükleniyor...</div>`;document.getElementById('gmd-foot').innerHTML=`<button class="btn btn-gold" style="width:100%;" onclick="openGmApproveModal(false,'${p.id}');closeGmDrawer()">👑 Final Onay Ver</button><button class="btn btn-danger" style="width:100%;" onclick="openGmRejectModal(false,'${p.id}');closeGmDrawer()">❌ Reddet</button>`;document.getElementById('gm-drawer').classList.add('open');const{data:approvals}=await db.from('approvals').select('*,users(name)').eq('payment_id',pid).order('created_at');document.getElementById('gmd-hist').innerHTML=renderApprovalHistory(approvals);renderFilesSection(pid,'gmd-files');}
 function closeGmDrawer(){document.getElementById('gm-drawer').classList.remove('open');}
 function openGmApproveModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-approve-sub').textContent=isBulk?`${gmSelectedIds.size} ödeme final onayına alınacak.`:`"${p?.cari}" tamamlanacak.`;document.getElementById('gm-approve-comment').value='';document.getElementById('gm-approve-modal').classList.add('open');}
-function openGmRejectModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-reject-sub').textContent=isBulk?`${gmSelectedIds.size} ödeme reddedilecek.`:`"${p?.cari}" reddedilecek.`;document.getElementById('gm-reject-comment').value='';document.getElementById('gm-reject-modal').classList.add('open');}
+function openGmRejectModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-reject-sub').innerHTML=_rejectDetailHtml(p, gmSelectedIds.size, isBulk);document.getElementById('gm-reject-comment').value='';document.getElementById('gm-reject-modal').classList.add('open');}
 async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'completed'}).eq('id',pid).eq('status','gmy_pending');await logAction(`GM Final Onay: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-approve-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme tamamlandı! 🎉`,'success');
     var _finTot=gmActionTarget.reduce(function(s,pid){var _p=gmPending.find(function(x){return x.id===pid;});return s+((_p&&_p.amount)||0);},0);
     notifyFinans(gmActionTarget.length,_finTot);
@@ -3720,9 +3769,11 @@ async function saveNewPassword() {
 
 // ── ADMİN ŞİFRE SIFIRLAMA ──
 async function adminResetPassword(userId, userName) {
+  const adminPw = _askAdminPw(); if(!adminPw) return;
   const newPass = Math.random().toString(36).slice(-8);
-  const { error } = await db.from('users').update({ password_hash: newPass }).eq('id', userId);
+  const { data:res, error } = await db.rpc('admin_set_password', { p_admin_id: currentUser.id, p_admin_password: adminPw, p_target_id: userId, p_new_password: newPass });
   if (error) { showToast('Hata: ' + error.message, 'error'); return; }
+  if(!res || res.success!==true){ showToast(res && res.error==='not_admin' ? 'Şifreniz yanlış veya yetkiniz yok.' : 'İşlem başarısız.','error'); return; }
   showToast(`${userName} şifresi sıfırlandı: ${newPass}`, 'success');
   await logAction('Şifre sıfırlandı: ' + userName, null, null);
 }
@@ -3796,43 +3847,15 @@ var _resetCode = null, _resetExpiry = null, _resetUserId = null;
 function showForgotScreen(){document.getElementById('login-screen').style.display='none';document.getElementById('forgot-screen').style.display='flex';document.getElementById('forgot-step1').style.display='block';document.getElementById('forgot-step2').style.display='none';document.getElementById('forgot-email').value='';document.getElementById('forgot-err1').style.display='none';}
 function backToLoginFromForgot(){document.getElementById('forgot-screen').style.display='none';document.getElementById('login-screen').style.display='flex';_resetCode=null;_resetUserId=null;}
 async function sendResetCode(){
-  var email=document.getElementById('forgot-email').value.trim();
+  // Güvenlik: self-servis şifre sıfırlama bu mimaride güvenli yapılamadığından kapatıldı.
+  // Şifre sıfırlama artık sistem yöneticisi (admin) üzerinden yapılır.
   var err=document.getElementById('forgot-err1');
-  err.style.display='none';
-  if(!email){err.textContent='E-posta adresinizi girin.';err.style.display='block';return;}
-  var btn=document.getElementById('forgot-send-btn');
-  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
-  var res=await db.from('users').select('id,name,email').eq('email',email).single();
-  btn.innerHTML='Kod Gönder →';btn.disabled=false;
-  if(res.error||!res.data){err.textContent='Bu e-posta sistemde kayıtlı değil.';err.style.display='block';return;}
-  _resetCode=Math.floor(100000+Math.random()*900000).toString();
-  _resetExpiry=Date.now()+5*60*1000;
-  _resetUserId=res.data.id;
-  try{await emailjs.send('service_ots','template_mrnhjpb',{to_email:res.data.email,to_name:res.data.name,otp_code:_resetCode});}catch(e){console.warn(e);}
-  document.getElementById('forgot-step1').style.display='none';
-  document.getElementById('forgot-step2').style.display='block';
-  document.getElementById('forgot-email-hint').textContent=email;
-  document.getElementById('forgot-err2').style.display='none';
+  if(err){ err.textContent='Şifre sıfırlama için lütfen sistem yöneticinize başvurun.'; err.style.display='block'; }
 }
 async function confirmResetPassword(){
-  var code=document.getElementById('forgot-code').value.trim();
-  var newp=document.getElementById('forgot-newpass').value.trim();
-  var conf=document.getElementById('forgot-confirm').value.trim();
+  // Self-servis şifre sıfırlama kapatıldı — şifre sıfırlama admin üzerinden yapılır.
   var err=document.getElementById('forgot-err2');
-  err.style.display='none';
-  if(!code||!newp||!conf){err.textContent='Tüm alanları doldurun.';err.style.display='block';return;}
-  if(Date.now()>_resetExpiry){err.textContent='Kodun süresi doldu.';err.style.display='block';return;}
-  if(code!==_resetCode){err.textContent='Hatalı kod.';err.style.display='block';return;}
-  if(newp.length<6){err.textContent='Şifre en az 6 karakter olmalı.';err.style.display='block';return;}
-  if(newp!==conf){err.textContent='Şifreler eşleşmiyor.';err.style.display='block';return;}
-  var btn=document.getElementById('forgot-confirm-btn');
-  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
-  var res=await db.from('users').update({password_hash:newp}).eq('id',_resetUserId);
-  btn.disabled=false;btn.innerHTML='Şifremi Sıfırla ✓';
-  if(res.error){err.textContent='Hata: '+res.error.message;err.style.display='block';return;}
-  backToLoginFromForgot();
-  showToast('Şifreniz sıfırlandı! Giriş yapabilirsiniz.','success');
-  _resetCode=null;_resetUserId=null;
+  if(err){ err.textContent='Şifre sıfırlama için lütfen sistem yöneticinize başvurun.'; err.style.display='block'; }
 }
 
 
@@ -4734,8 +4757,11 @@ async function saveProfilePassword(panel) {
   if (pw1 !== pw2) { showToast('Şifreler eşleşmiyor.', 'error'); return; }
   if (pw1.length < 6) { showToast('Şifre en az 6 karakter olmalı.', 'error'); return; }
   if (!currentUser) return;
-  const { error } = await db.from('users').update({ password_hash: pw1 }).eq('id', currentUser.id);
+  const cur = (window.prompt('Güvenlik için MEVCUT şifrenizi girin:') || '').trim();
+  if (!cur) return;
+  const { data:res, error } = await db.rpc('change_password', { p_id: currentUser.id, p_current: cur, p_new: pw1 });
   if (error) { showToast('Şifre güncelleme hatası: ' + error.message, 'error'); return; }
+  if (!res || res.success !== true) { showToast('Mevcut şifre hatalı.', 'error'); return; }
   document.getElementById(panel + '-profil-pw1').value = '';
   document.getElementById(panel + '-profil-pw2').value = '';
   showToast('Şifre değiştirildi ✓', 'success');
@@ -5490,7 +5516,30 @@ routeByRole = function(user) {
   if (MOB_IS_MOBILE && typeof window._mobHdrLoginReady === 'function') {
     setTimeout(window._mobHdrLoginReady, 100);
   }
+  // Uygulama simgesi rozeti (bekleyen ödeme sayısı)
+  setTimeout(_updateAppBadge, 400);
 };
+
+// ── App Badge: iPhone ana ekran simgesindeki kırmızı sayı (iOS 16.4+) ──
+async function _updateAppBadge(){
+  try{
+    if(!('setAppBadge' in navigator)) return;
+    if(!currentUser){ if(navigator.clearAppBadge) navigator.clearAppBadge(); return; }
+    var statusByRole = { departman:'department_pending', muhasebe_muduru:'manager_pending', direktor:'director_pending', gm:'gmy_pending' };
+    var st = statusByRole[currentUser.role];
+    if(!st){ if(navigator.clearAppBadge) navigator.clearAppBadge(); return; }
+    var q = db.from('payments').select('id',{count:'exact',head:true}).eq('status', st);
+    if(currentUser.role==='departman' && currentUser.department_id) q = q.eq('department_id', currentUser.department_id);
+    var r = await q;
+    var n = r.count || 0;
+    if(n>0) navigator.setAppBadge(n); else if(navigator.clearAppBadge) navigator.clearAppBadge();
+  }catch(e){}
+}
+// Uygulamaya geri dönünce rozeti tazele
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState==='visible') _updateAppBadge();
+}, false);
+window.addEventListener('focus', _updateAppBadge, false);
 
 // ── Ekran boyutu değişince yeniden hesapla (iOS Safari uyumlu) ──
 (function(){

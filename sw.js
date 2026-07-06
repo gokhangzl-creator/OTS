@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════════════
-//  ÖDEME TAKİP SİSTEMİ — Service Worker v1.0
-//  PWA offline desteği + Push bildirimleri
+//  ÖDEME TAKİP SİSTEMİ — Service Worker v2.0
+//  PWA offline desteği + Push bildirimleri + App Badge
 // ══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'ots-cache-v1';
+const CACHE_NAME = 'ots-cache-v2';
 const CACHE_URLS = ['./'];
 
 // ── INSTALL: Temel dosyaları önbelleğe al ──
@@ -76,9 +76,16 @@ self.addEventListener('push', event => {
     ]
   };
 
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
+  const tasks = [ self.registration.showNotification(data.title, options) ];
+  // App Badge: uygulama kapalıyken simge üstünde kırmızı sayı (iOS 16.4+)
+  try {
+    if (self.navigator && self.navigator.setAppBadge) {
+      if (typeof data.badgeCount === 'number') tasks.push(self.navigator.setAppBadge(data.badgeCount));
+      else tasks.push(self.navigator.setAppBadge());
+    }
+  } catch (e) {}
+
+  event.waitUntil(Promise.all(tasks));
 });
 
 // ── NOTIFICATION CLICK: Uygulamayı aç ──
