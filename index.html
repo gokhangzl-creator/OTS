@@ -1296,6 +1296,38 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
     .ok-f.on{background:var(--success-bg);border-color:var(--success);color:var(--success);font-weight:600;}
     .ok-dept-sel{width:100%;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:13px;min-height:32px;}
     .ok-dept-sel.empty{border-color:var(--danger);color:var(--danger);}
+    /* ── Sistemden Çek kartı ── */
+    .ws-card{background:linear-gradient(135deg,var(--accent) 0%,#0f766e 100%);border-radius:16px;padding:22px 24px;color:#fff;display:flex;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 8px 24px rgba(15,118,110,.25);}
+    .ws-card-icon{font-size:40px;line-height:1;flex:none;}
+    .ws-card-txt{flex:1;min-width:200px;}
+    .ws-card-txt h3{margin:0 0 4px;font-size:19px;color:#fff;}
+    .ws-card-txt p{margin:0;font-size:13.5px;opacity:.9;}
+    .ws-btn{background:#fff;color:var(--accent);border:none;border-radius:10px;padding:13px 22px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;min-height:48px;display:inline-flex;align-items:center;gap:8px;transition:transform .1s;}
+    .ws-btn:hover{transform:translateY(-1px);}
+    .ws-btn:active{transform:translateY(0);}
+    /* ── Aktarım ekranı (tam ekran overlay) ── */
+    .ws-overlay{position:fixed;inset:0;z-index:9998;background:rgba(8,15,20,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px;}
+    .ws-overlay.open{display:flex;}
+    .ws-panel{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:34px 30px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+    .ws-anim{position:relative;height:120px;margin:6px 0 22px;overflow:hidden;border-radius:14px;background:var(--surface2);}
+    /* akan çizgiler */
+    .ws-line{position:absolute;height:2px;left:-40%;width:40%;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.7;animation:wsflow 1.4s linear infinite;}
+    @keyframes wsflow{0%{left:-40%;}100%{left:100%;}}
+    .ws-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff;box-shadow:0 0 0 0 rgba(31,107,79,.5);animation:wspulse 1.6s ease-out infinite;}
+    @keyframes wspulse{0%{box-shadow:0 0 0 0 rgba(31,107,79,.45);}100%{box-shadow:0 0 0 26px rgba(31,107,79,0);}}
+    .ws-title{font-size:19px;font-weight:700;margin:0 0 6px;}
+    .ws-stage{font-size:13.5px;color:var(--text2);min-height:20px;margin:0 0 16px;}
+    .ws-bar{height:12px;border-radius:8px;background:var(--surface2);overflow:hidden;border:1px solid var(--border);}
+    .ws-bar-fill{height:100%;width:0;border-radius:8px;background:linear-gradient(90deg,var(--accent),#10b981);transition:width .5s ease;background-size:200% 100%;animation:wsshimmer 1.5s linear infinite;}
+    @keyframes wsshimmer{0%{background-position:0 0;}100%{background-position:200% 0;}}
+    .ws-pct{font-family:'DM Mono',monospace;font-size:26px;font-weight:700;margin:12px 0 0;}
+    .ws-steps{text-align:left;margin:16px 0 0;font-size:13px;}
+    .ws-step{display:flex;align-items:center;gap:9px;padding:4px 0;color:var(--text3);}
+    .ws-step.done{color:var(--success);} .ws-step.active{color:var(--text);font-weight:600;}
+    .ws-step .dot{width:16px;text-align:center;flex:none;}
+    .ws-err{background:var(--danger-bg);border:1px solid var(--danger);color:var(--danger);border-radius:10px;padding:12px 14px;font-size:13px;margin:14px 0 0;text-align:left;display:none;}
+    .ws-err.show{display:block;}
+    .ws-actions{margin-top:18px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
     /* Günlük onay raporu — masaüstü ve mobilde aynı bileşen, gruplar KAPALI gelir */
     .rapor-blok{margin-bottom:16px;}
     .rapor-blok-baslik{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);padding:0 2px 8px;border-bottom:1px solid var(--border);margin-bottom:8px;}
@@ -1578,7 +1610,21 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       </div>
       <!-- ENTEGRASYON — ÖZEL KOD TANIMLARI -->
       <div class="subpage" id="admin-entegrasyon">
-        <div class="page-header"><div><h1>Entegrasyon</h1><p>Hangi özel kodun hangi departmanın onayına düşeceğini tanımlayın</p></div></div>
+        <div class="page-header"><div><h1>Entegrasyon</h1><p>Web servis bağlantısı ve özel kod → departman tanımları</p></div></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div class="card-header"><div><h3>🔗 Web Servis Bağlantısı (BC Havale)</h3><p>Ödemelerin çekildiği ERP servis adresi. IT değiştirirse buradan güncelleyin.</p></div></div>
+          <div class="card-body">
+            <div class="form-group"><label>Servis Adresi (URL)</label>
+              <input id="bc-url-input" placeholder="http://... /havale" style="font-family:'DM Mono',monospace;font-size:12.5px;"></div>
+            <div id="bc-url-sonuc" style="display:none;border-radius:8px;padding:10px 13px;font-size:13px;margin-bottom:10px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <button class="btn btn-secondary btn-sm" id="bc-url-kontrol-btn" onclick="bcUrlKontrolEt()">🔍 Kontrol Et</button>
+              <button class="btn btn-primary btn-sm" id="bc-url-kaydet-btn" onclick="bcUrlKaydet()">💾 Kaydet</button>
+              <span id="bc-url-durum" style="font-size:12px;color:var(--text3);"></span>
+            </div>
+            <p style="font-size:12px;color:var(--text3);margin:10px 0 0;">Not: "Kontrol Et" için Finans bilgisayarında <strong>OTS BC Yardımcısı</strong> açık olmalı. Kontrol, şifre sormadan sadece adrese ulaşılıp ulaşılmadığını sınar (401 dönmesi bile linkin geçerli olduğunu gösterir).</p>
+          </div>
+        </div>
         <div class="card" style="margin-bottom:14px;">
           <div style="display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;">
             <div style="flex:1;min-width:110px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Toplam kod</div><div id="ok-stat-total" style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;">—</div></div>
@@ -1747,7 +1793,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       </div>
       <nav class="sidebar-nav">
         <div class="nav-section">İşlemler</div>
-        <div class="nav-item active" onclick="finansPage('upload',this)"><span class="nav-icon">📤</span>Excel Yükle</div>
+        <div class="nav-item active" onclick="finansPage('upload',this)"><span class="nav-icon">📥</span>Ödeme Al</div>
         <div class="nav-item" onclick="finansPage('batches',this)"><span class="nav-icon">📦</span>Paket Listesi</div>
         <div class="nav-item" onclick="finansPage('tanimlar',this)"><span class="nav-icon">🏷️</span>Ödeme Tanımları</div>
         <div class="nav-item" onclick="finansPage('rapor',this)"><span class="nav-icon">🧾</span>Günlük Rapor</div>
@@ -1794,6 +1840,11 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
           </div>
         </div>
         <div id="acik-paket-card" style="display:none;margin-bottom:14px;"></div>
+        <div class="ws-card" style="margin-bottom:14px;">
+          <div class="ws-card-icon">🔗</div>
+          <div class="ws-card-txt"><h3>Sistemden Çek <span style="font-size:12px;opacity:.85;font-weight:600;">(yakında)</span></h3><p>Bugünün ödemelerini BC (ERP) üzerinden otomatik alın — Excel yüklemeye gerek kalmadan. IT sunucu kurulumundan sonra aktif olacak.</p></div>
+          <button class="ws-btn" onclick="openBcModal()">⬇️ Ödemeleri Getir</button>
+        </div>
         <div class="card" id="manuel-odeme-card" style="margin-bottom:14px;">
           <div class="card-header">
             <div><h3>✍️ Manuel Ödeme Girişi</h3><p>Excel dışı ödemeler — aynı günün paketine eklenir, müdür onayından itibaren süreci izler</p></div>
@@ -1817,6 +1868,37 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
             <p style="font-size:12px;color:var(--text3);margin:10px 0 0;">Tarih otomatik olarak bugündür — sistem günlük çalışır, ileri tarihli ödeme girilemez.</p>
           </div>
         </div>
+        <!-- BC kimlik kutusu -->
+        <div class="modal-overlay" id="bc-modal"><div class="modal">
+          <h3>🔐 BC Girişi</h3>
+          <p class="msub">Ödemeleri çekmek için ERP (Business Central) kullanıcı adı ve şifrenizi girin. Bilgileriniz yalnızca bu çekim için kullanılır, kaydedilmez.</p>
+          <div class="form-group"><label>BC Kullanıcı Adı</label><input id="bc-user" autocomplete="off" placeholder="kullanici.adi"></div>
+          <div class="form-group"><label>BC Şifre</label><input id="bc-pass" type="password" autocomplete="off" placeholder="••••••••"></div>
+          <div id="bc-modal-err" style="display:none;background:var(--danger-bg);border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:10px;"></div>
+          <div class="modal-actions">
+            <button class="btn btn-secondary btn-sm" onclick="closeMod('bc-modal')">İptal</button>
+            <button class="btn btn-primary btn-sm" id="bc-getir-btn" onclick="bcCekBaslat()">⬇️ Getir</button>
+          </div>
+        </div></div>
+        <!-- Animasyonlu aktarım ekranı -->
+        <div class="ws-overlay" id="ws-overlay"><div class="ws-panel">
+          <div class="ws-anim">
+            <div class="ws-line" style="top:22%;animation-delay:0s;"></div>
+            <div class="ws-line" style="top:42%;animation-delay:.35s;"></div>
+            <div class="ws-line" style="top:62%;animation-delay:.7s;"></div>
+            <div class="ws-line" style="top:82%;animation-delay:.2s;"></div>
+            <div class="ws-hub" id="ws-hub">🏦</div>
+          </div>
+          <p class="ws-title" id="ws-title">Ödemeler Getiriliyor</p>
+          <p class="ws-stage" id="ws-stage">Başlatılıyor…</p>
+          <div class="ws-bar"><div class="ws-bar-fill" id="ws-fill"></div></div>
+          <p class="ws-pct" id="ws-pct">%0</p>
+          <div class="ws-steps" id="ws-steps"></div>
+          <div class="ws-err" id="ws-err"></div>
+          <div class="ws-actions" id="ws-actions" style="display:none;">
+            <button class="btn btn-secondary btn-sm" onclick="wsKapat()">Kapat</button>
+          </div>
+        </div></div>
         <div class="card" id="preview-card" style="display:none;">
           <div class="card-header">
             <div><h3 id="preview-title">Önizleme</h3><p id="preview-sub">—</p></div>
@@ -3029,7 +3111,7 @@ function adminPage(page, el) {
   if(page==='dashboard') loadAdminDashboard();
   if(page==='departments') loadDepts();
   if(page==='users') loadUsers();
-  if(page==='entegrasyon') loadOzelKodlar();
+  if(page==='entegrasyon'){ loadOzelKodlar(); loadBcUrlAyar(); }
   if(page==='logs') loadAdminLogs();
   if(page==='settings') loadAdminSettings();
 }
@@ -3924,6 +4006,247 @@ async function manuelOdemeEkle(){
     await loadAcikPaket();
   }catch(e){ showToast('Hata: '+e.message,'error'); }
   finally{ btn.disabled=false; btn.innerHTML='＋ Pakete Ekle'; }
+}
+
+// ══════════════════════════════════════════════
+//  SİSTEMDEN ÇEK — BC (Business Central) havale web service
+//  Tarayıcı bu HTTP+NTLM+iç-ağ servisine DOĞRUDAN erişemez (mixed-content
+//  + CORS + NTLM). Bu yüzden istek, Finans bilgisayarında çalışan küçük
+//  yardımcıya (http://localhost) gider; yardımcı BC'ye kullanıcı adı/şifre
+//  ile bağlanıp bugünün kayıtlarını döndürür. Kullanıcı akışı: buton →
+//  şifre kutusu → animasyonlu ekran → önizleme (Excel ile aynı hat).
+// ══════════════════════════════════════════════
+const BC_HELPER_URL  = 'http://localhost:8787/havale';   // yerel yardımcı — havale çekme
+const BC_KONTROL_URL = 'http://localhost:8787/kontrol';  // yerel yardımcı — bağlantı testi
+const BC_URL_VARSAYILAN = "http://tabbcservice.local.tabgida.com.tr:1925/TABGIDA/ODataV4/Company('Tab%20Gida%20Sanayi%20ve%20Tic.%20A.S.')/havale";
+
+// Aktif BC servis linkini Supabase ayarlar tablosundan getir (yoksa varsayılan)
+async function _bcGetUrl(){
+  try{
+    var r = await db.from('ayarlar').select('deger').eq('anahtar','bc_havale_url').maybeSingle();
+    if(r.data && r.data.deger) return r.data.deger;
+  }catch(e){}
+  return BC_URL_VARSAYILAN;
+}
+
+// Admin Entegrasyon: linki yükle / göster
+async function loadBcUrlAyar(){
+  var inp=document.getElementById('bc-url-input');
+  if(!inp) return;
+  inp.value = await _bcGetUrl();
+  var s=document.getElementById('bc-url-sonuc'); if(s) s.style.display='none';
+  var d=document.getElementById('bc-url-durum'); if(d) d.textContent='';
+}
+
+function _bcUrlSonuc(ok, mesaj){
+  var el=document.getElementById('bc-url-sonuc');
+  if(!el) return;
+  el.style.display='block';
+  el.style.background = ok ? 'var(--success-bg)' : 'var(--danger-bg)';
+  el.style.border = '1px solid '+(ok ? 'var(--success)' : 'var(--danger)');
+  el.style.color = ok ? 'var(--success)' : 'var(--danger)';
+  el.innerHTML = (ok?'✅ ':'⚠️ ')+escHtml(mesaj);
+}
+
+var _bcUrlKontrolOK = false;
+async function bcUrlKontrolEt(){
+  var url=(document.getElementById('bc-url-input').value||'').trim();
+  if(!url){ _bcUrlSonuc(false,'Önce bir servis adresi girin.'); return; }
+  var btn=document.getElementById('bc-url-kontrol-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Kontrol ediliyor...';
+  _bcUrlKontrolOK=false;
+  try{
+    var res=await fetch(BC_KONTROL_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url:url})});
+    var j=await res.json();
+    if(res.ok && j.reachable){
+      _bcUrlKontrolOK=true;
+      _bcUrlSonuc(true, (j.mesaj||'Servise ulaşıldı.')+' Artık "Kaydet" ile bu adresi kalıcı yapabilirsiniz.');
+    } else {
+      _bcUrlSonuc(false, j.mesaj || j.error || 'Servise ulaşılamadı. Adresi kontrol edin.');
+    }
+  }catch(e){
+    _bcUrlSonuc(false, 'Yardımcı programa ulaşılamadı. Finans bilgisayarında "OTS BC Yardımcısı" açık mı? ('+(e&&e.message?e.message:'bağlantı yok')+')');
+  }finally{
+    btn.disabled=false; btn.innerHTML='🔍 Kontrol Et';
+  }
+}
+
+async function bcUrlKaydet(){
+  var url=(document.getElementById('bc-url-input').value||'').trim();
+  if(!url){ _bcUrlSonuc(false,'Boş adres kaydedilemez.'); return; }
+  if(!_bcUrlKontrolOK){
+    if(!confirm('Bu adres henüz "Kontrol Et" ile doğrulanmadı. Yine de kaydedilsin mi?')) return;
+  }
+  var btn=document.getElementById('bc-url-kaydet-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Kaydediliyor...';
+  try{
+    var r=await db.from('ayarlar').upsert({anahtar:'bc_havale_url',deger:url,updated_at:new Date().toISOString()},{onConflict:'anahtar'});
+    if(r.error) throw r.error;
+    await logAction('BC servis linki güncellendi',null,null);
+    var d=document.getElementById('bc-url-durum'); if(d) d.textContent='Kaydedildi ✓';
+    showToast('Servis adresi kaydedildi. Bundan sonra ödemeler bu adresten çekilecek.','success');
+  }catch(e){ _bcUrlSonuc(false,'Kaydedilemedi: '+e.message); }
+  finally{ btn.disabled=false; btn.innerHTML='💾 Kaydet'; }
+}
+
+// BC OData alan adları → bizim alanlarımız. GERÇEK JSON ÖRNEĞİ GELİNCE
+// bu eşleme kesinleşecek; şu an olası adlar deneniyor (ilk bulunan alınır).
+// Gerçek BC OData çıktısından DOĞRULANDI (24 Ağustos 2026, canlı 55 kayıt):
+const BC_ALAN = {
+  ozel_kod:   ['ShortcutDimCode_x005B_8_x005D_'],   // CKS_ kodları (eski Excel "Ozelkod - Kod")
+  cari:       ['Account_Name','AccName'],
+  doc_no:     ['Document_No'],
+  amount:     ['Amount_LCY'],                        // TL karşılığı — asıl tutar
+  tutar_orj:  ['Amount'],                            // döviz cinsinden orijinal
+  doviz:      ['Currency_Code'],                     // "USD_DA" → _parseDoviz "USD" yapar; boş=TL
+  description:['Description'],
+  iban:       ['IBAN_No'],
+  due_date:   ['Posting_Date']                       // Deftere Nakil Tarihi (temiz ISO tarih)
+};
+function _bcVal(row, keys){
+  for(var i=0;i<keys.length;i++){ if(row[keys[i]]!==undefined && row[keys[i]]!==null && row[keys[i]]!=='') return row[keys[i]]; }
+  return '';
+}
+// BC tarihi (ISO ya da /Date()/ ) → YYYY-MM-DD
+function _bcDate(v){
+  if(!v) return null;
+  var s=String(v);
+  var m=s.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return m[1]+'-'+m[2]+'-'+m[3];
+  var d=s.match(/\/Date\((\d+)\)\//);
+  if(d){ var dt=new Date(+d[1]); return dt.toISOString().split('T')[0]; }
+  return null;
+}
+function _bcMapRow(row){
+  var dz=_parseDoviz(_bcVal(row,BC_ALAN.doviz));
+  var tl=parseAmount(_bcVal(row,BC_ALAN.amount));
+  var orjRaw=_bcVal(row,BC_ALAN.tutar_orj);
+  var orj=orjRaw!==''?parseAmount(orjRaw):tl;
+  return {
+    ozel_kod:String(_bcVal(row,BC_ALAN.ozel_kod)||'').trim(),
+    cari:String(_bcVal(row,BC_ALAN.cari)||'').trim(),
+    description:String(_bcVal(row,BC_ALAN.description)||'').trim(),
+    doc_no:String(_bcVal(row,BC_ALAN.doc_no)||'').trim(),
+    iban:String(_bcVal(row,BC_ALAN.iban)||'').trim(),
+    due_date:_bcDate(_bcVal(row,BC_ALAN.due_date)),
+    amount:tl, tutar_orj:orj,
+    doviz:dz.kod, doviz_raw:dz.raw,
+    kur:(dz.kod&&orj)?(tl/orj):null,
+    department_id:null, mukerrer:false, mukerrer_bilgi:null
+  };
+}
+
+const WS_STEPS=[
+  {k:'baglan', t:'Yardımcıya bağlanılıyor'},
+  {k:'kimlik', t:'BC kimliği doğrulanıyor'},
+  {k:'cek',    t:'Veriler çekiliyor'},
+  {k:'suz',    t:'Bugünün kayıtları süzülüyor'},
+  {k:'hazir',  t:'Önizleme hazırlanıyor'}
+];
+function _wsRenderSteps(aktifIdx, hataIdx){
+  document.getElementById('ws-steps').innerHTML=WS_STEPS.map(function(st,i){
+    var cls=i<aktifIdx?'done':(i===aktifIdx?'active':'');
+    var dot=i<aktifIdx?'✓':(i===aktifIdx?'⏳':'○');
+    if(hataIdx===i){cls='';dot='✕';}
+    return '<div class="ws-step '+cls+'"><span class="dot">'+dot+'</span>'+st.t+'</div>';
+  }).join('');
+}
+function _wsSet(pct, stageText, aktifIdx){
+  document.getElementById('ws-fill').style.width=pct+'%';
+  document.getElementById('ws-pct').textContent='%'+Math.round(pct);
+  if(stageText!=null) document.getElementById('ws-stage').textContent=stageText;
+  if(aktifIdx!=null) _wsRenderSteps(aktifIdx);
+}
+function _wsHata(mesaj){
+  var e=document.getElementById('ws-err'); e.textContent=mesaj; e.classList.add('show');
+  document.getElementById('ws-hub').textContent='⚠️';
+  document.getElementById('ws-title').textContent='Aktarım Tamamlanamadı';
+  document.getElementById('ws-stage').textContent='';
+  document.getElementById('ws-actions').style.display='flex';
+}
+function wsKapat(){ document.getElementById('ws-overlay').classList.remove('open'); }
+
+// Sistemden çekme, IT sunucu senkronu (Option-2) devreye girince açılacak.
+// O zamana kadar buton kibarca bilgilendirir; Excel yükleme yedek olarak çalışır.
+var BC_AKTIF = false;
+function openBcModal(){
+  if(!BC_AKTIF){
+    showToast('Sistemden otomatik çekme, IT sunucu kurulumundan sonra aktif olacak. Şimdilik Excel ile yükleyebilirsiniz.','info');
+    return;
+  }
+  if(document.getElementById('bc-modal-err')) document.getElementById('bc-modal-err').style.display='none';
+  var pk=document.getElementById('bc-pass'); if(pk) pk.value='';
+  document.getElementById('bc-modal').classList.add('open');
+  setTimeout(function(){ var u=document.getElementById('bc-user'); if(u) u.focus(); },100);
+}
+
+async function bcCekBaslat(){
+  var user=(document.getElementById('bc-user').value||'').trim();
+  var pass=document.getElementById('bc-pass').value||'';
+  var err=document.getElementById('bc-modal-err');
+  if(!user||!pass){ err.textContent='Kullanıcı adı ve şifre gerekli.'; err.style.display='block'; return; }
+  closeMod('bc-modal');
+  // aktarım ekranını başlat
+  var ov=document.getElementById('ws-overlay');
+  document.getElementById('ws-err').classList.remove('show');
+  document.getElementById('ws-actions').style.display='none';
+  document.getElementById('ws-hub').textContent='🏦';
+  document.getElementById('ws-title').textContent='Ödemeler Getiriliyor';
+  ov.classList.add('open');
+  _wsSet(8,'Yardımcı programa bağlanılıyor…',0);
+  var bugun=todayStr();
+  try{
+    _wsSet(22,'BC kimliğiniz doğrulanıyor…',1);
+    // Yardımcıya istek: bugünün havale kayıtları
+    var res=await fetch(BC_HELPER_URL+'?tarih='+encodeURIComponent(bugun),{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({user:user,pass:pass,tarih:bugun,url:await _bcGetUrl()})
+    });
+    _wsSet(55,'Veriler çekiliyor…',2);
+    if(!res.ok){
+      if(res.status===401){ _wsHata('BC kullanıcı adı veya şifre hatalı. Tekrar deneyin.'); return; }
+      _wsHata('Yardımcı hata döndürdü (kod '+res.status+').'); return;
+    }
+    var json=await res.json();
+    var satirlar=Array.isArray(json)?json:(json.value||json.data||[]);
+    _wsSet(72,'Bugünün kayıtları süzülüyor…',3);
+    // Yardımcı zaten tarihe göre süzüyor; yine de emniyet için burada da süz
+    var bugunSatir=satirlar.filter(function(r){
+      var d=_bcDate(_bcVal(r,BC_ALAN.due_date));
+      return d? d===bugun : true;
+    });
+    var mapped=bugunSatir.map(_bcMapRow).filter(function(r){ return r.cari && r.amount!==0; });
+    _wsSet(88,'Önizleme hazırlanıyor…',4);
+    if(!mapped.length){
+      _wsHata('BC\'de bugüne ('+bugun+') ait uygun ödeme bulunamadı.'); return;
+    }
+    // Excel hattının aynısı: özel kod eşleme + mükerrer + önizleme
+    parsedRows=mapped;
+    await _okLoadDepts();
+    await loadOzelKodMap();
+    unknownDepts=[];
+    var gorulen={};
+    parsedRows.forEach(function(r){
+      var k=_okNorm(r.ozel_kod);
+      r.department_id=ozelKodMap[k]||null;
+      if(!r.department_id&&!gorulen[k]){gorulen[k]=1;unknownDepts.push(r.ozel_kod||'(boş)');}
+    });
+    await _checkMukerrer(parsedRows);
+    buildPreview(parsedRows,[],parsedRows);
+    _wsSet(100,'Tamamlandı!',5);
+    _wsRenderSteps(5);
+    document.getElementById('ws-hub').textContent='✅';
+    document.getElementById('ws-title').textContent=mapped.length+' ödeme getirildi';
+    setTimeout(function(){
+      wsKapat();
+      showToast(mapped.length+' ödeme sistemden çekildi. Aşağıdan kontrol edip pakete ekleyin.','success');
+      var pc=document.getElementById('preview-card'); if(pc&&pc.scrollIntoView) pc.scrollIntoView({behavior:'smooth',block:'start'});
+    },900);
+  }catch(e){
+    // Yardımcı çalışmıyorsa fetch reddedilir
+    _wsHata('Yardımcı programa ulaşılamadı. Finans bilgisayarında "OTS BC Yardımcı" açık mı? (Ayrıntı: '+(e && e.message ? e.message : 'bağlantı yok')+')');
+  }
 }
 
 // ── AÇIK PAKET KARTI ──
