@@ -1283,6 +1283,47 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
   .sidebar-overlay:not(.open){pointer-events:none!important;}
   .bulk-bar:not(.show){pointer-events:none!important;}
 }
+
+    /* Hızlı ret sebepleri — ret'i tek dokunuşa indirir, red nedeni yine kayda geçer */
+    .rej-quick{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 9px;}
+    .rq{font-size:12px;line-height:1.2;padding:7px 11px;border-radius:15px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;min-height:32px;}
+    .rq:hover{border-color:var(--danger);color:var(--danger);}
+    .rq.on{background:var(--danger-bg);border-color:var(--danger);color:var(--danger);font-weight:600;}
+    .rq:focus-visible{outline:2px solid var(--danger);outline-offset:2px;}
+    /* Entegrasyon — özel kod filtreleri */
+    .ok-f{font-size:12px;line-height:1.2;padding:7px 12px;border-radius:15px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);cursor:pointer;font-family:inherit;min-height:32px;}
+    .ok-f:hover{border-color:var(--accent,#3b82f6);color:var(--text);}
+    .ok-f.on{background:var(--success-bg);border-color:var(--success);color:var(--success);font-weight:600;}
+    .ok-dept-sel{width:100%;padding:6px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-family:inherit;font-size:13px;min-height:32px;}
+    .ok-dept-sel.empty{border-color:var(--danger);color:var(--danger);}
+    /* Günlük onay raporu — masaüstü ve mobilde aynı bileşen, gruplar KAPALI gelir */
+    .rapor-blok{margin-bottom:16px;}
+    .rapor-blok-baslik{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);padding:0 2px 8px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+    .rapor-blok-toplam{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--text);}
+    .rapor-grup{border:1px solid var(--border);border-radius:10px;margin-bottom:6px;overflow:hidden;background:var(--surface);}
+    .rapor-grup-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;min-height:48px;-webkit-user-select:none;user-select:none;}
+    .rapor-grup-head:hover{background:var(--surface2);}
+    .rapor-grup-head:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+    .rapor-grup-ad{flex:1;min-width:0;font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;}
+    .rapor-grup-adet{font-size:12px;color:var(--text2);white-space:nowrap;}
+    .rapor-grup-tutar{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;white-space:nowrap;}
+    .rapor-chev{flex:none;font-size:11px;color:var(--text3);transition:transform .18s;}
+    .rapor-chev.open{transform:rotate(180deg);}
+    .rapor-grup-body{display:none;border-top:1px solid var(--border);}
+    .rapor-grup-body.open{display:block;}
+    .rapor-satir{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);}
+    .rapor-satir:last-child{border-bottom:none;}
+    .rapor-satir-ad{flex:1;min-width:0;font-size:13.5px;word-break:break-word;}
+    .rapor-satir-alt{font-size:11.5px;color:var(--text3);margin-top:2px;word-break:break-word;}
+    .rapor-satir-tutar{font-family:'DM Mono',monospace;font-size:13.5px;text-align:right;white-space:nowrap;flex:none;}
+    .rapor-genel{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:14px;border:2px solid var(--success);border-radius:10px;background:var(--success-bg);margin-top:6px;}
+    .rapor-genel b{font-family:'DM Mono',monospace;font-size:18px;}
+    .rapor-doviz{display:inline-block;font-size:10px;border:1px solid var(--border);border-radius:8px;padding:1px 5px;color:var(--text2);margin-left:5px;vertical-align:middle;}
+    @media(max-width:768px){
+      .rapor-grup-adet{display:none;}
+      .rapor-grup-head{padding:12px 11px;min-height:52px;}
+      .rapor-satir{padding:11px;}
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init("Ir9NBf6GStBs3gOnb");</script>
@@ -1434,6 +1475,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         <div class="nav-section" style="margin-top:10px;">Yönetim</div>
         <div class="nav-item" onclick="adminPage('departments',this)"><span class="nav-icon">🏢</span>Departmanlar</div>
         <div class="nav-item" onclick="adminPage('users',this)"><span class="nav-icon">👥</span>Kullanıcılar</div>
+        <div class="nav-item" onclick="adminPage('entegrasyon',this)"><span class="nav-icon">🔗</span>Entegrasyon</div>
         <div class="nav-section" style="margin-top:10px;">Sistem</div>
         <div class="nav-item" onclick="adminPage('logs',this)"><span class="nav-icon">📋</span>Audit Log</div>
         <div class="nav-item" onclick="adminPage('settings',this)"><span class="nav-icon">⚙️</span>Ayarlar</div>
@@ -1533,6 +1575,49 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
             </div>
           </div>
         </div>
+      </div>
+      <!-- ENTEGRASYON — ÖZEL KOD TANIMLARI -->
+      <div class="subpage" id="admin-entegrasyon">
+        <div class="page-header"><div><h1>Entegrasyon</h1><p>Hangi özel kodun hangi departmanın onayına düşeceğini tanımlayın</p></div></div>
+        <div class="card" style="margin-bottom:14px;">
+          <div style="display:flex;flex-wrap:wrap;gap:10px;padding:14px 16px;">
+            <div style="flex:1;min-width:110px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Toplam kod</div><div id="ok-stat-total" style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;">—</div></div>
+            <div style="flex:1;min-width:110px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Atanmış</div><div id="ok-stat-ok" style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--success);">—</div></div>
+            <div style="flex:1;min-width:110px;"><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Atanmamış</div><div id="ok-stat-none" style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:var(--danger);">—</div></div>
+          </div>
+          <div id="ok-unassigned-warn" style="display:none;padding:0 16px 14px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><h3>Özel Kod Tanımları</h3><p id="ok-count">—</p></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <input class="search-input" id="ok-search" placeholder="🔍 Kod veya açıklama ara..." oninput="renderOzelKodlar()">
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('ok-import-file').click()">📥 Excel'den Aktar</button>
+              <input type="file" id="ok-import-file" accept=".xlsx,.xls" style="display:none;" onchange="importOzelKodExcel(this.files[0])">
+              <button class="btn btn-primary btn-sm" onclick="openOzelKodModal()">+ Yeni Kod</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 12px;">
+            <button type="button" class="ok-f on" onclick="okFilter('all',this)">Tümü</button>
+            <button type="button" class="ok-f" onclick="okFilter('cks',this)">CKS_ Ödeme</button>
+            <button type="button" class="ok-f" onclick="okFilter('grs',this)">GRS_ Tahsilat</button>
+            <button type="button" class="ok-f" onclick="okFilter('other',this)">Diğer</button>
+            <button type="button" class="ok-f" onclick="okFilter('none',this)">⚠️ Atanmamış</button>
+          </div>
+          <div id="ok-bulk" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+            <span id="ok-bulk-count" style="font-size:13px;font-weight:600;"></span>
+            <select id="ok-bulk-dept" class="ok-dept-sel" style="max-width:240px;"></select>
+            <button class="btn btn-primary btn-sm" onclick="bulkAssignOzelKod()">Seçilenlere Ata</button>
+            <button class="btn btn-secondary btn-sm" onclick="okClearSel()">Seçimi Temizle</button>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th style="width:34px;"><input type="checkbox" id="ok-all" onchange="okToggleAll(this.checked)"></th><th>KOD</th><th>AÇIKLAMA</th><th style="min-width:200px;">DEPARTMAN</th><th style="width:50px;"></th></tr></thead><tbody id="ok-table"></tbody></table></div>
+        </div>
+        <div class="modal-overlay" id="ok-modal"><div class="modal"><h3 id="ok-modal-title">Yeni Özel Kod</h3>
+          <div class="form-group"><label>Kod <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><input id="ok-f-kod" placeholder="CKS_ORNEKKOD"></div>
+          <div class="form-group"><label>Açıklama</label><input id="ok-f-ad" placeholder="Ödemenin adı"></div>
+          <div class="form-group"><label>Departman</label><select id="ok-f-dept" class="ok-dept-sel"></select></div>
+          <div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('ok-modal')">İptal</button><button class="btn btn-primary btn-sm" id="ok-save-btn" onclick="saveOzelKod()">Kaydet</button></div>
+        </div></div>
       </div>
       <!-- CHART DASHBOARD -->
       <div class="subpage" id="admin-chart" style="display:none;"></div>
@@ -1663,7 +1748,9 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       <nav class="sidebar-nav">
         <div class="nav-section">İşlemler</div>
         <div class="nav-item active" onclick="finansPage('upload',this)"><span class="nav-icon">📤</span>Excel Yükle</div>
-        <div class="nav-item" onclick="finansPage('batches',this)"><span class="nav-icon">📦</span>Batch Listesi</div>
+        <div class="nav-item" onclick="finansPage('batches',this)"><span class="nav-icon">📦</span>Paket Listesi</div>
+        <div class="nav-item" onclick="finansPage('tanimlar',this)"><span class="nav-icon">🏷️</span>Ödeme Tanımları</div>
+        <div class="nav-item" onclick="finansPage('rapor',this)"><span class="nav-icon">🧾</span>Günlük Rapor</div>
         <div class="nav-section" style="margin-top:10px;">Raporlar</div>
         <div class="nav-item" onclick="finansPage('dashboard',this)"><span class="nav-icon">📊</span>Özet Dashboard</div>
         <div class="nav-item" onclick="finansPage('banka',this)"><span class="nav-icon">🏦</span>Banka Talimatı</div>
@@ -1706,6 +1793,30 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
             </div>
           </div>
         </div>
+        <div id="acik-paket-card" style="display:none;margin-bottom:14px;"></div>
+        <div class="card" id="manuel-odeme-card" style="margin-bottom:14px;">
+          <div class="card-header">
+            <div><h3>✍️ Manuel Ödeme Girişi</h3><p>Excel dışı ödemeler — aynı günün paketine eklenir, müdür onayından itibaren süreci izler</p></div>
+            <button class="btn btn-secondary btn-sm" onclick="toggleManuelForm()" id="manuel-toggle-btn">+ Ödeme Ekle</button>
+          </div>
+          <div class="card-body" id="manuel-form" style="display:none;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+              <div class="form-group"><label>Ödeme Başlığı <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><select id="mo-baslik" class="ok-dept-sel"></select></div>
+              <div class="form-group"><label>Firma Ünvanı <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><input id="mo-cari" placeholder="Alacaklı firma adı"></div>
+              <div class="form-group"><label>IBAN</label><input id="mo-iban" placeholder="TR..."></div>
+              <div class="form-group"><label>Tutar <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><input id="mo-tutar" inputmode="decimal" placeholder="0,00" oninput="_moOnizleme()"></div>
+              <div class="form-group"><label>Para Birimi</label><select id="mo-doviz" class="ok-dept-sel" onchange="_moDovizDegisti()"><option value="">TL</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="CHF">CHF</option></select></div>
+              <div class="form-group" id="mo-kur-wrap" style="display:none;"><label>Kur <span style="color:var(--danger);font-size:11px;">* döviz için zorunlu</span></label><input id="mo-kur" inputmode="decimal" placeholder="örn: 47,00" oninput="_moOnizleme()"></div>
+              <div class="form-group" style="grid-column:1/-1;"><label>Açıklama</label><input id="mo-aciklama" placeholder="Onaycının göreceği açıklama"></div>
+            </div>
+            <div id="mo-tl-onizleme" style="display:none;font-size:13px;color:var(--text2);margin-bottom:10px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="toggleManuelForm()">İptal</button>
+              <button class="btn btn-success btn-sm" id="mo-ekle-btn" onclick="manuelOdemeEkle()">＋ Pakete Ekle</button>
+            </div>
+            <p style="font-size:12px;color:var(--text3);margin:10px 0 0;">Tarih otomatik olarak bugündür — sistem günlük çalışır, ileri tarihli ödeme girilemez.</p>
+          </div>
+        </div>
         <div class="card" id="preview-card" style="display:none;">
           <div class="card-header">
             <div><h3 id="preview-title">Önizleme</h3><p id="preview-sub">—</p></div>
@@ -1736,6 +1847,38 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         </div>
       </div>
       <!-- BANKA TALİMATI -->
+      <!-- GÜNLÜK ONAY RAPORU -->
+      <div class="subpage" id="finans-rapor">
+        <div class="page-header"><div><h1>Günlük Onay Raporu</h1><p>Onaycılara giden özet — Grup İçi / Grup Dışı kırılımıyla</p></div></div>
+        <div class="card">
+          <div class="card-header">
+            <div><h3 id="gr-baslik">—</h3><p id="gr-alt">—</p></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <input type="date" id="gr-tarih" class="ok-dept-sel" style="max-width:170px;" onchange="loadGunlukRapor()">
+              <button class="btn btn-secondary btn-sm" onclick="raporExcelIndir()">📊 Excel</button>
+              <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Yazdır / PDF</button>
+            </div>
+          </div>
+          <div class="card-body" id="gr-govde"><div class="empty-state"><span class="icon">🧾</span><p>Yükleniyor…</p></div></div>
+        </div>
+      </div>
+      <!-- ÖDEME TANIMLARI -->
+      <div class="subpage" id="finans-tanimlar">
+        <div class="page-header"><div><h1>Ödeme Tanımları</h1><p>Manuel ödemelerde kullanılacak başlıklar — raporda hangi blokta görüneceğini belirler</p></div></div>
+        <div class="card">
+          <div class="card-header">
+            <div><h3>Ödeme Başlıkları</h3><p id="ob-count">—</p></div>
+            <button class="btn btn-primary btn-sm" onclick="openBaslikModal()">+ Yeni Başlık</button>
+          </div>
+          <div class="card-body" id="ob-liste"></div>
+        </div>
+        <div class="modal-overlay" id="ob-modal"><div class="modal"><h3 id="ob-modal-title">Yeni Ödeme Başlığı</h3>
+          <div class="form-group"><label>Ana Başlık <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label>
+            <select id="ob-f-ana" class="ok-dept-sel"><option value="finans">Finans Ödeme</option><option value="grup_ici">Grup İçi</option></select></div>
+          <div class="form-group"><label>Başlık Adı <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><input id="ob-f-ad" placeholder="örn: Teminat Mektubu Masrafları"></div>
+          <div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('ob-modal')">İptal</button><button class="btn btn-primary btn-sm" id="ob-save-btn" onclick="saveBaslik()">Kaydet</button></div>
+        </div></div>
+      </div>
       <div class="subpage" id="finans-banka">
         <div class="page-header">
           <div><h1>Banka Talimatı</h1><p>Onaylanan batch için resmi ödeme talimatı</p></div>
@@ -1950,10 +2093,10 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         <h3>Batch Oluşturulsun mu?</h3><p class="msub">Bilgileri kontrol edin.</p>
         <div id="confirm-details"></div>
         <div style="height:1px;background:var(--border);margin:20px 0;"></div>
-        <div class="form-group"><label>Batch Açıklaması (opsiyonel)</label><input type="text" id="batch-note" placeholder="örn: 10 Nisan Haftalık Ödemeler"></div>
+        <div class="form-group"><label>Paket Açıklaması (opsiyonel)</label><input type="text" id="batch-note" placeholder="örn: 24 Ağustos günlük ödemeler"></div>
         <div class="modal-actions">
           <button class="btn btn-secondary btn-sm" onclick="closeConfirmModal()">İptal</button>
-          <button class="btn btn-success btn-sm" id="confirm-save-btn" onclick="saveBatch()">✅ Kaydet ve Onaya Gönder</button>
+          <button class="btn btn-success btn-sm" id="confirm-save-btn" onclick="saveBatch()">✅ Pakete Ekle</button>
         </div>
       </div>
     </div>
@@ -2092,7 +2235,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
     </div>
     <div class="modal-overlay" id="dept-reject-modal">
       <div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="dept-reject-sub">—</p>
-        <div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="dept-reject-comment" placeholder="Red nedeni..."></textarea></div>
+        <div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><div class="rej-quick"><button type="button" class="rq" onclick="_setRejectReason('dept-reject-comment','Tutar hatalı')">Tutar hatalı</button><button type="button" class="rq" onclick="_setRejectReason('dept-reject-comment','Mükerrer ödeme')">Mükerrer ödeme</button><button type="button" class="rq" onclick="_setRejectReason('dept-reject-comment','Belge eksik')">Belge eksik</button><button type="button" class="rq" onclick="_setRejectReason('dept-reject-comment','Cari/IBAN yanlış')">Cari/IBAN yanlış</button><button type="button" class="rq" onclick="_setRejectReason('dept-reject-comment','Bütçe dışı')">Bütçe dışı</button></div><textarea id="dept-reject-comment" placeholder="Red nedeni... (ya da yukarıdan seç)"></textarea></div>
         <div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dept-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="dept-reject-btn" onclick="confirmDeptReject()">❌ Reddet</button></div>
       </div>
     </div>
@@ -2174,6 +2317,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
           <div class="card-header"><div><h3>Bekleyen Ödemeler</h3><p id="m-pending-sub">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('bekleyen_odemeler')" style="white-space:nowrap;">📊 Excel</button></div><div style="display:flex;gap:8px;"><input class="search-input" placeholder="🔍 Ara..." oninput="filterMudurPending(this.value)"><button class="btn btn-secondary btn-sm" onclick="loadMudurPending()">🔄</button></div></div>
           <div class="dept-tabs" id="m-dept-tabs"></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="m-select-all" onchange="mudurToggleAll(this.checked)"><label for="m-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="m-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
+          <div id="m-rapor-ozet" style="margin-bottom:14px;"></div>
           <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>NAKİL TARİHİ</th><th>DEP. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="m-pending-table"></tbody></table></div>
           <div id="m-pending-mob-cards" style="display:none;padding:4px 0 8px;"></div>
         </div>
@@ -2287,7 +2431,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       </button>
     </nav>
     <div class="modal-overlay" id="m-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="m-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="m-approve-comment" placeholder="Onay notu..."></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="m-approve-btn" onclick="confirmMudurApprove()">✅ Onayla</button></div></div></div>
-    <div class="modal-overlay" id="m-reject-modal"><div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="m-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="m-reject-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="m-reject-btn" onclick="confirmMudurReject()">❌ Reddet</button></div></div></div>
+    <div class="modal-overlay" id="m-reject-modal"><div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="m-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><div class="rej-quick"><button type="button" class="rq" onclick="_setRejectReason('m-reject-comment','Tutar hatalı')">Tutar hatalı</button><button type="button" class="rq" onclick="_setRejectReason('m-reject-comment','Mükerrer ödeme')">Mükerrer ödeme</button><button type="button" class="rq" onclick="_setRejectReason('m-reject-comment','Belge eksik')">Belge eksik</button><button type="button" class="rq" onclick="_setRejectReason('m-reject-comment','Cari/IBAN yanlış')">Cari/IBAN yanlış</button><button type="button" class="rq" onclick="_setRejectReason('m-reject-comment','Bütçe dışı')">Bütçe dışı</button></div><textarea id="m-reject-comment" placeholder="Red nedeni... (ya da yukarıdan seç)"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('m-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="m-reject-btn" onclick="confirmMudurReject()">❌ Reddet</button></div></div></div>
     <div class="bulk-bar" id="m-bulk-bar"><div class="bulk-info"><span id="m-bulk-count">0 seçildi</span><div class="bulk-div"></div><span id="m-bulk-amount" style="font-family:'DM Mono',monospace;color:white;"></span></div><div class="bulk-btns"><button class="bulk-btn ok" onclick="openMudurApproveModal(true)">✅ Toplu Onayla</button><button class="bulk-btn no" onclick="openMudurRejectModal(true)">❌ Toplu Reddet</button><button class="bulk-btn" onclick="clearMudurSelection()">✕</button></div></div>
     <div class="drawer" id="m-drawer"><div class="drawer-head" style="position:relative;"><h3 id="md-cari">—</h3><div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:var(--accent);margin-top:4px;" id="md-amount">—</div><button class="drawer-close" onclick="closeMudurDrawer()">✕</button></div><div class="drawer-body" id="md-body"></div><div class="drawer-foot" id="md-foot"></div></div>
   </div>
@@ -2369,6 +2513,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         <div class="card">
           <div class="card-header"><div><h3>Bekleyenler</h3><p id="dir-pending-sub">—</p><button class="btn btn-secondary btn-sm" onclick="exportCurrentTable('bekleyenler')" style="white-space:nowrap;">📊 Excel</button></div><div style="display:flex;gap:8px;"><select id="dir-dept-filter" onchange="filterDirDept()"><option value="">Tüm Departmanlar</option></select><button class="btn btn-secondary btn-sm" onclick="loadDirPending()">🔄</button></div></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="dir-select-all" onchange="dirToggleAll(this.checked)"><label for="dir-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="dir-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
+          <div id="dir-rapor-ozet" style="margin-bottom:14px;"></div>
           <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>NAKİL TARİHİ</th><th>MÜD. ONAY</th><th>İŞLEM</th></tr></thead><tbody id="dir-pending-table"></tbody></table></div>
           <div id="dir-mob-pending-cards" style="display:none;padding:4px 0 8px;"></div>
         </div>
@@ -2429,7 +2574,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       </button>
     </nav>
     <div class="modal-overlay" id="dir-approve-modal"><div class="modal"><h3>✅ Onaylıyorum</h3><p class="msub" id="dir-approve-sub">—</p><div class="form-group"><label>Açıklama (opsiyonel)</label><textarea id="dir-approve-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-approve-modal')">İptal</button><button class="btn btn-success btn-sm" id="dir-approve-btn" onclick="confirmDirApprove()">✅ Onayla</button></div></div></div>
-    <div class="modal-overlay" id="dir-reject-modal"><div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="dir-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="dir-reject-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="dir-reject-btn" onclick="confirmDirReject()">❌ Reddet</button></div></div></div>
+    <div class="modal-overlay" id="dir-reject-modal"><div class="modal"><h3>❌ Reddediyorum</h3><p class="msub" id="dir-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><div class="rej-quick"><button type="button" class="rq" onclick="_setRejectReason('dir-reject-comment','Tutar hatalı')">Tutar hatalı</button><button type="button" class="rq" onclick="_setRejectReason('dir-reject-comment','Mükerrer ödeme')">Mükerrer ödeme</button><button type="button" class="rq" onclick="_setRejectReason('dir-reject-comment','Belge eksik')">Belge eksik</button><button type="button" class="rq" onclick="_setRejectReason('dir-reject-comment','Cari/IBAN yanlış')">Cari/IBAN yanlış</button><button type="button" class="rq" onclick="_setRejectReason('dir-reject-comment','Bütçe dışı')">Bütçe dışı</button></div><textarea id="dir-reject-comment" placeholder="Red nedeni... (ya da yukarıdan seç)"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('dir-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="dir-reject-btn" onclick="confirmDirReject()">❌ Reddet</button></div></div></div>
     <div class="bulk-bar" id="dir-bulk-bar"><div class="bulk-info"><span id="dir-bulk-count">0 seçildi</span><div class="bulk-div"></div><span id="dir-bulk-amount" style="font-family:'DM Mono',monospace;color:white;"></span></div><div class="bulk-btns"><button class="bulk-btn ok" onclick="openDirApproveModal(true)">✅ Toplu Onayla</button><button class="bulk-btn no" onclick="openDirRejectModal(true)">❌ Toplu Reddet</button><button class="bulk-btn" onclick="clearDirSelection()">✕</button></div></div>
     <div class="drawer" id="dir-drawer"><div class="drawer-head" style="position:relative;background:var(--accent);"><h3 id="dird-cari" style="color:white;">—</h3><div style="font-size:20px;font-weight:700;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.9);margin-top:4px;" id="dird-amount">—</div><button class="drawer-close" style="color:#ffffff80;" onclick="closeDirDrawer()">✕</button></div><div class="drawer-body" id="dird-body"></div><div class="drawer-foot" id="dird-foot"></div></div>
   </div>
@@ -2493,6 +2638,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
         <div class="card">
           <div class="card-header"><div><h3>Bekleyen Ödemeler</h3><p id="gm-pending-sub">—</p></div><select id="gm-dept-filter" onchange="filterGmDept()"><option value="">Tüm Departmanlar</option></select></div>
           <div class="select-all-row"><input type="checkbox" class="cb" id="gm-select-all" onchange="gmToggleAll(this.checked)"><label for="gm-select-all" style="cursor:pointer;">Tümünü Seç</label><span id="gm-selected-count" style="margin-left:8px;color:var(--accent);font-size:11px;"></span></div>
+          <div id="gm-rapor-ozet" style="margin-bottom:14px;"></div>
           <div class="table-wrap"><table><thead><tr><th style="width:40px;"></th><th>CARİ</th><th>DEPARTMAN</th><th>TUTAR</th><th>NAKİL TARİHİ</th><th>ONAY ZİNCİRİ</th><th>İŞLEM</th></tr></thead><tbody id="gm-pending-table"></tbody></table></div>
           <div id="gm-mob-pending-cards" style="display:none;padding:4px 0 8px;"></div>
         </div>
@@ -2581,7 +2727,7 @@ tbody tr:hover td{background:#f8fbff;color:var(--text);}
       </button>
     </nav>
     <div class="modal-overlay" id="gm-approve-modal"><div class="modal"><h3>👑 Final Onay</h3><p class="msub" id="gm-approve-sub">—</p><div class="form-group"><label>GM Notu (opsiyonel)</label><textarea id="gm-approve-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('gm-approve-modal')">İptal</button><button class="btn btn-gold btn-sm" id="gm-approve-btn" onclick="confirmGmApprove()">👑 Final Onay Ver</button></div></div></div>
-    <div class="modal-overlay" id="gm-reject-modal"><div class="modal"><h3>Reddet</h3><p class="msub" id="gm-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><textarea id="gm-reject-comment"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('gm-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="gm-reject-btn" onclick="confirmGmReject()">❌ Reddet</button></div></div></div>
+    <div class="modal-overlay" id="gm-reject-modal"><div class="modal"><h3>Reddet</h3><p class="msub" id="gm-reject-sub">—</p><div class="form-group"><label>Red Nedeni <span style="color:var(--danger);font-size:11px;">* zorunlu</span></label><div class="rej-quick"><button type="button" class="rq" onclick="_setRejectReason('gm-reject-comment','Tutar hatalı')">Tutar hatalı</button><button type="button" class="rq" onclick="_setRejectReason('gm-reject-comment','Mükerrer ödeme')">Mükerrer ödeme</button><button type="button" class="rq" onclick="_setRejectReason('gm-reject-comment','Belge eksik')">Belge eksik</button><button type="button" class="rq" onclick="_setRejectReason('gm-reject-comment','Cari/IBAN yanlış')">Cari/IBAN yanlış</button><button type="button" class="rq" onclick="_setRejectReason('gm-reject-comment','Bütçe dışı')">Bütçe dışı</button></div><textarea id="gm-reject-comment" placeholder="Red nedeni... (ya da yukarıdan seç)"></textarea></div><div class="modal-actions"><button class="btn btn-secondary btn-sm" onclick="closeMod('gm-reject-modal')">İptal</button><button class="btn btn-danger btn-sm" id="gm-reject-btn" onclick="confirmGmReject()">❌ Reddet</button></div></div></div>
     <div class="bulk-bar" id="gm-bulk-bar"><div class="bulk-info"><span id="gm-bulk-count">0 seçildi</span><div class="bulk-div"></div><span id="gm-bulk-amount" style="font-family:'DM Mono',monospace;color:white;"></span></div><div class="bulk-btns"><button class="bulk-btn ok" onclick="openGmApproveModal(true)">✅ Final Onayla</button><button class="bulk-btn no" onclick="openGmRejectModal(true)">❌ Reddet</button><button class="bulk-btn" onclick="clearGmSelection()">✕</button></div></div>
     <div class="drawer" id="gm-drawer"><div class="drawer-head" style="background:var(--accent);position:relative;"><h3 id="gmd-cari" style="color:white;">—</h3><div style="font-size:22px;font-weight:700;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.9);margin-top:6px;" id="gmd-amount">—</div><button class="drawer-close" style="color:rgba(255,255,255,0.8);" onclick="closeGmDrawer()">✕</button></div><div class="drawer-body" id="gmd-body"></div><div class="drawer-foot" id="gmd-foot"></div></div>
   </div>
@@ -2603,6 +2749,8 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let currentUser = null;
 let deptMap = {};
 let parsedRows = [], deptSummary = {}, unknownDepts = [];
+// Özel kod → departman eşlemesi (Journal Batch Name eşlemesinin yerini aldı)
+let ozelKodlar = [], ozelKodMap = {}, okDepts = [], okSel = new Set(), okActiveFilter = 'all';
 
 // ═══════════════════════════════════════════
 // LOGIN & ROUTING
@@ -2698,6 +2846,10 @@ function formatDate(iso) {
 function statusBadge(s) {
   const map = {
     department_pending:['badge-blue','Dep. Bekliyor'],
+    dept_done:['badge-blue','Dep. Onayladı — paket bekliyor'],
+    manager_done:['badge-yellow','Müdür Onayladı — paket bekliyor'],
+    director_done:['badge-yellow','Direktör Onayladı — paket bekliyor'],
+    taslak:['badge-gray','Taslak (gönderilmedi)'],
     manager_pending:['badge-yellow','Müdür Bekliyor'],
     director_pending:['badge-yellow','Direktör Bekliyor'],
     gmy_pending:['badge-yellow','GM Bekliyor'],
@@ -2712,6 +2864,143 @@ function statusBadge(s) {
 async function logAction(action, batchId, paymentId) {
   if (!currentUser) return;
   await db.from('audit_log').insert({user_id:currentUser.id,action,batch_id:batchId||null,payment_id:paymentId||null});
+}
+
+// ══════════════════════════════════════════════
+//  TOPLU ONAY / RET MOTORU
+//  Eski akış her ödeme için sırayla 3 istek atıyordu (approvals + payments
+//  + audit_log). 500 ödeme = 1.500 sıralı istek, yaklaşık 50 dakika.
+//  Bu motor aynı işi ödeme sayısından bağımsız olarak birkaç istekte yapar.
+//  Sıra önemli: önce durum güncellenir (yalnız beklenen aşamadakiler
+//  değişir), sonra SADECE gerçekten değişen ödemeler için onay kaydı
+//  yazılır. Böylece çift onaya sahte onay kaydı düşmez.
+// ══════════════════════════════════════════════
+// Hazır ret sebebi seçimi — seçilen metin yorum alanına yazılır,
+// böylece toplu ret tek dokunuşla verilir ama red nedeni yine kayda geçer.
+function _setRejectReason(targetId, text){
+  var el=document.getElementById(targetId);
+  if(!el) return;
+  el.value=text;
+  var wrap=el.parentElement?el.parentElement.querySelector('.rej-quick'):null;
+  if(wrap){
+    var bs=wrap.querySelectorAll('.rq');
+    for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].textContent===text);
+  }
+}
+// Modal her açıldığında önceki seçim kalmasın
+function _resetRejectQuick(targetId){
+  var el=document.getElementById(targetId);
+  if(!el||!el.parentElement) return;
+  var bs=el.parentElement.querySelectorAll('.rq');
+  for(var i=0;i<bs.length;i++) bs[i].classList.remove('on');
+}
+
+// ══════════════════════════════════════════════
+//  PAKET AŞAMALARI VE ONAY KAPISI
+//  Onay birimi artık tek ödeme değil, günün PAKET'i. Bir onaycı kendi
+//  payına düşeni bitirince ödemeler "…_done" durumunda bekler; paketteki
+//  o aşamaya ait son bekleyen de karara bağlanınca kapı açılır ve
+//  paketin tamamı bir sonraki onaycıya TEK SEFERDE geçer.
+//  Reddedilip tekrar gönderilen ödemelerin paketi yoktur (batch_id null);
+//  onlar kapıya takılmadan tekil ilerler.
+// ══════════════════════════════════════════════
+const PAKET_ASAMA = {
+  departman:       {bekleyen:'department_pending', tamam:'dept_done',     sonraki:'manager_pending'},
+  muhasebe_muduru: {bekleyen:'manager_pending',    tamam:'manager_done',  sonraki:'director_pending'},
+  direktor:        {bekleyen:'director_pending',   tamam:'director_done', sonraki:'gmy_pending'},
+  genel_mudur:     {bekleyen:'gmy_pending',        tamam:'completed',     sonraki:null}
+};
+
+// Paketteki o aşamada bekleyen kalmadıysa bekleyenleri bir sonraki adıma taşır.
+// Dönen değer: ilerleyen ödeme sayısı (0 ise kapı hâlâ kapalı).
+async function _paketKapisi(paketIds, asama){
+  var a = PAKET_ASAMA[asama];
+  if(!a || !a.sonraki) return 0;
+  var ilerleyen = 0;
+  var liste = [...new Set(paketIds||[])].filter(Boolean);
+  for(var i=0;i<liste.length;i++){
+    var pid = liste[i];
+    var k = await db.from('payments').select('id',{count:'exact',head:true})
+      .eq('batch_id',pid).eq('status',a.bekleyen);
+    if(k.error) throw k.error;
+    if((k.count||0) > 0) continue;               // hâlâ bekleyen var → kapı kapalı
+    var u = await db.from('payments').update({status:a.sonraki})
+      .eq('batch_id',pid).eq('status',a.tamam).select('id');
+    if(u.error) throw u.error;
+    ilerleyen += (u.data||[]).length;
+    if((u.data||[]).length){
+      await db.from('batches').update({asama:a.sonraki}).eq('id',pid);
+    }
+  }
+  return ilerleyen;
+}
+
+const BULK_CHUNK = 400;
+async function bulkDecide(o){
+  const ids=[...new Set(o.ids||[])].filter(Boolean);
+  const out={count:0,amount:0,ids:[],rows:[]};
+  if(!ids.length) return out;
+  // 1) Durum güncellemesi — tek sorguda, yalnız beklenen aşamadakiler
+  for(let i=0;i<ids.length;i+=BULK_CHUNK){
+    const r=await db.from('payments').update({status:o.toStatus})
+      .in('id',ids.slice(i,i+BULK_CHUNK)).eq('status',o.fromStatus)
+      .select('id,amount,department_id,batch_id');
+    if(r.error) throw r.error;
+    (r.data||[]).forEach(function(p){ out.rows.push(p); out.ids.push(p.id); out.amount+=Number(p.amount)||0; });
+  }
+  out.count=out.rows.length;
+  if(!out.count) return out;
+  // 2) Onay kayıtları — toplu insert
+  const arows=out.rows.map(function(p){
+    return {payment_id:p.id,stage:o.stage,status:o.decision,user_id:currentUser.id,comment:o.comment||null};
+  });
+  for(let i=0;i<arows.length;i+=BULK_CHUNK){
+    const r=await db.from('approvals').insert(arows.slice(i,i+BULK_CHUNK));
+    if(r.error) throw r.error;
+  }
+  // 3) Pakete bağlı olmayan (tekrar gönderilmiş) ödemeler kapıya takılmaz
+  out.ilerleyen = 0;
+  if(o.tekilSonraki){
+    var tk = out.rows.filter(function(p){ return !p.batch_id; }).map(function(p){ return p.id; });
+    for(var t=0;t<tk.length;t+=BULK_CHUNK){
+      var tr = await db.from('payments').update({status:o.tekilSonraki})
+        .in('id',tk.slice(t,t+BULK_CHUNK)).eq('status',o.toStatus);
+      if(tr.error) throw tr.error;
+    }
+    out.ilerleyen += tk.length;
+  }
+  // 4) Paket kapısı — ret de kapıyı açabilir (son bekleyen reddedilmişse)
+  if(o.gate){
+    out.ilerleyen += await _paketKapisi(out.rows.map(function(p){ return p.batch_id; }), o.gate);
+  }
+  // 5) Tek özet log — ödeme bazlı denetim izi approvals tablosunda duruyor
+  await logAction(o.label+': '+out.count+' ödeme, '+formatMoney(out.amount)+(o.comment?' | '+o.comment:''),null,null);
+  return out;
+}
+
+// ══════════════════════════════════════════════
+//  BİLDİRİM TOPLULAŞTIRMA
+//  Realtime, değişen her satır için ayrı olay gönderiyor. Toplu işlemde
+//  33 ödeme = 33 bildirim + 33 panel yenilemesi demekti ("önce 2, sonra 5,
+//  sonra 33 reddedildi"). Olaylar kısa bir pencerede biriktirilip tek
+//  bildirime ve tek yenilemeye indiriliyor.
+// ══════════════════════════════════════════════
+var _notifBuf={n:0,timer:null,first:0,title:'',body:''};
+function _flushRealtimeNotice(){
+  var n=_notifBuf.n;
+  if(!n) return;
+  _notifBuf.n=0; _notifBuf.timer=null;
+  showLocalNotification(_notifBuf.title, n>1 ? (n+' ödeme — '+_notifBuf.body) : _notifBuf.body);
+  _refreshCurrentPanel();
+  if(typeof _updateAppBadge==='function') _updateAppBadge();
+}
+function _queueRealtimeNotice(title,body){
+  var now=new Date().getTime();
+  if(!_notifBuf.n) _notifBuf.first=now;
+  _notifBuf.n++; _notifBuf.title=title; _notifBuf.body=body;
+  if(_notifBuf.timer) clearTimeout(_notifBuf.timer);
+  // Olay akışı uzarsa süresiz beklemesin: ilk olaydan 6 sn sonra zorla gönder
+  _notifBuf.timer=setTimeout(_flushRealtimeNotice, (now-_notifBuf.first>6000)?0:1500);
 }
 function renderApprovalHistory(approvals) {
   if (!approvals||approvals.length===0) return '<div style="font-size:13px;color:var(--text2);">Henüz onay hareketi yok.</div>';
@@ -2740,6 +3029,7 @@ function adminPage(page, el) {
   if(page==='dashboard') loadAdminDashboard();
   if(page==='departments') loadDepts();
   if(page==='users') loadUsers();
+  if(page==='entegrasyon') loadOzelKodlar();
   if(page==='logs') loadAdminLogs();
   if(page==='settings') loadAdminSettings();
 }
@@ -2928,11 +3218,256 @@ async function loadDeptMap(){
   deptMap={};(data||[]).forEach(d=>{deptMap[d.name.trim().toUpperCase()]=d.id;});
 }
 
+// ══════════════════════════════════════════════
+//  ENTEGRASYON — ÖZEL KOD → DEPARTMAN TANIMLARI
+//  Ödemenin hangi departmanın onayına düşeceği artık Journal Batch Name'den
+//  değil, Excel'deki "Ozelkod - Kod" sütunundan belirleniyor. Tanımsız kod
+//  içeren yükleme tamamen engellenir; kararı admin verir.
+// ══════════════════════════════════════════════
+function _okNorm(k){ return String(k==null?'':k).trim().toUpperCase(); }
+
+// Excel başlıklarını karşılaştırmak için normalleştirir.
+// ÖNEMLİ: yeni aktarım Excel'inde başlıklarda ÇİFT BOŞLUK var
+// ("Ozelkod  - Kod"), bu yüzden tüm boşluk dizileri teke indiriliyor.
+function _normHeader(h){
+  return String(h==null?'':h).replace(/\u00A0/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
+}
+
+// Yükleme sırasında kullanılan hafif eşleme (yalnız aktif + departmanı olanlar)
+async function loadOzelKodMap(){
+  const r = await db.from('ozel_kodlar').select('kod,department_id,aktif');
+  ozelKodMap = {};
+  (r.data||[]).forEach(function(k){
+    if(k.aktif !== false && k.department_id) ozelKodMap[_okNorm(k.kod)] = k.department_id;
+  });
+  return ozelKodMap;
+}
+
+async function _okLoadDepts(){
+  const r = await db.from('departments').select('id,name').order('name');
+  okDepts = r.data || [];
+}
+
+async function loadOzelKodlar(){
+  await _okLoadDepts();
+  const r = await db.from('ozel_kodlar').select('*').order('kod');
+  if(r.error){ showToast('Özel kodlar okunamadı: '+r.error.message,'error'); return; }
+  ozelKodlar = r.data || [];
+  okSel.clear();
+  var bd = document.getElementById('ok-bulk-dept');
+  if(bd) bd.innerHTML = _okDeptOptions('');
+  renderOzelKodlar();
+}
+
+function _okDeptOptions(sel){
+  return '<option value="">— departman seçin —</option>' + okDepts.map(function(d){
+    return '<option value="'+d.id+'"'+(sel===d.id?' selected':'')+'>'+escHtml(d.name)+'</option>';
+  }).join('');
+}
+
+function okFilter(f, el){
+  okActiveFilter = f;
+  var bs = document.querySelectorAll('#admin-entegrasyon .ok-f');
+  for(var i=0;i<bs.length;i++) bs[i].classList.remove('on');
+  if(el) el.classList.add('on');
+  renderOzelKodlar();
+}
+
+function _okPassesFilter(k){
+  var kod = String(k.kod||'');
+  if(okActiveFilter==='cks')   return /^CKS[_-]/i.test(kod);
+  if(okActiveFilter==='grs')   return /^GRS_/i.test(kod);
+  if(okActiveFilter==='none')  return !k.department_id;
+  if(okActiveFilter==='other') return !/^CKS[_-]|^GRS_/i.test(kod);
+  return true;
+}
+
+function renderOzelKodlar(){
+  var qEl = document.getElementById('ok-search');
+  var q = (qEl ? qEl.value : '').trim().toLowerCase();
+  var list = ozelKodlar.filter(function(k){
+    if(!_okPassesFilter(k)) return false;
+    if(!q) return true;
+    return String(k.kod||'').toLowerCase().indexOf(q)>-1 || String(k.ad||'').toLowerCase().indexOf(q)>-1;
+  });
+  var total = ozelKodlar.length;
+  var assigned = ozelKodlar.filter(function(k){ return !!k.department_id; }).length;
+  var missing = total - assigned;
+  var el;
+  if((el=document.getElementById('ok-stat-total'))) el.textContent = total;
+  if((el=document.getElementById('ok-stat-ok')))    el.textContent = assigned;
+  if((el=document.getElementById('ok-stat-none')))  el.textContent = missing;
+  if((el=document.getElementById('ok-count')))      el.textContent = list.length + ' kod gösteriliyor';
+
+  var warn = document.getElementById('ok-unassigned-warn');
+  if(warn){
+    if(missing>0){
+      warn.style.display='block';
+      warn.innerHTML = '<div style="background:#ef444415;border:1px solid #ef444440;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);">⚠️ <strong>'+missing+' kodun departmanı atanmamış.</strong> Bu kodlardan biri ödeme Excel\'inde çıkarsa yükleme engellenir.</div>';
+    } else {
+      warn.style.display='block';
+      warn.innerHTML = '<div style="background:#10b98112;border:1px solid #10b98130;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--success);">✅ Tüm kodların departmanı atanmış.</div>';
+    }
+  }
+
+  var tbody = document.getElementById('ok-table');
+  if(!tbody) return;
+  if(list.length===0){
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><span class="icon">🔗</span><p>Bu filtreye uyan kod yok.</p></div></td></tr>';
+  } else {
+    tbody.innerHTML = list.map(function(k){
+      var kod = String(k.kod||'');
+      var esc = kod.replace(/'/g,"\\'");
+      var checked = okSel.has(kod) ? ' checked' : '';
+      return '<tr>'
+        + '<td><input type="checkbox" class="ok-cb"'+checked+' onchange="okToggleOne(\''+esc+'\',this.checked)"></td>'
+        + '<td style="font-family:\'DM Mono\',monospace;font-size:12.5px;white-space:nowrap;">'+escHtml(kod)+'</td>'
+        + '<td style="font-size:13px;color:var(--text2);">'+escHtml(k.ad||'—')+'</td>'
+        + '<td><select class="ok-dept-sel'+(k.department_id?'':' empty')+'" onchange="setOzelKodDept(\''+esc+'\',this.value)">'+_okDeptOptions(k.department_id)+'</select></td>'
+        + '<td><button class="btn btn-secondary btn-sm" onclick="openOzelKodModal(\''+esc+'\')" title="Düzenle">✏️</button></td>'
+        + '</tr>';
+    }).join('');
+  }
+  _okRefreshBulkBar();
+}
+
+function _okRefreshBulkBar(){
+  var bar = document.getElementById('ok-bulk');
+  var cnt = document.getElementById('ok-bulk-count');
+  if(!bar) return;
+  if(okSel.size>0){ bar.style.display='flex'; if(cnt) cnt.textContent = okSel.size+' kod seçildi'; }
+  else bar.style.display='none';
+}
+function okToggleOne(kod, on){ if(on) okSel.add(kod); else okSel.delete(kod); _okRefreshBulkBar(); }
+function okClearSel(){ okSel.clear(); var a=document.getElementById('ok-all'); if(a) a.checked=false; renderOzelKodlar(); }
+function okToggleAll(on){
+  var qEl=document.getElementById('ok-search');
+  var q=(qEl?qEl.value:'').trim().toLowerCase();
+  ozelKodlar.forEach(function(k){
+    if(!_okPassesFilter(k)) return;
+    if(q && String(k.kod||'').toLowerCase().indexOf(q)===-1 && String(k.ad||'').toLowerCase().indexOf(q)===-1) return;
+    if(on) okSel.add(String(k.kod)); else okSel.delete(String(k.kod));
+  });
+  renderOzelKodlar();
+}
+
+async function setOzelKodDept(kod, deptId){
+  try{
+    var r = await db.from('ozel_kodlar').update({department_id: deptId||null}).eq('kod', kod);
+    if(r.error) throw r.error;
+    var it = ozelKodlar.find(function(k){ return String(k.kod)===String(kod); });
+    if(it) it.department_id = deptId||null;
+    var dn = (okDepts.find(function(d){ return d.id===deptId; })||{}).name || '(kaldırıldı)';
+    await logAction('Özel kod ataması: '+kod+' → '+dn, null, null);
+    renderOzelKodlar();
+    showToast(kod+' → '+dn,'success');
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+}
+
+async function bulkAssignOzelKod(){
+  var sel = document.getElementById('ok-bulk-dept');
+  var deptId = sel ? sel.value : '';
+  if(!deptId){ showToast('Önce departman seçin!','error'); return; }
+  if(okSel.size===0){ showToast('Hiç kod seçilmedi!','error'); return; }
+  var kods = [...okSel];
+  try{
+    for(var i=0;i<kods.length;i+=200){
+      var r = await db.from('ozel_kodlar').update({department_id:deptId}).in('kod', kods.slice(i,i+200));
+      if(r.error) throw r.error;
+    }
+    var dn = (okDepts.find(function(d){ return d.id===deptId; })||{}).name || '';
+    ozelKodlar.forEach(function(k){ if(okSel.has(String(k.kod))) k.department_id = deptId; });
+    await logAction('Toplu özel kod ataması: '+kods.length+' kod → '+dn, null, null);
+    okSel.clear();
+    var a=document.getElementById('ok-all'); if(a) a.checked=false;
+    renderOzelKodlar();
+    showToast(kods.length+' kod '+dn+' departmanına atandı.','success');
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+}
+
+function openOzelKodModal(kod){
+  var it = kod ? ozelKodlar.find(function(k){ return String(k.kod)===String(kod); }) : null;
+  document.getElementById('ok-modal-title').textContent = it ? 'Özel Kodu Düzenle' : 'Yeni Özel Kod';
+  var f = document.getElementById('ok-f-kod');
+  f.value = it ? it.kod : '';
+  f.readOnly = !!it;
+  document.getElementById('ok-f-ad').value = it ? (it.ad||'') : '';
+  document.getElementById('ok-f-dept').innerHTML = _okDeptOptions(it ? it.department_id : '');
+  document.getElementById('ok-modal').classList.add('open');
+}
+
+async function saveOzelKod(){
+  var kod = document.getElementById('ok-f-kod').value.trim();
+  var ad  = document.getElementById('ok-f-ad').value.trim();
+  var dep = document.getElementById('ok-f-dept').value || null;
+  if(!kod){ showToast('Kod zorunludur!','error'); return; }
+  var btn = document.getElementById('ok-save-btn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try{
+    var r = await db.from('ozel_kodlar').upsert({kod:kod, ad:ad||null, department_id:dep, aktif:true},{onConflict:'kod'});
+    if(r.error) throw r.error;
+    await logAction('Özel kod kaydedildi: '+kod, null, null);
+    closeMod('ok-modal');
+    await loadOzelKodlar();
+    showToast('Kaydedildi.','success');
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+  finally{ btn.disabled=false; btn.innerHTML='Kaydet'; }
+}
+
+// Excel'den toplu içe aktarma — "Kod / Ad / Departman Bilgisi" sütunları beklenir.
+// Departman adı yazılmışsa sistemdeki departmanla eşleştirilir; eşleşmeyenler raporlanır.
+function importOzelKodExcel(file){
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = async function(e){
+    try{
+      var wb = XLSX.read(e.target.result,{type:'array'});
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var raw = XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(raw.length<2){ showToast('Dosya boş!','error'); return; }
+      var hdr = raw[0].map(function(h){ return _normHeader(h); });
+      var iKod = hdr.indexOf('kod'), iAd = hdr.indexOf('ad'), iDep = hdr.indexOf('departman bilgisi');
+      if(iDep===-1) iDep = hdr.indexOf('departman');
+      if(iKod===-1){ showToast('“Kod” sütunu bulunamadı!','error'); return; }
+      await _okLoadDepts();
+      var byName = {};
+      okDepts.forEach(function(d){ byName[_okNorm(d.name)] = d.id; });
+      var rows = [], unmatched = [];
+      raw.slice(1).forEach(function(r){
+        var kod = String(r[iKod]||'').trim();
+        if(!kod) return;
+        var depName = iDep>-1 ? String(r[iDep]||'').trim() : '';
+        var depId = depName ? (byName[_okNorm(depName)] || null) : null;
+        if(depName && !depId && unmatched.indexOf(depName)===-1) unmatched.push(depName);
+        var rec = {kod:kod, ad: iAd>-1 ? (String(r[iAd]||'').trim()||null) : null, aktif:true};
+        if(depId) rec.department_id = depId;
+        rows.push(rec);
+      });
+      if(!rows.length){ showToast('Aktarılacak kod bulunamadı!','error'); return; }
+      for(var i=0;i<rows.length;i+=200){
+        var res = await db.from('ozel_kodlar').upsert(rows.slice(i,i+200),{onConflict:'kod'});
+        if(res.error) throw res.error;
+      }
+      await logAction('Özel kod içe aktarma: '+rows.length+' kayıt', null, null);
+      await loadOzelKodlar();
+      showToast(rows.length+' kod aktarıldı.'+(unmatched.length? ' '+unmatched.length+' departman adı eşleşmedi.' : ''),'success');
+      if(unmatched.length){
+        alert('Şu departman adları sistemde bulunamadı, o kodların departmanı boş bırakıldı:\n\n• '+unmatched.join('\n• ')+'\n\nDepartmanları açtıktan sonra tekrar aktarabilir ya da ekrandan tek tek seçebilirsiniz.');
+      }
+    }catch(err){ showToast('Hata: '+err.message,'error'); }
+    finally{ var fi=document.getElementById('ok-import-file'); if(fi) fi.value=''; }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
 function finansPage(page,el){
   document.querySelectorAll('#panel-finans .subpage').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('#panel-finans .nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('finans-'+page).classList.add('active');
   if(el)el.classList.add('active');
+  if(page==='upload'){ _okLoadDepts().then(loadAcikPaket); loadOdemeBasliklari().then(_moDoldurBaslik); }
+  if(page==='tanimlar'){ loadOdemeBasliklari().then(renderOdemeBasliklari); }
+  if(page==='rapor'){ var _t=document.getElementById('gr-tarih'); if(_t&&!_t.value)_t.value=todayStr(); loadGunlukRapor(); }
   if(page==='batches'){loadBatchesFiltered((window.GF_DATES&&GF_DATES['finans'])||todayStr());}
   if(page==='dashboard')loadFinansDashboard();
   if(page==='rejected')loadRejected();
@@ -2952,24 +3487,117 @@ uploadZoneEl.addEventListener('dragover',e=>{e.preventDefault();uploadZoneEl.cla
 uploadZoneEl.addEventListener('dragleave',()=>uploadZoneEl.classList.remove('dragover'));
 uploadZoneEl.addEventListener('drop',e=>{e.preventDefault();uploadZoneEl.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)handleFile(f);});
 
+// ══════════════════════════════════════════════
+//  AKTARIM EXCEL'İ OKUMA (yeni format — "HavaleEFT Kontrol", 54 sütun)
+//  Departman artık Journal Batch Name'den DEĞİL, "Ozelkod - Kod"
+//  sütunundan belirleniyor. Başlıklarda çift boşluk olabildiği için
+//  eşleştirme _normHeader ile boşluk-toleranslı yapılıyor.
+// ══════════════════════════════════════════════
+const XL_COLS=[
+  {key:'ozel_kod',    head:'ozelkod - kod',        zorunlu:true},
+  {key:'cari',        head:'hesap adı',            zorunlu:true},
+  {key:'doc_no',      head:'belge no',             zorunlu:true},
+  {key:'amount',      head:'tutar (lpb)',          zorunlu:true},
+  {key:'tutar_orj',   head:'tutar',                zorunlu:false},
+  {key:'doviz',       head:'döviz cinsi',          zorunlu:false},
+  {key:'description', head:'açıklama',             zorunlu:false},
+  {key:'iban',        head:'iban no',              zorunlu:false},
+  {key:'due_date',    head:'deftere nakil tarihi', zorunlu:false}
+];
+
+// "USD_DA" -> {kod:'USD', raw:'USD_DA'} · boşsa TL kabul edilir
+function _parseDoviz(v){
+  var s=String(v==null?'':v).trim();
+  if(!s) return {kod:'',raw:''};
+  return {kod:s.split(/[_\s\-]/)[0].toUpperCase(), raw:s};
+}
+
 function handleFile(file){
   if(!file)return;
   if(!file.name.match(/\.(xlsx|xls)$/i)){showToast('Lütfen .xlsx veya .xls dosyası seçin!','error');return;}
   const reader=new FileReader();
-  reader.onload=e=>{
-    const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-    if(raw.length<2){showToast('Dosya boş veya hatalı!','error');return;}
-    const headers=raw[0].map(h=>String(h).trim());
-    const rows=raw.slice(1).filter(r=>r.some(c=>c!==''));
-    const colIdx={batchName:headers.indexOf('Journal Batch Name'),date:headers.indexOf('Deftere Nakil Tarihi'),docNo:headers.indexOf('Harici Belge No'),accountName:headers.indexOf('Hesap Adı'),description:headers.indexOf('Açıklama'),iban:headers.indexOf('IBAN No'),currency:headers.indexOf('Döviz Cinsi'),amount:headers.indexOf('Tutar (LPB)')};
-    const missing=Object.entries(colIdx).filter(([k,v])=>v===-1).map(([k])=>k);
-    if(missing.length>0){showToast('Sütun bulunamadı: '+missing.join(', '),'error');return;}
-    parsedRows=rows.map(r=>({journal_batch_name:String(r[colIdx.batchName]||'').trim(),due_date:fmtExcelDate(r[colIdx.date]),doc_no:String(r[colIdx.docNo]||'').trim(),cari:String(r[colIdx.accountName]||'').trim(),description:String(r[colIdx.description]||'').trim(),iban:String(r[colIdx.iban]||'').trim(),currency:String(r[colIdx.currency]||'').trim(),amount:parseAmount(r[colIdx.amount])})).filter(r=>r.cari&&r.amount!==0);
-    buildPreview(parsedRows,headers,rows);
+  reader.onload=async function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(raw.length<2){showToast('Dosya boş veya hatalı!','error');return;}
+      const headers=raw[0].map(function(h){return String(h);});
+      const norm=headers.map(_normHeader);
+      const idx={}, eksik=[];
+      XL_COLS.forEach(function(c){
+        var i=norm.indexOf(c.head);
+        idx[c.key]=i;
+        if(i===-1&&c.zorunlu) eksik.push(c.head);
+      });
+      if(eksik.length){showToast('Excel sütunu bulunamadı: '+eksik.join(' · '),'error');return;}
+
+      const dataRows=raw.slice(1).filter(function(r){return r.some(function(c){return c!=='';});});
+      const val=function(r,k){return idx[k]>-1?r[idx[k]]:'';};
+      parsedRows=dataRows.map(function(r){
+        var dz=_parseDoviz(val(r,'doviz'));
+        var tl=parseAmount(val(r,'amount'));
+        var orj=idx.tutar_orj>-1?parseAmount(val(r,'tutar_orj')):tl;
+        return {
+          ozel_kod:String(val(r,'ozel_kod')||'').trim(),
+          cari:String(val(r,'cari')||'').trim(),
+          description:String(val(r,'description')||'').trim(),
+          doc_no:String(val(r,'doc_no')||'').trim(),
+          iban:String(val(r,'iban')||'').trim(),
+          due_date:fmtExcelDate(val(r,'due_date')),
+          amount:tl,                                   // Tutar (LPB) — asıl tutar, TL
+          tutar_orj:orj,                               // döviz cinsinden orijinal
+          doviz:dz.kod, doviz_raw:dz.raw,
+          kur:(dz.kod&&orj)?(tl/orj):null,
+          department_id:null, mukerrer:false, mukerrer_bilgi:null
+        };
+      }).filter(function(r){return r.cari&&r.amount!==0;});
+
+      if(!parsedRows.length){showToast('Okunabilir ödeme satırı bulunamadı!','error');return;}
+
+      // Özel kod → departman eşlemesi
+      await _okLoadDepts();
+      await loadOzelKodMap();
+      unknownDepts=[];
+      var gorulen={};
+      parsedRows.forEach(function(r){
+        var k=_okNorm(r.ozel_kod);
+        r.department_id=ozelKodMap[k]||null;
+        if(!r.department_id&&!gorulen[k]){gorulen[k]=1;unknownDepts.push(r.ozel_kod||'(boş)');}
+      });
+
+      await _checkMukerrer(parsedRows);
+      buildPreview(parsedRows,headers,dataRows);
+    }catch(err){showToast('Dosya okunamadı: '+err.message,'error');}
   };
   reader.readAsArrayBuffer(file);
+}
+
+// Mükerrer kontrolü — Belge No ile tüm geçmişe karşı. Engellemez, uyarır;
+// kararı Finans verir. Manuel girişlerde belge no olmadığı için yedek
+// anahtar (IBAN+tutar+cari) ile de bakılır.
+async function _checkMukerrer(rows){
+  try{
+    var docs=[...new Set(rows.map(function(r){return r.doc_no;}).filter(Boolean))];
+    var bulunan={};
+    for(var i=0;i<docs.length;i+=200){
+      var r=await db.from('payments').select('doc_no,cari,amount,status,created_at').in('doc_no',docs.slice(i,i+200));
+      if(r.error) throw r.error;
+      (r.data||[]).forEach(function(p){ if(p.doc_no) bulunan[p.doc_no]=p; });
+    }
+    // Belge no'su olmayan kayıtlar için yedek anahtar
+    var ibans=[...new Set(rows.filter(function(r){return !r.doc_no&&r.iban;}).map(function(r){return r.iban;}))];
+    var yedek={};
+    for(var j=0;j<ibans.length;j+=200){
+      var r2=await db.from('payments').select('iban,cari,amount,status,created_at').in('iban',ibans.slice(j,j+200));
+      if(r2.error) throw r2.error;
+      (r2.data||[]).forEach(function(p){ yedek[p.iban+'|'+Number(p.amount).toFixed(2)]=p; });
+    }
+    rows.forEach(function(r){
+      var hit=r.doc_no?bulunan[r.doc_no]:yedek[r.iban+'|'+Number(r.amount).toFixed(2)];
+      r.mukerrer=!!hit; r.mukerrer_bilgi=hit||null;
+    });
+  }catch(e){ console.warn('Mükerrer kontrolü yapılamadı:',e); }
 }
 function fmtExcelDate(val){if(!val)return null;if(val instanceof Date)return val.toISOString().split('T')[0];if(typeof val==='number'){const d=new Date(Math.round((val-25569)*86400*1000));return d.toISOString().split('T')[0];}return String(val).split('T')[0]||null;}
 // Tutar ayrıştırma — sayı hücresi olduğu gibi; metin hücrede Türkçe format (1.234,56) güvenli çözülür
@@ -2983,53 +3611,433 @@ function parseAmount(v){
   return isFinite(n)?n:0;
 }
 function buildPreview(rows,headers,rawRows){
-  deptSummary={};unknownDepts=[];
-  rows.forEach(r=>{const key=r.journal_batch_name.toUpperCase();if(!deptSummary[r.journal_batch_name])deptSummary[r.journal_batch_name]={count:0,amount:0,known:!!deptMap[key]};deptSummary[r.journal_batch_name].count++;deptSummary[r.journal_batch_name].amount+=r.amount;if(!deptMap[key]&&!unknownDepts.includes(r.journal_batch_name))unknownDepts.push(r.journal_batch_name);});
-  document.getElementById('dept-summary-grid').innerHTML=Object.entries(deptSummary).map(([name,info])=>`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;"><div style="font-size:13px;font-weight:600;margin-bottom:4px;">${name||'(Boş)'}</div><div style="font-size:12px;color:var(--text2);margin-bottom:8px;">${info.count} kayıt</div><div style="font-size:18px;font-weight:700;font-family:'DM Mono',monospace;color:${info.known?'#10b981':'#ef4444'};">${formatMoney(info.amount)}</div><div style="font-size:11px;margin-top:4px;color:${info.known?'#10b981':'#ef4444'};">${info.known?'✅ Eşleşti':'⚠️ Eşleşmedi'}</div></div>`).join('');
-  const warn=document.getElementById('unknown-warning');
-  if(unknownDepts.length>0){warn.style.display='block';warn.innerHTML=`<div style="background:#ef444415;border:1px solid #ef444430;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--danger);">⚠️ Eşleşmeyen departmanlar: <strong>${unknownDepts.join(', ')}</strong></div>`;}else warn.style.display='none';
-  const showCols=['Journal Batch Name','Hesap Adı','Tutar (LPB)','Döviz Cinsi','Deftere Nakil Tarihi','Harici Belge No'];
-  const showIdx=showCols.map(c=>headers.indexOf(c)).filter(i=>i>=0);
-  document.getElementById('preview-head').innerHTML=showIdx.map(i=>`<th>${headers[i]}</th>`).join('');
-  document.getElementById('preview-body').innerHTML=rawRows.slice(0,20).map(r=>`<tr>${showIdx.map(i=>`<td>${r[i]??''}</td>`).join('')}</tr>`).join('');
-  document.getElementById('preview-title').textContent=`${rows.length} kayıt hazır`;
-  var _skipped=(rawRows?rawRows.length:rows.length)-rows.length;
-  document.getElementById('preview-sub').textContent=`${Object.keys(deptSummary).length} departman · ${formatMoney(rows.reduce((s,r)=>s+r.amount,0))}`+(_skipped>0?` · ${_skipped} satır atlandı (boş cari / 0 tutar)`:'');
+  deptSummary={};
+  var deptAdi={};
+  okDepts.forEach(function(d){deptAdi[d.id]=d.name;});
+  rows.forEach(function(r){
+    var nm=r.department_id?(deptAdi[r.department_id]||'(departman)'):'⚠️ TANIMSIZ ÖZEL KOD';
+    if(!deptSummary[nm]) deptSummary[nm]={count:0,amount:0,known:!!r.department_id};
+    deptSummary[nm].count++; deptSummary[nm].amount+=r.amount;
+  });
+  var _dovizN=rows.filter(function(r){return !!r.doviz;}).length;
+  var _mukN=rows.filter(function(r){return r.mukerrer;}).length;
+  var _toplam=rows.reduce(function(a,r){return a+r.amount;},0);
+  var _atlanan=(rawRows?rawRows.length:rows.length)-rows.length;
+
+  document.getElementById('dept-summary-grid').innerHTML=Object.entries(deptSummary).map(function(en){
+    var name=en[0],info=en[1];
+    return '<div style="background:var(--surface2);border:1px solid '+(info.known?'var(--border)':'#ef444455')+';border-radius:10px;padding:14px;">'
+      +'<div style="font-size:13px;font-weight:600;margin-bottom:4px;">'+escHtml(name)+'</div>'
+      +'<div style="font-size:12px;color:var(--text2);margin-bottom:8px;">'+info.count+' kayıt</div>'
+      +'<div style="font-size:18px;font-weight:700;font-family:\'DM Mono\',monospace;color:'+(info.known?'#10b981':'#ef4444')+';">'+formatMoney(info.amount)+'</div>'
+      +'<div style="font-size:11px;margin-top:4px;color:'+(info.known?'#10b981':'#ef4444')+';">'+(info.known?'✅ Departmana atandı':'🚫 Tanımsız kod')+'</div></div>';
+  }).join('');
+
+  var warn=document.getElementById('unknown-warning');
+  var uyari='';
+  if(unknownDepts.length>0){
+    uyari+='<div style="background:#ef444415;border:1px solid #ef444440;border-radius:8px;padding:12px 14px;font-size:13px;color:var(--danger);margin-bottom:8px;">'
+      +'<strong>🚫 '+unknownDepts.length+' özel kodun departmanı tanımlı değil — bu yükleme gönderilemez.</strong><br>'
+      +'<span style="font-family:\'DM Mono\',monospace;font-size:12px;">'+escHtml(unknownDepts.join(' · '))+'</span><br>'
+      +'<span style="color:var(--text2);">Admin → Entegrasyon ekranından bu kodların departmanını tanımlayın, sonra Excel\'i tekrar yükleyin.</span></div>';
+  }
+  if(_mukN>0){
+    uyari+='<div style="background:#f59e0b18;border:1px solid #f59e0b45;border-radius:8px;padding:12px 14px;font-size:13px;color:var(--warning);margin-bottom:8px;">'
+      +'<strong>⚠️ '+_mukN+' ödeme daha önce sisteme girilmiş görünüyor.</strong><br>'
+      +'<span style="color:var(--text2);">Kayıtlar yine eklenecek, karar sizde. Aşağıdaki listede “mükerrer” işaretiyle görebilirsiniz.</span></div>';
+  }
+  if(_dovizN>0){
+    uyari+='<div style="background:#3b82f618;border:1px solid #3b82f645;border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);margin-bottom:8px;">'
+      +'💱 <strong>'+_dovizN+' ödeme döviz cinsinden.</strong> <span style="color:var(--text2);">Toplamlar TL karşılığı (Tutar LPB) üzerinden hesaplanır; banka talimatına orijinal döviz tutarı yazılır.</span></div>';
+  }
+  if(uyari){warn.style.display='block';warn.innerHTML=uyari;}else warn.style.display='none';
+
+  document.getElementById('preview-head').innerHTML='<th>ÖZEL KOD</th><th>CARİ</th><th>AÇIKLAMA</th><th>BELGE NO</th><th style="text-align:right;">TUTAR</th>';
+  document.getElementById('preview-body').innerHTML=rows.slice(0,25).map(function(r){
+    var dv=r.doviz?'<div style="font-size:11px;color:var(--text3);font-family:\'DM Mono\',monospace;">'+formatMoney(r.tutar_orj)+' '+escHtml(r.doviz)+(r.kur?' · kur '+r.kur.toFixed(4):'')+'</div>':'';
+    var mk=r.mukerrer?' <span style="font-size:10px;color:#f59e0b;border:1px solid #f59e0b66;border-radius:8px;padding:1px 6px;">mükerrer</span>':'';
+    var tanimsiz=!r.department_id?' <span style="font-size:10px;color:#ef4444;border:1px solid #ef444466;border-radius:8px;padding:1px 6px;">tanımsız</span>':'';
+    return '<tr><td style="font-family:\'DM Mono\',monospace;font-size:12px;">'+escHtml(r.ozel_kod)+tanimsiz+'</td>'
+      +'<td>'+escHtml(r.cari)+mk+'</td>'
+      +'<td style="font-size:12.5px;color:var(--text2);">'+escHtml(r.description||'—')+'</td>'
+      +'<td style="font-family:\'DM Mono\',monospace;font-size:12px;">'+escHtml(r.doc_no||'—')+'</td>'
+      +'<td style="text-align:right;font-family:\'DM Mono\',monospace;">'+formatMoney(r.amount)+dv+'</td></tr>';
+  }).join('');
+  document.getElementById('preview-title').textContent=rows.length+' kayıt hazır';
+  document.getElementById('preview-sub').textContent=Object.keys(deptSummary).length+' departman · '+formatMoney(_toplam)
+    +(_atlanan>0?' · '+_atlanan+' satır atlandı (boş cari / 0 tutar)':'');
   document.getElementById('preview-card').style.display='block';
-  showToast(`${rows.length} kayıt okundu!`,'success');
+  showToast(rows.length+' kayıt okundu!','success');
 }
-function resetUpload(){parsedRows=[];deptSummary={};document.getElementById('preview-card').style.display='none';document.getElementById('file-input').value='';}
+function resetUpload(){parsedRows=[];deptSummary={};unknownDepts=[];var w=document.getElementById('unknown-warning');if(w)w.style.display='none';document.getElementById('preview-card').style.display='none';document.getElementById('file-input').value='';}
 
 function openConfirmModal(){
   if(parsedRows.length===0){showToast('Önce dosya yükleyin!','error');return;}
+  // KATİ KURAL: departmanı belirlenemeyen ödeme sisteme giremez.
+  // Kısmi kayıt yapılmaz; aksi halde o ödemeler sessizce kaybolur.
+  if(unknownDepts&&unknownDepts.length>0){
+    showToast(unknownDepts.length+' özel kod tanımsız — önce Admin → Entegrasyon ekranından tanımlayın.','error');
+    var _w=document.getElementById('unknown-warning');
+    if(_w&&_w.scrollIntoView) _w.scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
   const total=parsedRows.reduce((s,r)=>s+r.amount,0);
-  const _unmatchedWarn=(typeof unknownDepts!=='undefined'&&unknownDepts&&unknownDepts.length>0)?`<div style="background:#ef444418;border:1px solid #ef444440;border-radius:8px;padding:10px 14px;font-size:13px;color:#ef4444;margin-bottom:12px;font-weight:600;">⚠️ ${unknownDepts.length} departman eşleşmedi (${escHtml(unknownDepts.join(', '))}). Bu kayıtlar hiçbir departmana atanmayacak ve onay sürecine düşmeyecek — devam etmeden önce departman adlarını kontrol edin.</div>`:'';
+  const _mukN=parsedRows.filter(function(r){return r.mukerrer;}).length;
+  const _unmatchedWarn=_mukN>0?`<div style="background:#f59e0b18;border:1px solid #f59e0b45;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--warning);margin-bottom:12px;font-weight:600;">⚠️ ${_mukN} ödeme daha önce sisteme girilmiş görünüyor. Yine de eklenecekler.</div>`:'';
   document.getElementById('confirm-details').innerHTML=_unmatchedWarn+`<div style="background:#10b98112;border:1px solid #10b98130;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--success);margin-bottom:12px;">✅ Toplam <strong>${parsedRows.length}</strong> kayıt · <strong>${formatMoney(total)}</strong></div>`+Object.entries(deptSummary).map(([name,info])=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;"><span>${name} <span style="font-size:11px;color:var(--text2);">(${info.count})</span></span><span style="font-family:'DM Mono',monospace;color:${info.known?'#e2e8f0':'#ef4444'};">${formatMoney(info.amount)}</span></div>`).join('');
   document.getElementById('confirm-modal').classList.add('open');
 }
 function closeConfirmModal(){document.getElementById('confirm-modal').classList.remove('open');}
+
+// ══════════════════════════════════════════════
+//  PAKETE EKLEME
+//  Yükleme artık ödemeleri doğrudan onaya göndermez. Ödemeler günün AÇIK
+//  (taslak) paketine eklenir; açık paket yoksa yenisi açılır. Finans ikinci
+//  bir Excel yükleyebilir veya manuel ödeme girebilir; hepsi aynı paketin
+//  içine düşer. Süreç ancak "Onaya Gönder" ile başlar.
+// ══════════════════════════════════════════════
+
+// Bugünün açık (taslak) paketini getirir; yoksa oluşturur.
+async function acikPaketiGetirVeyaAc(){
+  var bugun = todayStr();
+  var r = await db.from('batches').select('*').eq('upload_date',bugun).eq('status','taslak')
+    .order('created_at',{ascending:false}).limit(1);
+  if(r.error) throw r.error;
+  if(r.data && r.data.length) return r.data[0];
+  var c = await db.from('batches').select('id',{count:'exact',head:true}).eq('upload_date',bugun);
+  if(c.error) throw c.error;
+  var sira = (c.count||0) + 1;
+  var y = await db.from('batches').insert({
+    upload_date:bugun, created_by:currentUser.id, total_amount:0,
+    status:'taslak', sira:sira, description:null
+  }).select().single();
+  if(y.error) throw y.error;
+  await logAction('Paket açıldı: '+paketAdi(y.data),y.data.id,null);
+  return y.data;
+}
+
+function paketAdi(p){
+  if(!p) return '—';
+  var d = p.upload_date ? formatDate(p.upload_date) : '';
+  return d + ' · Paket ' + (p.sira||1);
+}
 
 async function saveBatch(){
   const btn=document.getElementById('confirm-save-btn');
   btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Kaydediliyor...';
   try{
     const note=document.getElementById('batch-note').value.trim();
-    const total=parsedRows.reduce((s,r)=>s+r.amount,0);
-    const{data:batch,error:bErr}=await db.from('batches').insert({upload_date:new Date().toISOString().split('T')[0],created_by:currentUser.id,total_amount:total,status:'department_pending',description:note||null}).select().single();
-    if(bErr)throw bErr;
-    const payments=parsedRows.map(r=>{const key=r.journal_batch_name.toUpperCase();return{batch_id:batch.id,cari:r.cari,amount:r.amount,department_id:deptMap[key]||null,due_date:r.due_date,status:'department_pending',doc_no:r.doc_no,description:r.description,iban:r.iban,currency:r.currency,journal_batch_name:r.journal_batch_name};});
+    const total=parsedRows.reduce(function(a,r){return a+r.amount;},0);
+    const paket=await acikPaketiGetirVeyaAc();
+    const payments=parsedRows.map(function(r){return{
+      batch_id:paket.id, cari:r.cari, amount:r.amount, department_id:r.department_id,
+      due_date:r.due_date, status:'taslak', doc_no:r.doc_no,
+      description:r.description, iban:r.iban,
+      currency:r.doviz||'', ozel_kod:r.ozel_kod, tutar_orj:r.tutar_orj,
+      doviz_kur:r.kur, mukerrer:!!r.mukerrer, kaynak:'excel'
+    };});
     for(let i=0;i<payments.length;i+=100){const{error:pErr}=await db.from('payments').insert(payments.slice(i,i+100));if(pErr)throw pErr;}
-    await logAction(`Batch oluşturuldu: ${parsedRows.length} kayıt, ${formatMoney(total)}`,batch.id,null);
-    // Departmanlara bildirim gönder
-    notifyDeptUpload(payments, total);
+    await db.from('batches').update({
+      total_amount:(Number(paket.total_amount)||0)+total,
+      description: note || paket.description || null
+    }).eq('id',paket.id);
+    await logAction(paketAdi(paket)+' — Excel eklendi: '+parsedRows.length+' kayıt, '+formatMoney(total),paket.id,null);
     closeConfirmModal();resetUpload();
-    showToast(`Batch oluşturuldu! ${parsedRows.length} kayıt kaydedildi.`,'success');
-    finansPage('batches',document.querySelectorAll('#panel-finans .nav-item')[1]);
-    // Mobil nav güncelle
-    var _batchBtn=document.querySelector('#finans-mob-nav .mob-nav-item[onclick*="batches"]');
-    if(_batchBtn)finansMobNav('batches',_batchBtn);
+    showToast(parsedRows.length+' ödeme pakete eklendi. Onaya göndermek için "Onaya Gönder"e basın.','success');
+    await loadAcikPaket();
   }catch(err){showToast('Hata: '+err.message,'error');}
-  finally{btn.disabled=false;btn.innerHTML='✅ Kaydet ve Onaya Gönder';}
+  finally{btn.disabled=false;btn.innerHTML='✅ Pakete Ekle';}
+}
+
+// ══════════════════════════════════════════════
+//  ÖDEME BAŞLIKLARI (Finans manuel girişleri için)
+//  İki ana başlık: "Finans Ödeme" ve "Grup İçi". Alt başlıkları Finans
+//  kendisi açar — bugün olmayan senaryolar yarın eklenebilsin diye
+//  tamamen modüler. Seçilen başlık, ödemenin günlük raporda hangi blokta
+//  toplanacağını belirler. (Excel'den gelen her ödeme ise Grup Dışı'dır.)
+// ══════════════════════════════════════════════
+let odemeBasliklari=[];
+const ANA_BASLIK_ADI={finans:'Finans Ödeme', grup_ici:'Grup İçi'};
+
+async function loadOdemeBasliklari(){
+  var r=await db.from('odeme_basliklari').select('*').order('ana_baslik').order('sira').order('ad');
+  if(r.error){ console.warn('Ödeme başlıkları okunamadı:',r.error); odemeBasliklari=[]; return odemeBasliklari; }
+  odemeBasliklari=r.data||[];
+  return odemeBasliklari;
+}
+
+function _baslikOptions(sel){
+  var g={finans:[],grup_ici:[]};
+  odemeBasliklari.forEach(function(b){ if(b.aktif!==false && g[b.ana_baslik]) g[b.ana_baslik].push(b); });
+  var h='<option value="">— başlık seçin —</option>';
+  ['finans','grup_ici'].forEach(function(k){
+    if(!g[k].length) return;
+    h+='<optgroup label="'+ANA_BASLIK_ADI[k]+'">'
+      +g[k].map(function(b){ return '<option value="'+b.id+'"'+(sel===b.id?' selected':'')+'>'+escHtml(b.ad)+'</option>'; }).join('')
+      +'</optgroup>';
+  });
+  return h;
+}
+
+function renderOdemeBasliklari(){
+  var wrap=document.getElementById('ob-liste');
+  if(!wrap) return;
+  var cnt=document.getElementById('ob-count');
+  if(cnt) cnt.textContent=odemeBasliklari.length+' başlık';
+  var h='';
+  ['finans','grup_ici'].forEach(function(k){
+    var list=odemeBasliklari.filter(function(b){ return b.ana_baslik===k; });
+    h+='<div style="margin-bottom:18px;">'
+      +'<div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">'+ANA_BASLIK_ADI[k]+'</div>';
+    if(!list.length){
+      h+='<div style="font-size:13px;color:var(--text3);padding:8px 0;">Henüz başlık eklenmedi.</div>';
+    } else {
+      h+=list.map(function(b){
+        var pasif=b.aktif===false;
+        return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:var(--surface2);'+(pasif?'opacity:.55;':'')+'">'
+          +'<span style="flex:1;font-size:14px;">'+escHtml(b.ad)+(pasif?' <span style="font-size:11px;color:var(--text3);">(pasif)</span>':'')+'</span>'
+          +'<button class="btn btn-secondary btn-sm" onclick="openBaslikModal(\''+b.id+'\')">✏️</button>'
+          +'<button class="btn btn-secondary btn-sm" onclick="toggleBaslikAktif(\''+b.id+'\','+(pasif?'true':'false')+')">'+(pasif?'Aktifleştir':'Pasifleştir')+'</button>'
+          +'<button class="btn btn-danger btn-sm" onclick="deleteBaslik(\''+b.id+'\')">🗑</button>'
+          +'</div>';
+      }).join('');
+    }
+    h+='</div>';
+  });
+  wrap.innerHTML=h;
+}
+
+function openBaslikModal(id){
+  var it=id?odemeBasliklari.find(function(b){return b.id===id;}):null;
+  document.getElementById('ob-modal-title').textContent=it?'Başlığı Düzenle':'Yeni Ödeme Başlığı';
+  document.getElementById('ob-f-ana').value=it?it.ana_baslik:'finans';
+  document.getElementById('ob-f-ad').value=it?it.ad:'';
+  document.getElementById('ob-modal').dataset.editId=it?it.id:'';
+  document.getElementById('ob-modal').classList.add('open');
+}
+
+async function saveBaslik(){
+  var ana=document.getElementById('ob-f-ana').value;
+  var ad=document.getElementById('ob-f-ad').value.trim();
+  var id=document.getElementById('ob-modal').dataset.editId||'';
+  if(!ad){ showToast('Başlık adı zorunludur!','error'); return; }
+  var btn=document.getElementById('ob-save-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+  try{
+    var r = id
+      ? await db.from('odeme_basliklari').update({ana_baslik:ana,ad:ad}).eq('id',id)
+      : await db.from('odeme_basliklari').insert({ana_baslik:ana,ad:ad,aktif:true,sira:0});
+    if(r.error) throw r.error;
+    await logAction('Ödeme başlığı '+(id?'güncellendi':'eklendi')+': '+ANA_BASLIK_ADI[ana]+' / '+ad,null,null);
+    closeMod('ob-modal');
+    await loadOdemeBasliklari(); renderOdemeBasliklari(); _moDoldurBaslik();
+    showToast('Kaydedildi.','success');
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+  finally{ btn.disabled=false; btn.innerHTML='Kaydet'; }
+}
+
+async function toggleBaslikAktif(id, yap){
+  try{
+    var r=await db.from('odeme_basliklari').update({aktif:yap}).eq('id',id);
+    if(r.error) throw r.error;
+    await loadOdemeBasliklari(); renderOdemeBasliklari(); _moDoldurBaslik();
+    showToast(yap?'Aktifleştirildi.':'Pasifleştirildi.','success');
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+}
+
+async function deleteBaslik(id){
+  var it=odemeBasliklari.find(function(b){return b.id===id;});
+  if(!it) return;
+  var k=await db.from('payments').select('id',{count:'exact',head:true}).eq('kategori_id',id);
+  if(!k.error && (k.count||0)>0){
+    showToast('Bu başlıkla '+k.count+' ödeme var — silinemez. Pasifleştirebilirsiniz.','error');
+    return;
+  }
+  if(!confirm('"'+it.ad+'" başlığı silinecek. Devam edilsin mi?')) return;
+  try{
+    var r=await db.from('odeme_basliklari').delete().eq('id',id);
+    if(r.error) throw r.error;
+    await logAction('Ödeme başlığı silindi: '+it.ad,null,null);
+    await loadOdemeBasliklari(); renderOdemeBasliklari(); _moDoldurBaslik();
+    showToast('Silindi.','success');
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+}
+
+// ── MANUEL ÖDEME GİRİŞİ ──
+function _moDoldurBaslik(){
+  var el=document.getElementById('mo-baslik');
+  if(el) el.innerHTML=_baslikOptions(el.value||'');
+}
+function toggleManuelForm(){
+  var f=document.getElementById('manuel-form'), b=document.getElementById('manuel-toggle-btn');
+  if(!f) return;
+  var ac=f.style.display==='none';
+  f.style.display=ac?'block':'none';
+  if(b) b.textContent=ac?'✕ Kapat':'+ Ödeme Ekle';
+  if(ac) _moDoldurBaslik();
+}
+function _moDovizDegisti(){
+  var d=document.getElementById('mo-doviz').value;
+  document.getElementById('mo-kur-wrap').style.display=d?'block':'none';
+  _moOnizleme();
+}
+function _moOnizleme(){
+  var d=document.getElementById('mo-doviz').value;
+  var t=parseAmount(document.getElementById('mo-tutar').value);
+  var k=parseAmount(document.getElementById('mo-kur').value);
+  var el=document.getElementById('mo-tl-onizleme');
+  if(!el) return;
+  if(d && t && k){ el.style.display='block'; el.innerHTML='💱 <strong>'+formatMoney(t)+' '+d+'</strong> × kur '+k+' = <strong>'+formatMoney(t*k)+'</strong> (TL karşılığı, toplamlara bu girer)'; }
+  else el.style.display='none';
+}
+
+async function manuelOdemeEkle(){
+  var bid=document.getElementById('mo-baslik').value;
+  var cari=document.getElementById('mo-cari').value.trim();
+  var iban=document.getElementById('mo-iban').value.trim().replace(/\s+/g,'');
+  var tutar=parseAmount(document.getElementById('mo-tutar').value);
+  var doviz=document.getElementById('mo-doviz').value;
+  var kur=parseAmount(document.getElementById('mo-kur').value);
+  var aciklama=document.getElementById('mo-aciklama').value.trim();
+  if(!bid){ showToast('Ödeme başlığı seçin!','error'); return; }
+  if(!cari){ showToast('Firma ünvanı zorunludur!','error'); return; }
+  if(!tutar || tutar<=0){ showToast('Geçerli bir tutar girin!','error'); return; }
+  if(doviz && (!kur || kur<=0)){ showToast('Döviz ödemesinde kur zorunludur!','error'); return; }
+  var tl = doviz ? (tutar*kur) : tutar;
+  var btn=document.getElementById('mo-ekle-btn');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>';
+  try{
+    var paket=await acikPaketiGetirVeyaAc();
+    var r=await db.from('payments').insert({
+      batch_id:paket.id, cari:cari, amount:tl, department_id:null,
+      due_date:todayStr(), status:'taslak', doc_no:'', description:aciklama||null,
+      iban:iban||null, currency:doviz||'', ozel_kod:null,
+      tutar_orj:doviz?tutar:tl, doviz_kur:doviz?kur:null,
+      mukerrer:false, kaynak:'manuel', kategori_id:bid
+    });
+    if(r.error) throw r.error;
+    await db.from('batches').update({total_amount:(Number(paket.total_amount)||0)+tl}).eq('id',paket.id);
+    await logAction(paketAdi(paket)+' — manuel ödeme: '+cari+' '+formatMoney(tl),paket.id,null);
+    ['mo-cari','mo-iban','mo-tutar','mo-kur','mo-aciklama'].forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
+    _moOnizleme();
+    showToast('Ödeme pakete eklendi.','success');
+    await loadAcikPaket();
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+  finally{ btn.disabled=false; btn.innerHTML='＋ Pakete Ekle'; }
+}
+
+// ── AÇIK PAKET KARTI ──
+let acikPaket=null, acikPaketOdemeler=[];
+
+async function loadAcikPaket(){
+  var kart=document.getElementById('acik-paket-card');
+  if(!kart) return;
+  try{
+    var bugun=todayStr();
+    var r=await db.from('batches').select('*').eq('upload_date',bugun).eq('status','taslak')
+      .order('created_at',{ascending:false}).limit(1);
+    if(r.error) throw r.error;
+    acikPaket=(r.data&&r.data.length)?r.data[0]:null;
+    // Dünden kalan gönderilmemiş paket var mı? (bilgi amaçlı)
+    var eski=await db.from('batches').select('id,upload_date,sira,total_amount')
+      .eq('status','taslak').lt('upload_date',bugun).order('upload_date',{ascending:false}).limit(3);
+    var eskiUyari='';
+    if(!eski.error && eski.data && eski.data.length){
+      eskiUyari='<div style="background:#f59e0b18;border:1px solid #f59e0b45;border-radius:8px;padding:10px 14px;font-size:13px;color:var(--warning);margin-bottom:10px;">'
+        +'⏰ <strong>Önceki günlerden gönderilmemiş '+eski.data.length+' paket var</strong> ('
+        +eski.data.map(function(p){return formatDate(p.upload_date);}).join(', ')
+        +'). Sistem günlük çalışır — gerekiyorsa bu ödemeleri bugün tekrar yükleyin.</div>';
+    }
+    if(!acikPaket){
+      kart.style.display=eskiUyari?'block':'none';
+      kart.innerHTML=eskiUyari;
+      return;
+    }
+    var p=await db.from('payments').select('id,cari,amount,department_id,ozel_kod,doc_no,description,currency,tutar_orj,kaynak,kategori_id')
+      .eq('batch_id',acikPaket.id).eq('status','taslak').order('created_at');
+    if(p.error) throw p.error;
+    acikPaketOdemeler=p.data||[];
+    renderAcikPaket(eskiUyari);
+  }catch(e){ console.warn('Açık paket okunamadı:',e); }
+}
+
+function renderAcikPaket(eskiUyari){
+  var kart=document.getElementById('acik-paket-card');
+  if(!kart||!acikPaket) return;
+  var deptAdi={};
+  okDepts.forEach(function(d){deptAdi[d.id]=d.name;});
+  var toplam=acikPaketOdemeler.reduce(function(a,r){return a+(Number(r.amount)||0);},0);
+  var exN=acikPaketOdemeler.filter(function(r){return r.kaynak!=='manuel';}).length;
+  var mnN=acikPaketOdemeler.length-exN;
+  var gruplar={};
+  acikPaketOdemeler.forEach(function(r){
+    var nm=r.kaynak==='manuel'?'Finans Ödemeleri (manuel)':(deptAdi[r.department_id]||'(departman yok)');
+    if(!gruplar[nm]) gruplar[nm]={n:0,t:0};
+    gruplar[nm].n++; gruplar[nm].t+=Number(r.amount)||0;
+  });
+  kart.style.display='block';
+  kart.innerHTML=(eskiUyari||'')
+    +'<div class="card" style="border:2px solid var(--warning);">'
+    +'<div class="card-header"><div>'
+      +'<h3>🟡 Açık Paket — '+escHtml(paketAdi(acikPaket))+'</h3>'
+      +'<p>'+acikPaketOdemeler.length+' ödeme · '+formatMoney(toplam)+' · '+exN+' Excel, '+mnN+' manuel · <strong>henüz onaya gönderilmedi</strong></p>'
+    +'</div><div style="display:flex;gap:8px;flex-wrap:wrap;">'
+      +'<button class="btn btn-secondary btn-sm" onclick="paketiSil()">🗑 Paketi Sil</button>'
+      +'<button class="btn btn-success btn-sm" onclick="paketiOnayaGonder()">🚀 Onaya Gönder</button>'
+    +'</div></div>'
+    +'<div class="card-body">'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">'
+      +Object.keys(gruplar).map(function(nm){
+        return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;">'
+          +'<div style="font-size:13px;font-weight:600;margin-bottom:3px;">'+escHtml(nm)+'</div>'
+          +'<div style="font-size:12px;color:var(--text2);margin-bottom:6px;">'+gruplar[nm].n+' ödeme</div>'
+          +'<div style="font-size:17px;font-weight:700;font-family:\'DM Mono\',monospace;">'+formatMoney(gruplar[nm].t)+'</div></div>';
+      }).join('')
+      +'</div>'
+    +'</div></div>';
+}
+
+async function paketiOnayaGonder(){
+  if(!acikPaket){ showToast('Açık paket yok!','error'); return; }
+  if(!acikPaketOdemeler.length){ showToast('Pakette ödeme yok!','error'); return; }
+  var eksik=acikPaketOdemeler.filter(function(r){ return r.kaynak!=='manuel' && !r.department_id; });
+  if(eksik.length){ showToast(eksik.length+' ödemenin departmanı yok — pakete alınmamalıydı. Yöneticinize bildirin.','error'); return; }
+  if(!confirm(paketAdi(acikPaket)+'\n\n'+acikPaketOdemeler.length+' ödeme onay sürecine gönderilecek.\nGönderildikten sonra bu pakete ekleme yapılamaz.\n\nDevam edilsin mi?')) return;
+  try{
+    // Excel'den gelenler departman onayına; Finans manuel girişleri departman
+    // adımını atlar ve paketin kapısında (dept_done) bekler.
+    var ex=await db.from('payments').update({status:'department_pending'})
+      .eq('batch_id',acikPaket.id).eq('status','taslak').neq('kaynak','manuel').select('id,department_id,amount');
+    if(ex.error) throw ex.error;
+    var mn=await db.from('payments').update({status:'dept_done'})
+      .eq('batch_id',acikPaket.id).eq('status','taslak').eq('kaynak','manuel').select('id,amount');
+    if(mn.error) throw mn.error;
+    var toplam=acikPaketOdemeler.reduce(function(a,r){return a+(Number(r.amount)||0);},0);
+    await db.from('batches').update({status:'onayda',asama:'department_pending',total_amount:toplam,gonderildi_at:new Date().toISOString()}).eq('id',acikPaket.id);
+    await logAction(paketAdi(acikPaket)+' onaya gönderildi: '+acikPaketOdemeler.length+' ödeme, '+formatMoney(toplam),acikPaket.id,null);
+    // Excel ödemesi hiç yoksa departman adımı boştur — kapı hemen açılmalı
+    if((ex.data||[]).length===0){ await _paketKapisi([acikPaket.id],'departman'); }
+    else { notifyDeptUpload((ex.data||[]).map(function(p){return{department_id:p.department_id};}), toplam); }
+    showToast('Paket onaya gönderildi! 🚀','success');
+    acikPaket=null; acikPaketOdemeler=[];
+    await loadAcikPaket();
+    loadBatchesFiltered(todayStr());
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
+}
+
+async function paketiSil(){
+  if(!acikPaket) return;
+  if(!confirm(paketAdi(acikPaket)+' ve içindeki '+acikPaketOdemeler.length+' ödeme silinecek.\n\nBu işlem geri alınamaz. Devam edilsin mi?')) return;
+  try{
+    var d1=await db.from('payments').delete().eq('batch_id',acikPaket.id).eq('status','taslak');
+    if(d1.error) throw d1.error;
+    var d2=await db.from('batches').delete().eq('id',acikPaket.id).eq('status','taslak');
+    if(d2.error) throw d2.error;
+    await logAction('Taslak paket silindi: '+paketAdi(acikPaket),null,null);
+    showToast('Paket silindi.','success');
+    acikPaket=null; acikPaketOdemeler=[];
+    await loadAcikPaket();
+  }catch(e){ showToast('Hata: '+e.message,'error'); }
 }
 
 async function loadBatches(){
@@ -3181,21 +4189,20 @@ function openDeptRejectModal(isBulk,singleId){
   deptActionTarget=isBulk?[...deptSelectedIds]:[singleId];
   const p=!isBulk?deptPayments.find(x=>x.id===singleId):null;
   document.getElementById('dept-reject-sub').innerHTML=_rejectDetailHtml(p, deptSelectedIds.size, isBulk);
-  document.getElementById('dept-reject-comment').value='';
+  document.getElementById('dept-reject-comment').value='';_resetRejectQuick('dept-reject-comment');
   document.getElementById('dept-reject-modal').classList.add('open');
 }
 async function confirmDeptApprove(){
   const btn=document.getElementById('dept-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
   const comment=document.getElementById('dept-approve-comment').value.trim();
   try{
-    for(const pid of deptActionTarget){
-      const p=deptPayments.find(x=>x.id===pid);
-      await db.from('approvals').insert({payment_id:pid,stage:'departman',status:'approved',user_id:currentUser.id,comment:comment||null});
-      await db.from('payments').update({status:'manager_pending'}).eq('id',pid).eq('status','department_pending');
-      await logAction(`Departman onayı: ${p?.cari}`,p?.batch_id,pid);
+    const _r=await bulkDecide({ids:deptActionTarget,stage:'departman',decision:'approved',fromStatus:'department_pending',toStatus:'dept_done',tekilSonraki:'manager_pending',gate:'departman',comment:comment,label:'Departman onayı'});
+    closeMod('dept-approve-modal');clearDeptSelection();showToast(`${_r.count} ödeme onaylandı!`,'success');
+    if(_r.ilerleyen>0){
+      db.from('payments').select('amount').eq('status','manager_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('muhasebe_muduru',r.data.length,t);}});
+    } else {
+      showToast('Onayınız alındı — paketteki diğer departmanlar bekleniyor.','success');
     }
-    closeMod('dept-approve-modal');clearDeptSelection();showToast(`${deptActionTarget.length} ödeme onaylandı!`,'success');
-    db.from('payments').select('amount').eq('status','manager_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('muhasebe_muduru',r.data.length,t);}});
     loadDeptPayments();
   }catch(err){showToast('Hata: '+err.message,'error');}
   finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}
@@ -3205,13 +4212,8 @@ async function confirmDeptReject(){
   if(!comment){showToast('Red nedeni zorunludur!','error');return;}
   const btn=document.getElementById('dept-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
   try{
-    for(const pid of deptActionTarget){
-      const p=deptPayments.find(x=>x.id===pid);
-      await db.from('approvals').insert({payment_id:pid,stage:'departman',status:'rejected',user_id:currentUser.id,comment});
-      await db.from('payments').update({status:'rejected'}).eq('id',pid).eq('status','department_pending');
-      await logAction(`Departman reddi: ${p?.cari} | ${comment}`,p?.batch_id,pid);
-    }
-    closeMod('dept-reject-modal');clearDeptSelection();showToast(`${deptActionTarget.length} ödeme reddedildi.`,'error');loadDeptPayments();
+    const _r=await bulkDecide({ids:deptActionTarget,stage:'departman',decision:'rejected',fromStatus:'department_pending',toStatus:'rejected',gate:'departman',comment:comment,label:'Departman reddi'});
+    closeMod('dept-reject-modal');clearDeptSelection();showToast(`${_r.count} ödeme reddedildi.`,'error');loadDeptPayments();
   }catch(err){showToast('Hata: '+err.message,'error');}
   finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}
 }
@@ -3267,10 +4269,10 @@ async function showMudurDrawer(pid){
 function closeMudurDrawer(){document.getElementById('m-drawer').classList.remove('open');}
 function openMudurApproveModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-approve-sub').textContent=isBulk?`${mudurSelectedIds.size} ödeme onaylanacak.`:`"${p?.cari}" onaylanacak.`;document.getElementById('m-approve-comment').value='';document.getElementById('m-approve-modal').classList.add('open');}
 function openMudurRejectModal(isBulk,singleId){mudurActionTarget=isBulk?[...mudurSelectedIds]:[singleId];const p=!isBulk?mudurPending.find(x=>x.id===singleId):null;document.getElementById('m-reject-sub').innerHTML=_rejectDetailHtml(p, mudurSelectedIds.size, isBulk);document.getElementById('m-reject-comment').value='';document.getElementById('m-reject-modal').classList.add('open');}
-async function confirmMudurApprove(){const btn=document.getElementById('m-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('m-approve-comment').value.trim();try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'director_pending'}).eq('id',pid).eq('status','manager_pending');await logAction(`Müdür onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('m-approve-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme onaylandı! Direktöre iletildi.`,'success');
-    db.from('payments').select('amount').eq('status','director_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('direktor',r.data.length,t);}});
+async function confirmMudurApprove(){const btn=document.getElementById('m-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('m-approve-comment').value.trim();try{const _r=await bulkDecide({ids:mudurActionTarget,stage:'muhasebe_muduru',decision:'approved',fromStatus:'manager_pending',toStatus:'manager_done',tekilSonraki:'director_pending',gate:'muhasebe_muduru',comment:comment,label:'Müdür onayı'});closeMod('m-approve-modal');clearMudurSelection();showToast(`${_r.count} ödeme onaylandı! Direktöre iletildi.`,'success');
+    if(_r.ilerleyen>0) db.from('payments').select('amount').eq('status','director_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('direktor',r.data.length,t);}});
     loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
-async function confirmMudurReject(){const comment=document.getElementById('m-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('m-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of mudurActionTarget){const p=mudurPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'muhasebe_muduru',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid).eq('status','manager_pending');await logAction(`Müdür reddi: ${p?.cari}`,p?.batch_id,pid);}var mDepts={};mudurActionTarget.forEach(pid=>{const p=mudurPending.find(x=>x.id===pid);if(p?.department_id)mDepts[p.department_id]=(mDepts[p.department_id]||0)+1;});Object.entries(mDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('m-reject-modal');clearMudurSelection();showToast(`${mudurActionTarget.length} ödeme reddedildi.`,'error');loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
+async function confirmMudurReject(){const comment=document.getElementById('m-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('m-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{const _r=await bulkDecide({ids:mudurActionTarget,stage:'muhasebe_muduru',decision:'rejected',fromStatus:'manager_pending',toStatus:'rejected',gate:'muhasebe_muduru',comment:comment,label:'Müdür reddi'});var mDepts={};_r.rows.forEach(function(p){if(p.department_id)mDepts[p.department_id]=(mDepts[p.department_id]||0)+1;});Object.entries(mDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('m-reject-modal');clearMudurSelection();showToast(`${_r.count} ödeme reddedildi.`,'error');loadMudurPending();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 
 async function loadMudurHistory(){
   const filter=document.getElementById('m-history-filter').value;
@@ -3459,10 +4461,10 @@ async function showDirDrawer(pid){const p=dirPending.find(x=>x.id===pid);if(!p)r
 function closeDirDrawer(){document.getElementById('dir-drawer').classList.remove('open');}
 function openDirApproveModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-approve-sub').textContent=isBulk?`${dirSelectedIds.size} ödeme onaylanacak.`:`"${p?.cari}" onaylanacak.`;document.getElementById('dir-approve-comment').value='';document.getElementById('dir-approve-modal').classList.add('open');}
 function openDirRejectModal(isBulk,singleId){dirActionTarget=isBulk?[...dirSelectedIds]:[singleId];const p=!isBulk?dirPending.find(x=>x.id===singleId):null;document.getElementById('dir-reject-sub').innerHTML=_rejectDetailHtml(p, dirSelectedIds.size, isBulk);document.getElementById('dir-reject-comment').value='';document.getElementById('dir-reject-modal').classList.add('open');}
-async function confirmDirApprove(){const btn=document.getElementById('dir-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('dir-approve-comment').value.trim();try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'gmy_pending'}).eq('id',pid).eq('status','director_pending');await logAction(`Direktör onayı: ${p?.cari}`,p?.batch_id,pid);}closeMod('dir-approve-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme onaylandı! GM'ye iletildi.`,'success');
-    db.from('payments').select('amount').eq('status','gmy_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('gm',r.data.length,t);}});
+async function confirmDirApprove(){const btn=document.getElementById('dir-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('dir-approve-comment').value.trim();try{const _r=await bulkDecide({ids:dirActionTarget,stage:'direktor',decision:'approved',fromStatus:'director_pending',toStatus:'director_done',tekilSonraki:'gmy_pending',gate:'direktor',comment:comment,label:'Direktör onayı'});closeMod('dir-approve-modal');clearDirSelection();showToast(`${_r.count} ödeme onaylandı! GM'ye iletildi.`,'success');
+    if(_r.ilerleyen>0) db.from('payments').select('amount').eq('status','gmy_pending').then(function(r){if(r.data&&r.data.length>0){var t=r.data.reduce(function(s,p){return s+p.amount;},0);notifyRole('gm',r.data.length,t);}});
     loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='✅ Onayla';}}
-async function confirmDirReject(){const comment=document.getElementById('dir-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('dir-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of dirActionTarget){const p=dirPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'direktor',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid).eq('status','director_pending');await logAction(`Direktör reddi: ${p?.cari}`,p?.batch_id,pid);}var dDepts={};dirActionTarget.forEach(pid=>{const p=dirPending.find(x=>x.id===pid);if(p?.department_id)dDepts[p.department_id]=(dDepts[p.department_id]||0)+1;});Object.entries(dDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('dir-reject-modal');clearDirSelection();showToast(`${dirActionTarget.length} ödeme reddedildi.`,'error');loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
+async function confirmDirReject(){const comment=document.getElementById('dir-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('dir-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{const _r=await bulkDecide({ids:dirActionTarget,stage:'direktor',decision:'rejected',fromStatus:'director_pending',toStatus:'rejected',gate:'direktor',comment:comment,label:'Direktör reddi'});var dDepts={};_r.rows.forEach(function(p){if(p.department_id)dDepts[p.department_id]=(dDepts[p.department_id]||0)+1;});Object.entries(dDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('dir-reject-modal');clearDirSelection();showToast(`${_r.count} ödeme reddedildi.`,'error');loadDirPending();loadDirOverview();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadDirHistory(){
   const filter=document.getElementById('dir-history-filter').value;
   const date=(window.GF_DATES&&GF_DATES['dir'])||todayStr();
@@ -3531,11 +4533,10 @@ async function showGmDrawer(pid){const p=gmPending.find(x=>x.id===pid);if(!p)ret
 function closeGmDrawer(){document.getElementById('gm-drawer').classList.remove('open');}
 function openGmApproveModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-approve-sub').textContent=isBulk?`${gmSelectedIds.size} ödeme final onayına alınacak.`:`"${p?.cari}" tamamlanacak.`;document.getElementById('gm-approve-comment').value='';document.getElementById('gm-approve-modal').classList.add('open');}
 function openGmRejectModal(isBulk,singleId){gmActionTarget=isBulk?[...gmSelectedIds]:[singleId];const p=!isBulk?gmPending.find(x=>x.id===singleId):null;document.getElementById('gm-reject-sub').innerHTML=_rejectDetailHtml(p, gmSelectedIds.size, isBulk);document.getElementById('gm-reject-comment').value='';document.getElementById('gm-reject-modal').classList.add('open');}
-async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'approved',user_id:currentUser.id,comment:comment||null});await db.from('payments').update({status:'completed'}).eq('id',pid).eq('status','gmy_pending');await logAction(`GM Final Onay: ${p?.cari}`,p?.batch_id,pid);}closeMod('gm-approve-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme tamamlandı! 🎉`,'success');
-    var _finTot=gmActionTarget.reduce(function(s,pid){var _p=gmPending.find(function(x){return x.id===pid;});return s+((_p&&_p.amount)||0);},0);
-    notifyFinans(gmActionTarget.length,_finTot);
+async function confirmGmApprove(){const btn=document.getElementById('gm-approve-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';const comment=document.getElementById('gm-approve-comment').value.trim();try{const _r=await bulkDecide({ids:gmActionTarget,stage:'genel_mudur',decision:'approved',fromStatus:'gmy_pending',toStatus:'completed',comment:comment,label:'GM final onayı'});closeMod('gm-approve-modal');clearGmSelection();showToast(`${_r.count} ödeme tamamlandı! 🎉`,'success');
+    notifyFinans(_r.count,_r.amount);
     loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='👑 Final Onay Ver';}}
-async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{for(const pid of gmActionTarget){const p=gmPending.find(x=>x.id===pid);await db.from('approvals').insert({payment_id:pid,stage:'genel_mudur',status:'rejected',user_id:currentUser.id,comment});await db.from('payments').update({status:'rejected'}).eq('id',pid).eq('status','gmy_pending');await logAction(`GM Reddi: ${p?.cari}`,p?.batch_id,pid);}var gDepts={};gmActionTarget.forEach(pid=>{const p=gmPending.find(x=>x.id===pid);if(p?.department_id)gDepts[p.department_id]=(gDepts[p.department_id]||0)+1;});Object.entries(gDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('gm-reject-modal');clearGmSelection();showToast(`${gmActionTarget.length} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
+async function confirmGmReject(){const comment=document.getElementById('gm-reject-comment').value.trim();if(!comment){showToast('Red nedeni zorunludur!','error');return;}const btn=document.getElementById('gm-reject-btn');btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';try{const _r=await bulkDecide({ids:gmActionTarget,stage:'genel_mudur',decision:'rejected',fromStatus:'gmy_pending',toStatus:'rejected',gate:'genel_mudur',comment:comment,label:'GM reddi'});var gDepts={};_r.rows.forEach(function(p){if(p.department_id)gDepts[p.department_id]=(gDepts[p.department_id]||0)+1;});Object.entries(gDepts).forEach(([did,cnt])=>notifyDeptRejection(did,comment,cnt));closeMod('gm-reject-modal');clearGmSelection();showToast(`${_r.count} ödeme reddedildi.`,'error');loadGmPending();loadGmDashboard();}catch(err){showToast('Hata: '+err.message,'error');}finally{btn.disabled=false;btn.innerHTML='❌ Reddet';}}
 async function loadGmHistory(){
   const filter=document.getElementById('gm-history-filter').value;
   const date=(window.GF_DATES&&GF_DATES['gm'])||todayStr();
@@ -4647,10 +5648,8 @@ async function setupRealtimeNotifications() {
       'postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'payments', filter: 'status=eq.' + watch.status },
       (payload) => {
-        // Anlık bildirim göster
-        showLocalNotification(watch.title, watch.body);
-        // Paneli yenile
-        _refreshCurrentPanel();
+        // Toplu işlemde onlarca olay gelir; biriktirip tek bildirime indiriyoruz
+        _queueRealtimeNotice(watch.title, watch.body);
       }
     )
     .subscribe((state) => {
@@ -4973,8 +5972,8 @@ async function loadBatchesFiltered(date) {
     bStats[p.batch_id].amount += p.amount || 0;
     bStats[p.batch_id].status[p.status] = (bStats[p.batch_id].status[p.status]||0)+1;
   });
-  const stLabels = {department_pending:'Dept. Onayı',manager_pending:'Müdür Onayı',director_pending:'Dir. Onayı',gmy_pending:'GM Onayı',completed:'Tamamlandı',rejected:'Reddedildi'};
-  const stBadge = {department_pending:'badge-yellow',manager_pending:'badge-yellow',director_pending:'badge-yellow',gmy_pending:'badge-yellow',completed:'badge-green',rejected:'badge-red'};
+  const stLabels = {taslak:'Taslak',department_pending:'Dept. Onayı',dept_done:'Paket bekliyor',manager_pending:'Müdür Onayı',manager_done:'Paket bekliyor',director_pending:'Dir. Onayı',director_done:'Paket bekliyor',gmy_pending:'GM Onayı',completed:'Tamamlandı',rejected:'Reddedildi'};
+  const stBadge = {taslak:'badge-gray',department_pending:'badge-yellow',dept_done:'badge-blue',manager_pending:'badge-yellow',manager_done:'badge-blue',director_pending:'badge-yellow',director_done:'badge-blue',gmy_pending:'badge-yellow',completed:'badge-green',rejected:'badge-red'};
   tbody.innerHTML = list.map(b => {
     const s = bStats[b.id] || {count:0, amount:0, status:{}};
     const st = b.approval_status || 'department_pending';
@@ -5296,7 +6295,7 @@ function renderOtPipeline(panel, payments, allUsers) {
         if(btn){btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';}
       } else {
         bannerEl.classList.add('inactive');
-        var stLbl = {department_pending:'Departman onayı bekleniyor',manager_pending:'Müdür onayı bekleniyor',director_pending:'Direktör onayı bekleniyor',gmy_pending:'GM onayı bekleniyor'};
+        var stLbl = {taslak:'Taslak — onaya gönderilmedi',department_pending:'Departman onayı bekleniyor',dept_done:'Departman onayladı — paketteki diğer departmanlar bekleniyor',manager_pending:'Müdür onayı bekleniyor',manager_done:'Müdür onayladı — paket tamamlanmayı bekliyor',director_pending:'Direktör onayı bekleniyor',director_done:'Direktör onayladı — paket tamamlanmayı bekliyor',gmy_pending:'GM onayı bekleniyor'};
         bannerEl.querySelector('.banka-banner-text').textContent = '⏳ Onay Süreci Devam Ediyor';
         bannerEl.querySelector('.banka-banner-sub').textContent = stLbl[batchStage] || 'Süreç henüz tamamlanmadı.';
         if(btn){btn.disabled=true;btn.style.opacity='0.4';btn.style.cursor='not-allowed';}
@@ -5372,6 +6371,10 @@ function renderOnayTakipTable(panel, payments, filterStatus) {
   var fmt = function(n){ return n ? new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY',maximumFractionDigits:0}).format(n) : '—'; };
   var stBadge = {
     department_pending: '<span class="badge badge-pending">Dept. Onayı</span>',
+    dept_done: '<span class="badge badge-pending">Paket bekliyor</span>',
+    manager_done: '<span class="badge badge-pending">Paket bekliyor</span>',
+    director_done: '<span class="badge badge-pending">Paket bekliyor</span>',
+    taslak: '<span class="badge">Taslak</span>',
     manager_pending:    '<span class="badge badge-pending">Müdür Onayı</span>',
     director_pending:   '<span class="badge badge-pending">Dir. Onayı</span>',
     gmy_pending:        '<span class="badge badge-pending">GM Onayı</span>',
@@ -5400,6 +6403,10 @@ function filterOnayPipeline(panel, status) {
   var subEl = document.getElementById(subIds[panel]);
   var stLabels = {
     department_pending: 'Dept. Onayı bekleyenler',
+    dept_done: 'Paketteki diğer departmanlar bekleniyor',
+    manager_done: 'Paket tamamlanmayı bekliyor',
+    director_done: 'Paket tamamlanmayı bekliyor',
+    taslak: 'Taslak — onaya gönderilmedi',
     manager_pending:    'Müdür Onayı bekleyenler',
     director_pending:   'Direktör Onayı bekleyenler',
     gmy_pending:        'GM Onayı bekleyenler',
@@ -5521,6 +6528,11 @@ routeByRole = function(user) {
 };
 
 // ── App Badge: iPhone ana ekran simgesindeki kırmızı sayı (iOS 16.4+) ──
+// Rozet GÜN BAZLIDIR: yalnızca bugünün paketlerinde bana düşen bekleyen
+// ödemeler sayılır. Önceki günden hiçbir şey rozete yansımaz — sistem
+// günlük çalıştığı için ertesi güne iş devretmemesi esas alınmıştır.
+// Pakete bağlı olmayan (tekrar onaya gönderilmiş) ödemeler de sayılır,
+// yoksa görünmez kalırlardı.
 async function _updateAppBadge(){
   try{
     if(!('setAppBadge' in navigator)) return;
@@ -5528,12 +6540,41 @@ async function _updateAppBadge(){
     var statusByRole = { departman:'department_pending', muhasebe_muduru:'manager_pending', direktor:'director_pending', gm:'gmy_pending' };
     var st = statusByRole[currentUser.role];
     if(!st){ if(navigator.clearAppBadge) navigator.clearAppBadge(); return; }
-    var q = db.from('payments').select('id',{count:'exact',head:true}).eq('status', st);
-    if(currentUser.role==='departman' && currentUser.department_id) q = q.eq('department_id', currentUser.department_id);
-    var r = await q;
-    var n = r.count || 0;
+    var n = await _bugunBekleyenSayisi(st);
     if(n>0) navigator.setAppBadge(n); else if(navigator.clearAppBadge) navigator.clearAppBadge();
   }catch(e){}
+}
+
+// Bugünün paketlerindeki + pakete bağlı olmayan bekleyen ödeme sayısı
+async function _bugunBekleyenSayisi(st){
+  var ids = await getBatchIdsByDate(todayStr());
+  var toplam = 0;
+  if(ids.length){
+    var q = db.from('payments').select('id',{count:'exact',head:true}).eq('status',st).in('batch_id',ids);
+    if(currentUser.role==='departman' && currentUser.department_id) q = q.eq('department_id',currentUser.department_id);
+    var r = await q;
+    toplam += r.count || 0;
+  }
+  var q2 = db.from('payments').select('id',{count:'exact',head:true}).eq('status',st).is('batch_id',null);
+  if(currentUser.role==='departman' && currentUser.department_id) q2 = q2.eq('department_id',currentUser.department_id);
+  var r2 = await q2;
+  return toplam + (r2.count || 0);
+}
+
+// Bilgi amaçlı: önceki günlerden karara bağlanmamış ödeme var mı?
+// Rozete yansımaz (kullanıcı kararı), yalnız panelde küçük bir not olarak görünür.
+async function _gecikmisBilgi(st){
+  try{
+    var ids = await getBatchIdsByDate(todayStr());
+    var q = db.from('payments').select('id,batch_id').eq('status',st);
+    if(currentUser.role==='departman' && currentUser.department_id) q = q.eq('department_id',currentUser.department_id);
+    var r = await q;
+    if(r.error || !r.data) return null;
+    var bugun = {};
+    ids.forEach(function(i){ bugun[i]=1; });
+    var eski = r.data.filter(function(p){ return p.batch_id ? !bugun[p.batch_id] : false; });
+    return eski.length ? {adet:eski.length} : null;
+  }catch(e){ return null; }
 }
 // Uygulamaya geri dönünce rozeti tazele
 document.addEventListener('visibilitychange', function(){
@@ -5741,9 +6782,9 @@ function _renderPendingDeptAccordion(wrap, list, cfg) {
         + '<div class="mob-ot-group-icon">🏢</div>'
         + '<div class="mob-ot-group-name">' + escHtml(dept) + '</div>'
         + '<div class="mob-ot-group-stats"><div class="mob-ot-group-amount">' + fmt(g.total) + '</div><div class="mob-ot-group-count">' + g.payments.length + ' ödeme</div></div>'
-        + '<span class="mob-ot-group-chevron open" id="' + gid + '-chev">▼</span>'
+        + '<span class="mob-ot-group-chevron" id="' + gid + '-chev">▼</span>'
       + '</div>'
-      + '<div class="mob-ot-group-body open" id="' + gid + '">';
+      + '<div class="mob-ot-group-body" id="' + gid + '">';
     g.payments.forEach(function(p){
       var _desc = p.description || p.doc_no || '';
       html += '<div class="mob-ot-row" style="align-items:flex-start;cursor:pointer;" onclick="' + cfg.drawer + '(\'' + p.id + '\')">'
@@ -6717,6 +7758,187 @@ function mobFitStatValues() {
       if (cb !== el) cb.checked = on;
     });
   }, true); // capture: inline onchange'den önce senkronize et
+})();
+
+// ══════════════════════════════════════════════
+//  GÜNLÜK ONAY RAPORU
+//  Finans'ın her gün elle hazırladığı tabloyu sistem üretiyor.
+//  Blok kuralı ödemenin KAYNAĞINA bağlı, ek bir işaretleme yok:
+//    Grup Dışı    → Excel ile yüklenen tüm ödemeler (departman bazında)
+//    Finans Ödeme → Finans'ın manuel girdiği, başlığı "finans" olanlar
+//    Grup İçi     → Finans'ın manuel girdiği, başlığı "grup_ici" olanlar
+//  Aynı bileşen onaycı ekranlarında özet olarak da kullanılıyor.
+// ══════════════════════════════════════════════
+const RAPOR_BLOK_SIRA = ['finans','grup_disi','grup_ici'];
+const RAPOR_BLOK_ADI  = {finans:'Finans Ödeme', grup_disi:'Grup Dışı', grup_ici:'Grup İçi'};
+
+function _odemeGrubu(p){
+  if(p.kaynak === 'manuel'){
+    var b = odemeBasliklari.find(function(x){ return x.id === p.kategori_id; });
+    return {blok:(b && b.ana_baslik === 'grup_ici') ? 'grup_ici' : 'finans', ad:(b && b.ad) || '(başlıksız)'};
+  }
+  return {blok:'grup_disi', ad:(p.departments && p.departments.name) || p.dept_adi || '(departman yok)'};
+}
+
+function raporModeli(list){
+  var m = {bloklar:{}, genel:0, adet:0, dovizli:0};
+  RAPOR_BLOK_SIRA.forEach(function(k){ m.bloklar[k] = {ad:RAPOR_BLOK_ADI[k], gruplar:{}, toplam:0, adet:0}; });
+  (list||[]).forEach(function(p){
+    var g = _odemeGrubu(p), b = m.bloklar[g.blok];
+    if(!b.gruplar[g.ad]) b.gruplar[g.ad] = {ad:g.ad, odemeler:[], toplam:0};
+    var t = Number(p.amount) || 0;
+    b.gruplar[g.ad].odemeler.push(p); b.gruplar[g.ad].toplam += t;
+    b.toplam += t; b.adet++; m.genel += t; m.adet++;
+    if(p.currency) m.dovizli++;
+  });
+  return m;
+}
+
+function _raporSatir(p, cfg){
+  var dv = p.currency ? '<span class="rapor-doviz">'+escHtml(p.currency)+'</span>' : '';
+  var alt = [];
+  if(p.description) alt.push(escHtml(p.description));
+  if(p.doc_no) alt.push(escHtml(p.doc_no));
+  if(p.currency && p.tutar_orj) alt.push(formatMoney(p.tutar_orj)+' '+escHtml(p.currency)+(p.doviz_kur?' · kur '+Number(p.doviz_kur).toFixed(4):''));
+  if(p.mukerrer) alt.push('⚠️ mükerrer olabilir');
+  var btn = '';
+  if(cfg && cfg.approve){
+    btn = '<div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end;">'
+      + '<button class="dpc-btn dpc-btn-ok" onclick="event.stopPropagation();'+cfg.approve+'(false,\''+p.id+'\')">✅</button>'
+      + '<button class="dpc-btn dpc-btn-red" onclick="event.stopPropagation();'+cfg.reject+'(false,\''+p.id+'\')">❌</button></div>';
+  }
+  return '<div class="rapor-satir">'
+    + '<div class="rapor-satir-ad">'+escHtml(p.cari||'—')+dv
+      + (alt.length ? '<div class="rapor-satir-alt">'+alt.join(' · ')+'</div>' : '')
+    + '</div>'
+    + '<div class="rapor-satir-tutar">'+formatMoney(p.amount)+btn+'</div></div>';
+}
+
+// Gruplar KAPALI gelir; kullanıcı istediğini açar (madde 7).
+function raporAccordionHtml(m, cfg){
+  cfg = cfg || {};
+  if(!m.adet) return '<div class="empty-state"><span class="icon">🧾</span><p>Gösterilecek ödeme yok.</p></div>';
+  var h = '', i = 0;
+  RAPOR_BLOK_SIRA.forEach(function(k){
+    var b = m.bloklar[k];
+    if(!b.adet) return;
+    h += '<div class="rapor-blok"><div class="rapor-blok-baslik"><span>'+b.ad+'</span>'
+       + '<span class="rapor-blok-toplam">'+formatMoney(b.toplam)+'</span></div>';
+    Object.keys(b.gruplar).sort(function(a,c){ return a.localeCompare(c,'tr'); }).forEach(function(ad){
+      var g = b.gruplar[ad], gid = (cfg.prefix||'rp')+'-g'+(i++);
+      h += '<div class="rapor-grup">'
+        + '<div class="rapor-grup-head" tabindex="0" role="button" onclick="raporGrupAc(\''+gid+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();raporGrupAc(\''+gid+'\');}">'
+          + '<span class="rapor-chev" id="'+gid+'-c">▼</span>'
+          + '<span class="rapor-grup-ad">'+escHtml(g.ad)+'</span>'
+          + '<span class="rapor-grup-adet">'+g.odemeler.length+' ödeme</span>'
+          + '<span class="rapor-grup-tutar">'+formatMoney(g.toplam)+'</span>'
+        + '</div>'
+        + '<div class="rapor-grup-body" id="'+gid+'">'
+        + g.odemeler.map(function(p){ return _raporSatir(p, cfg); }).join('')
+        + '</div></div>';
+    });
+    h += '</div>';
+  });
+  h += '<div class="rapor-genel"><span>Genel Toplam · '+m.adet+' ödeme'
+     + (m.dovizli ? ' · '+m.dovizli+' dövizli' : '')+'</span><b>'+formatMoney(m.genel)+'</b></div>';
+  return h;
+}
+
+function raporGrupAc(gid){
+  var b = document.getElementById(gid), c = document.getElementById(gid+'-c');
+  if(!b) return;
+  var acik = b.classList.contains('open');
+  b.classList.toggle('open', !acik);
+  if(c) c.classList.toggle('open', !acik);
+}
+
+// ── Finans > Günlük Rapor ──
+let _sonRaporModeli = null, _sonRaporTarihi = null;
+
+async function loadGunlukRapor(){
+  var govde = document.getElementById('gr-govde');
+  if(!govde) return;
+  var t = document.getElementById('gr-tarih');
+  var tarih = (t && t.value) || todayStr();
+  _sonRaporTarihi = tarih;
+  govde.innerHTML = '<div class="empty-state"><span class="icon">⏳</span><p>Yükleniyor…</p></div>';
+  try{
+    await loadOdemeBasliklari();
+    var pk = await db.from('batches').select('id').eq('upload_date', tarih);
+    if(pk.error) throw pk.error;
+    var ids = (pk.data||[]).map(function(b){ return b.id; });
+    var list = [];
+    if(ids.length){
+      var r = await db.from('payments')
+        .select('id,cari,amount,status,doc_no,description,currency,tutar_orj,doviz_kur,mukerrer,kaynak,kategori_id,department_id,departments(name)')
+        .in('batch_id', ids).neq('status','taslak');
+      if(r.error) throw r.error;
+      list = r.data||[];
+    }
+    _sonRaporModeli = raporModeli(list);
+    document.getElementById('gr-baslik').textContent = formatDate(tarih)+' Günlük Onay Raporu';
+    document.getElementById('gr-alt').textContent = _sonRaporModeli.adet+' ödeme · '+formatMoney(_sonRaporModeli.genel);
+    govde.innerHTML = raporAccordionHtml(_sonRaporModeli, {prefix:'gr'});
+  }catch(e){
+    govde.innerHTML = '<div class="empty-state"><span class="icon">⚠️</span><p>Rapor okunamadı: '+escHtml(e.message)+'</p></div>';
+  }
+}
+
+function raporExcelIndir(){
+  if(!_sonRaporModeli || !_sonRaporModeli.adet){ showToast('İndirilecek veri yok.','error'); return; }
+  var aoa = [['Grup İçi/Dışı','Ödeme Türü','Para Birimi','Tutar (TL)']];
+  RAPOR_BLOK_SIRA.forEach(function(k){
+    var b = _sonRaporModeli.bloklar[k];
+    if(!b.adet) return;
+    var ilk = true;
+    Object.keys(b.gruplar).sort(function(a,c){ return a.localeCompare(c,'tr'); }).forEach(function(ad){
+      aoa.push([ilk ? b.ad : '', ad, 'TL', b.gruplar[ad].toplam]);
+      ilk = false;
+    });
+    aoa.push(['Toplam '+b.ad, '', '', b.toplam]);
+  });
+  aoa.push(['Genel Toplam','','',_sonRaporModeli.genel]);
+  var ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:18},{wch:44},{wch:12},{wch:18}];
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Onay Raporu');
+  XLSX.writeFile(wb, 'Onay_Raporu_'+(_sonRaporTarihi||todayStr())+'.xlsx');
+}
+
+// ── Onaycı ekranlarındaki özet (aynı bileşen, onay butonlarıyla) ──
+async function _raporOzetCiz(hedefId, list, cfg){
+  var el = document.getElementById(hedefId);
+  if(!el) return;
+  if(!odemeBasliklari.length) await loadOdemeBasliklari();
+  var m = raporModeli(list||[]);
+  var not = '';
+  try{
+    var stByRole = {departman:'department_pending', muhasebe_muduru:'manager_pending', direktor:'director_pending', gm:'gmy_pending'};
+    var g = currentUser ? await _gecikmisBilgi(stByRole[currentUser.role]) : null;
+    if(g) not = '<div style="background:#f59e0b18;border:1px solid #f59e0b45;border-radius:8px;padding:9px 13px;font-size:12.5px;color:var(--warning);margin-bottom:10px;">'
+      + '⏰ Önceki günlerden karara bağlanmamış <strong>'+g.adet+' ödeme</strong> var. Tarih filtresini değiştirerek görebilirsiniz.</div>';
+  }catch(e){}
+  el.innerHTML = m.adet
+    ? not + '<div style="font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">ÖZET — gruba dokunun, detay açılsın</div>'
+      + raporAccordionHtml(m, cfg)
+    : not;
+}
+
+// Mevcut yükleme fonksiyonlarını sarmalayarak özeti tazeliyoruz.
+// (Dosyanın sonunda çalışır; hangi tanım en son geçerliyse onu sarar.)
+(function(){
+  function sar(ad, hedef, listeAl, cfg){
+    var org = window[ad];
+    if(typeof org !== 'function') return;
+    window[ad] = async function(){
+      var r = await org.apply(this, arguments);
+      try{ await _raporOzetCiz(hedef, listeAl(), cfg); }catch(e){ console.warn('Rapor özeti çizilemedi:', e); }
+      return r;
+    };
+  }
+  sar('loadMudurPending','m-rapor-ozet',  function(){ return typeof mudurPending!=='undefined'?mudurPending:[]; }, {prefix:'mo', approve:'openMudurApproveModal', reject:'openMudurRejectModal'});
+  sar('loadDirPending',  'dir-rapor-ozet',function(){ return typeof dirPending!=='undefined'?dirPending:[]; },     {prefix:'do', approve:'openDirApproveModal',   reject:'openDirRejectModal'});
+  sar('loadGmPending',   'gm-rapor-ozet', function(){ return typeof gmPending!=='undefined'?gmPending:[]; },       {prefix:'go', approve:'openGmApproveModal',    reject:'openGmRejectModal'});
 })();
 </script>
 </body>
