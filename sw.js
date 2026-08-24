@@ -1,9 +1,9 @@
 // ══════════════════════════════════════════════════════
-//  ÖDEME TAKİP SİSTEMİ — Service Worker v2.0
+//  ÖDEME TAKİP SİSTEMİ — Service Worker v3.0
 //  PWA offline desteği + Push bildirimleri + App Badge
 // ══════════════════════════════════════════════════════
 
-const CACHE_NAME = 'ots-cache-v2';
+const CACHE_NAME = 'ots-cache-v3';
 const CACHE_URLS = ['./'];
 
 // ── INSTALL: Temel dosyaları önbelleğe al ──
